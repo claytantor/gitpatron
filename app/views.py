@@ -102,6 +102,8 @@ def cbcallback(request,github_username):
 
 
 def login_user(request):
+
+    print 'login_user'
     return redirect(
         'https://github.com/login/oauth/authorize?client_id={0}&redirect_uri={1}&scope={2}'.format(
             settings.GIT_APP_CLIENT_ID,

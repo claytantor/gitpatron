@@ -131,7 +131,7 @@ FIXTURE_DIRS = (
 
 # GIT
 GIT_APP_CLIENT_ID=config.get('git','GIT_APP_CLIENT_ID')
-GIT_APP_CLIENT_SECRET=config.get('git','GIT_APP_CLIENT_ID')
+GIT_APP_CLIENT_SECRET=config.get('git','GIT_APP_CLIENT_SECRET')
 GIT_APP_REDIRECT=config.get('git','GIT_APP_REDIRECT')
 GIT_OAUTH_SCOPES='user:email,user,repo,notifications,read:repo_hook'
 
