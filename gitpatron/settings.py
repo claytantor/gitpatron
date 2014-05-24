@@ -1,25 +1,27 @@
-
-
 import os
-import re
+
+from ConfigParser import RawConfigParser
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PROJECT_DIR = os.path.dirname(__file__)
 
 here = lambda x: os.path.join(os.path.abspath(os.path.dirname(__file__)), x)
 
-
+# you will need to copy the example and make custom
+# settings for the environment
+config = RawConfigParser()
+config.read('{0}/conf/settings.ini'.format(BASE_DIR))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'qaq3&+tcg_32dlsk7hn9^7$-l#e1@$)=-+3j_b90aa*(*h0#)l'
+SECRET_KEY = config.get('secrets','DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = config.get('debug','DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -66,10 +68,10 @@ WSGI_APPLICATION = 'gitpatron.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'gitpatron',                      # Or path to database file if using sqlite3.
+        'NAME': config.get('database','DATABASE_NAME'),                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': 'gitpatron',
-        'PASSWORD': 'New89Govern',
+        'USER': config.get('database','DATABASE_USER'),
+        'PASSWORD': config.get('database','DATABASE_PASSWORD'),
         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
     }
@@ -121,33 +123,23 @@ STATICFILES_FINDERS = (
 )
 
 
-
-
 # app specific settings
 
 FIXTURE_DIRS = (
    os.path.join(PROJECT_DIR, '.', 'fixtures/'),
 )
 
-# https://github.com/login/oauth/authorize?
-#   client_id=...&
-#   redirect_uri=http://www.example.com/oauth_redirect
-#prod
-GIT_APP_CLIENT_ID='f12cc86f9487e1d0ffde'
-GIT_APP_CLIENT_SECRET='8cb875452af3a6bba056822fea24880c04c0b9eb'
-GIT_APP_REDIRECT='http://local.gitpatron.com:8000/oauth_redirect'
-
-
-
-LOGIN_URL = 'https://github.com/login/oauth/authorize?client_id={0}&redirect_uri={1}'.format(
-            GIT_APP_CLIENT_ID, GIT_APP_REDIRECT)
+# GIT
+GIT_APP_CLIENT_ID=config.get('git','GIT_APP_CLIENT_ID')
+GIT_APP_CLIENT_SECRET=config.get('git','GIT_APP_CLIENT_ID')
+GIT_APP_REDIRECT=config.get('git','GIT_APP_REDIRECT')
 GIT_OAUTH_SCOPES='user:email,user,repo,notifications,read:repo_hook'
-COINBASE_SECRET='a8b693bf-668c-461d-9a91-78f4b083e288'
 
-COINBASE_API_KEY='gDu7LYvG7GfxXPS4'
-COINBASE_API_SECRET='1kkhWJEz9rr6MMFSJ9hyMhcFZjVYjhx4'
-
-COINBASE_OAUTH_CLIENT_APP='gitpatron_dev'
-COINBASE_OAUTH_CLIENT_ID='842f2bf8909aff0aebc677be937470d548a2ba6967a3a143b511c4511437b70a'
-COINBASE_OAUTH_CLIENT_SECRET='db56a8cb4ffec09468559ba11bff69c5eea4476c8df75794b33fa5c45039c458'
-COINBASE_OAUTH_CLIENT_CALLBACK='http://local.gitpatron.com:8000/coin_callback.html'
+#COINBASE
+COINBASE_SECRET=config.get('coinbase','COINBASE_SECRET')
+COINBASE_API_KEY=config.get('coinbase','COINBASE_API_KEY')
+COINBASE_API_SECRET=config.get('coinbase','COINBASE_API_SECRET')
+COINBASE_OAUTH_CLIENT_APP=config.get('coinbase','COINBASE_OAUTH_CLIENT_APP')
+COINBASE_OAUTH_CLIENT_ID=config.get('coinbase','COINBASE_OAUTH_CLIENT_ID')
+COINBASE_OAUTH_CLIENT_SECRET=config.get('coinbase','COINBASE_OAUTH_CLIENT_SECRET')
+COINBASE_OAUTH_CLIENT_CALLBACK=config.get('coinbase','COINBASE_OAUTH_CLIENT_CALLBACK')
