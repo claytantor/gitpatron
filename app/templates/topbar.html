@@ -1,0 +1,37 @@
+<div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-header">
+        <div class="container">
+            <div class="navbar-header">
+              <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a href="{% url 'site_landing' %}" class="navbar-brand">gitpatron</a>
+            </div>
+            <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+              <ul class="nav navbar-nav navbar-left">
+                <li>
+                  <a href="{% url 'patron_home' %}">Home</a>
+                </li>
+                <li>
+                  <a href="#discover">Discover</a>
+                </li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right" style="margin-top: 10px;">
+                {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'logout' %}">Logout {{ request.user.username }}</a></li>
+                {% else %}
+{#                    <li style="margin-right: 5px;"><button type="button btn-sm" class="btn btn-success">Join</button></li>#}
+                    <li>
+                        <button id="github_login" class="btn btn-default btn-small">
+                        <img src="{{ STATIC_URL }}img/Logos-Github-icon.png"
+                             style="width: 16px; height: 16px; margin-bottom: 2px;"/>&nbsp;Login With Github</button>
+                    </li>
+                {% endif %}
+              </ul>
+            </nav>
+        </div>
+      </div>
+    </div>

@@ -1,0 +1,17 @@
+<table class="table table-striped" >
+{% for issue in issues %}
+    <tr>
+        <td class="col-md-10">
+            <div>owned by {{ repo.owner.user.username }} </div>
+            <div style="font-weight: 600;">{{ issue.title }}</div>
+            <div>{{ issue.description }}</div>
+            {% if repo.owner.user.username == request.user.username %}
+            <div>owner</div>
+            {% endif %}
+        </td>
+        <td class="col-md-2 monetize_section" >
+            {% include 'button_ajax.html' %}
+        </td>
+    </tr>
+{% endfor %}
+</table>

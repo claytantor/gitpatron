@@ -12,14 +12,14 @@ reply_re = re.compile("^@(\w+)")
 class Patron(models.Model):
     user = models.ForeignKey(User)
     name = models.CharField(max_length=250, unique=False)
-    img = models.URLField(default="", verbose_name='Image URL', blank=True)
+    img = models.URLField(default="", verbose_name='Image URL', blank=True, null=True)
     bio = models.TextField( default="", verbose_name='Patron Bio')
 
     # "login": "claytantor",
     github_login = models.CharField(max_length=250, unique=False)
 
     #   "id": 407854,
-    github_id = models.BigIntegerField(unique=True, null=True)
+    github_id = models.BigIntegerField(unique=True, blank=True,  null=True)
 
     #   "avatar_url": "https://avatars.githubusercontent.com/u/407854?",
     github_avatar_url = models.CharField(max_length=250, unique=False)
@@ -41,17 +41,22 @@ class Patron(models.Model):
     #   "type": "User",
     github_type = models.CharField(max_length=16, unique=False)
 
-    #   "site_admin": false
+    github_access_token = models.CharField(max_length=64, unique=False)
 
+    coinbase_access_token = models.CharField(max_length=250, unique=False, blank=True,  null=True)
 
+    coinbase_refresh_token = models.CharField(max_length=250, unique=False, blank=True,  null=True)
 
     def __unicode__(self):
-        return self.name
+        return self.github_login
 
 
 class Repository(models.Model):
     name = models.CharField(max_length=250)
-    markdown = models.TextField( default="", verbose_name='Repository Description')
+    fullname = models.CharField(max_length=250)
+    tagline = models.CharField(max_length=250)
+    github_description = models.TextField( default="", verbose_name='Repository Description')
+    markdown = models.TextField( default="", verbose_name='Published Repo Info')
     owner = models.ForeignKey('Patron',null=True,blank=True)
 
     def __unicode__(self):
@@ -62,18 +67,28 @@ class Issue(models.Model):
     
     # # "url": "https://api.github.com/repos/claytantor/grailo/issues/4",
     # name = models.CharField(max_length=250, unique=False)
+    github_api_url = models.CharField(max_length=250, unique=False)
 
     # "html_url": "https://github.com/claytantor/grailo/issues/4",
     github_html_url = models.CharField(max_length=250, unique=False)
-    
+
     # "id": 8657138,
     github_id = models.BigIntegerField(unique=True, null=True)
     
     # "number": 4,
-    github_issue_no = models.BigIntegerField(unique=True, null=True)
+    github_issue_no = models.BigIntegerField(unique=False, null=True)
     
     # "title": "Message length check",  
     title = models.CharField(max_length=250, unique=False)
+
+    json_body = models.TextField( default="", verbose_name='Issue JSON')
+
+    description = models.TextField( default="", verbose_name='Issue Description')
+
+    repository = models.ForeignKey('Repository',null=True,blank=True)
+
+    def __unicode__(self):
+        return '{0} {1}'.format(self.github_id,self.title)
 
 
 class Reward(models.Model):
@@ -91,6 +106,7 @@ class Update(models.Model):
     subject = models.CharField(max_length=255)
     text = models.TextField()
     repository = models.ForeignKey('Repository',null=True,blank=True)
+    read_status = models.IntegerField(default=0, null=True)
     def __unicode__(self):
         return self.subject
 
@@ -108,6 +124,100 @@ class Question(models.Model):
     subject = models.CharField(max_length=255)
     patron = models.ForeignKey('Patron',null=True,blank=True)
     text = models.TextField()
+
+class CallbackMessage(models.Model):
+    created_at = models.DateTimeField(auto_now=True)
+    message = models.TextField()
+
+# {
+#     "order": {
+#         "id": "5RTQNACF",
+#         "created_at": "2012-12-09T21:23:41-08:00",
+#         "status": "completed",
+#         "total_btc": {
+#             "cents": 100000000,
+#             "currency_iso": "BTC"
+#         },
+#         "total_native": {
+#             "cents": 1253,
+#             "currency_iso": "USD"
+#         },
+#         "custom": "order1234",
+#         "receive_address": "1NhwPYPgoPwr5hynRAsto5ZgEcw1LzM3My",
+#         "button": {
+#             "type": "buy_now",
+#             "name": "Alpaca Socks",
+#             "description": "The ultimate in lightweight footwear",
+#             "id": "5d37a3b61914d6d0ad15b5135d80c19f"
+#         },
+#         "transaction": {
+#             "id": "514f18b7a5ea3d630a00000f",
+#             "hash": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+#             "confirmations": 0
+#         },
+#         "customer": {
+#             "email": "coinbase@example.com",
+#             "shipping_address": [
+#                 "John Smith",
+#                 "123 Main St.",
+#                 "Springfield, OR 97477",
+#                 "United States"
+#             ]
+#         },
+#         "refund_address": "1HcmQZarSgNuGYz4r7ZkjYumiU4PujrNYk"
+#     }
+# }
+class CoinOrder(models.Model):
+     #"id": "5RTQNACF",
+    external_id = models.CharField(max_length=12)
+    status = models.CharField(max_length=12)
+    total_coin_cents = models.DecimalField(max_digits=8, decimal_places=8, default="", verbose_name="Order BTC Amount")
+    total_coin_currency_iso = models.CharField(max_length=3)
+    receive_address = models.CharField(max_length=36)
+    refund_address = models.CharField(max_length=36)
+
+#         "customer": {
+#             "email": "coinbase@example.com",
+#             "shipping_address": [
+#                 "John Smith",
+#                 "123 Main St.",
+#                 "Springfield, OR 97477",
+#                 "United States"
+#             ]
+#         },
+class CoinCustomer(models.Model):
+    email = models.CharField(max_length=64)
+    order = models.ForeignKey(CoinOrder)
+    addr_name = models.CharField(max_length=64)
+    addr1 = models.CharField(max_length=64)
+    addr2 = models.CharField(max_length=64)
+    addr_contry = models.CharField(max_length=64)
+
+
+
+#         "transaction": {
+#             "id": "514f18b7a5ea3d630a00000f",
+#             "hash": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+#             "confirmations": 0
+#         },
+class CoinTransaction(models.Model):
+    external_id =models.CharField(max_length=36)
+    hash =models.CharField(max_length=64)
+    order = models.ForeignKey(CoinOrder)
+    confirmations = models.IntegerField(default=0)
+
+
+class CoinbaseButton(models.Model):
+    code = models.CharField(max_length=64)
+    external_id = models.TextField()
+    button_response = models.TextField()
+    issue = models.ForeignKey('Issue',null=True,blank=True)
+    def __unicode__(self):
+        return self.issue.title
+
+
+
+
 
 
 

@@ -1,0 +1,17 @@
+
+{% for repo in published_repos %}
+    <div>
+        <div class="col-xs-18 col-sm-6 col-md-3">
+          <div class="thumbnail" style="min-height: 200px;">
+{#            <img src="http://placehold.it/500x300" alt="">#}
+              <div class="caption">
+                <h4>{{ repo.name }}</h4>
+                <p>{{ repo.github_description }}</p>
+                <p>
+                    <a href="{% url 'repo' repo.owner.user.username repo.name %}" class="btn btn-primary btn-xs" role="button">View Details</a>
+                </p>
+            </div>
+          </div>
+        </div>
+    </div>
+{% endfor %}

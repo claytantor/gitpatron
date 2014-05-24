@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+
+    $('#publish_repo a').click(function (e) {
+        $(this).find('span').show();
+        $(this).find('span').toggleClass('glyphicon-refresh-animate');
+        $.ajax({
+            url:"{% url 'sync_issues_ajax' repo.owner.user.username repo.name %}",
+            success:function(result){
+                $("#issues_area").html(result);
+                $('#issue_sync_icon').hide();
+            }
+        });
+    });
+
+    $('.monetize_section button').click(function (e) {
+        $(this).find('span').show();
+        $(this).find('span').toggleClass('glyphicon-refresh-animate');
+        issue_id = $(this).data('issue')
+        $.ajax({
+            url:"http://local.gitpatron.com:8000/monetize_issue_ajax/"+issue_id+"/",
+            success:function(result){
+                $("#issue_button_"+issue_id).html(result);
+            }
+        });
+    });
+
+
+
+});
+
+</script>
+<body>
+    {% include 'topbar.html' %}
+    <div class="container" style="margin-top: 60px;" id="repo_container">
+        <div class="row" style="margin-top: 30px;">
+            <div class="col-xs-12 col-sm-9">
+                {% if repo.owner.user.username == request.user.username %}
+                <div>
+                    <div class="nav navbar-right" id="publish_repo">
+                    <a class="btn btn-primary" href="#" role="button">Sync Issues &raquo;</a>
+                    </div>
+                </div>
+                {% endif %}
+                <div>
+                    <h1>{{ repo.name }}</h1>
+                    <p>{{ repo.github_description }}</p>
+                    <div id="issues_area">
+                        {% include 'issues_ajax.html' %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                {% include 'sidebar.html' %}
+            </div><!--/span-->
+        </div>
+
+
+
+
+    </div> <!-- /container -->
+</body>
+</html>

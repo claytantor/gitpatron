@@ -1,0 +1,276 @@
+
+/*font-family: 'Ubuntu Mono', monospace;*/
+/*font-family: 'Titillium Web', sans-serif;*/
+/*font-family: 'Lusitana', serif;*/
+
+
+
+
+
+/*---- makenex----*?
+
+
+/*--- carousel */
+/* GLOBAL STYLES
+-------------------------------------------------- */
+/* Padding below the footer and lighter body text */
+
+body {
+    font-family: 'Titillium Web', sans-serif;
+    padding-bottom: 40px;
+    color: #5a5a5a;
+}
+
+
+/* CUSTOMIZE THE NAVBAR
+-------------------------------------------------- */
+
+/* Special class on .container surrounding .navbar, used for positioning it into place. */
+.navbar-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 20;
+}
+
+/* Flip around the padding for proper display in narrow viewports */
+.navbar-wrapper .container {
+  padding-right: 0;
+  padding-left: 0;
+}
+.navbar-wrapper .navbar {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.navbar-brand{
+    padding: 0px 0px;
+    margin-top: 13px;
+    font-size: x-large;
+    font-weight: 700;
+}
+
+/* CUSTOMIZE THE CAROUSEL
+-------------------------------------------------- */
+
+/* Carousel base class */
+.carousel {
+  height: 500px;
+  margin-bottom: 60px;
+}
+/* Since positioning the image, we need to help out the caption */
+.carousel-caption {
+  z-index: 10;
+}
+
+/* Declare heights because of positioning of img element */
+.carousel .item {
+  height: 500px;
+  background-color: #777;
+}
+.carousel-inner > .item > img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  height: 500px;
+}
+
+
+
+/* MARKETING CONTENT
+-------------------------------------------------- */
+
+/* Pad the edges of the mobile views a bit */
+.marketing {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+/* Center align the text within the three columns below the carousel */
+.marketing .col-lg-4 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+.marketing h2 {
+  font-weight: normal;
+}
+.marketing .col-lg-4 p {
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+
+/* Featurettes
+------------------------- */
+
+.featurette-divider {
+  margin: 80px 0; /* Space out the Bootstrap <hr> more */
+}
+
+/* Thin out the marketing headings */
+.featurette-heading {
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+
+
+/* RESPONSIVE CSS
+-------------------------------------------------- */
+
+@media (min-width: 768px) {
+
+  /* Remove the edge padding needed for mobile */
+  .marketing {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  /* Navbar positioning foo */
+  .navbar-wrapper {
+    margin-top: 20px;
+  }
+  .navbar-wrapper .container {
+    padding-right: 15px;
+    padding-left:  15px;
+  }
+  .navbar-wrapper .navbar {
+    padding-right: 0;
+    padding-left:  0;
+  }
+
+  /* The navbar becomes detached from the top, so we round the corners */
+  .navbar-wrapper .navbar {
+    border-radius: 4px;
+  }
+
+  /* Bump up size of carousel content */
+  .carousel-caption p {
+    margin-bottom: 20px;
+    font-size: 21px;
+    line-height: 1.4;
+  }
+
+  .featurette-heading {
+    font-size: 50px;
+  }
+}
+
+@media (min-width: 992px) {
+  .featurette-heading {
+    margin-top: 120px;
+  }
+}
+
+
+/*----- spinner   -*/
+
+.glyphicon-refresh-animate {
+    -animation: spin 1.4s infinite linear;
+    -webkit-animation: spin2 1.4s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
+}
+
+/*------ sidebar -----*/
+span.sidebar-title {
+    font-family: 'Ubuntu Mono', monospace;
+    text-transform:uppercase;
+    font-size: x-large;
+    font-weight: 900;
+
+}
+a.list-group-item.disabled {
+    color: #999999;
+}
+
+a.list-group-item.disabled:hover,
+a.list-group-item.disabled:focus {
+  color: #999999;
+  text-decoration: none;
+  background-color: transparent;
+  cursor: not-allowed;
+}
+
+/*----- projects page   ------*/
+.project-owner{
+    border-radius:10px;
+    background-color: #ffe794;
+    margin: 10px;
+    padding: 5px;
+}
+
+.stats-area{
+    margin-bottom: 10px;
+}
+
+.stats-patrons{
+    font-size: 50px;
+    line-height: 40px;
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+.stats-pledged{
+    font-size: 50px;
+    line-height: 40px;
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+.stats-days{
+    font-size: 50px;
+    line-height: 40px;
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+.project-title {
+    margin-bottom: 0px;
+}
+
+.project-rewards{
+    border-radius:10px;
+    background-color: #fff7cb;
+    margin: 10px;
+    padding: 5px;
+}
+
+.project-reward-item{
+    margin: 5px;
+    padding: 5px;
+}
+
+.project-update{
+    border-radius:10px;
+    background-color: #fff0a5;
+    margin: 10px;
+    padding: 5px;
+}
+
+/*------- patron ---*/
+.patron-title{
+    font-size: 30px;
+}
+
+.patron-bio-area{
+    border-top: 1px solid #888;
+    margin-top: 5px;
+}
+.patron-table {
+    padding:15px;
+}
+
+/*-------- repo -----------*/
+.repo-title {
+    margin-bottom: 0px;
+    font-size: x-large;
+}

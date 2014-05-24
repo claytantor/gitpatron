@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+    $("#e1").select2();
+
+    $('#publish_repo a').click(function (e) {
+
+        var fullname = $('#e1').find(":selected").data('fullname');
+
+        $(this).find('span').show();
+        $(this).find('span').toggleClass('glyphicon-refresh-animate');
+        $.ajax({
+            url:"/publish_repo_ajax/"+$('#e1').find(":selected").data('fullname')+"/",
+            success:function(result){
+                $("#repo_container").html(result);
+                $("#publish_repo").hide();
+
+            }
+        });
+        return false;
+    });
+
+});
+
+</script>
+<body>
+{#    {% load makenextags  %}#}
+    {% include 'topbar.html' %}
+    <div class="container" style="margin-top: 60px;">
+        <div class="row">
+            <ul id="project_tabs" class="nav nav-pills" style="margin-top: 15px;">
+              <li class="active"><a href="#home" data-toggle="tab">Dashboard</a></li>
+              <li><a href="#updates" data-toggle="tab">Updates <span class="badge">0</span></a></li>
+              <li><a href="#patrons" data-toggle="tab">Supported Issues<span class="badge">0</span></a></li>
+              {% if published_repos %}
+              <li><a href="#published_repos" data-toggle="tab">Published Repos <span class="badge">{{ published_repos|length }}</span></a></li>
+              {% endif %}
+            </ul>
+        </div>
+
+
+        <!-- Tab panes -->
+    <div class="tab-content">
+      <div class="tab-pane active" id="home">
+ <!-- home -->
+        <div class="row row-offcanvas row-offcanvas-right" style="margin-top: 10px;">
+            <div class="col-xs-12 col-sm-9">
+              <p class="pull-right visible-xs">
+                <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+              </p>
+              <div class="jumbotron">
+{#                  https://avatars.githubusercontent.com/u/407854#}
+                  <table>
+                      <tr>
+                          <td style="width: 128px; vertical-align: 0px;padding-right: 10px">
+                              <img src="{{  patron.github_avatar_url }}" alt="github avatar" style="width: 128px; height: 128px;"></td>
+                          <td>
+                             <h1>Hello, {{ patron.github_login }}!</h1>
+                            <p>This is where we want to show you a basic overview of
+                                funding activity related to repos that you own as well
+                                as projects you are a patron of.</p>
+                          </td>
+                      </tr>
+                  </table>
+
+
+
+
+              </div>
+              <div class="row">
+                <h2>For Patrons</h2>
+                {% if patron.coinbase_access_token %}
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>1. Integrate Your Coinbase Wallet</h3>
+                  <h3>Done!</h3>
+                </div><!--/span-->
+                {% else %}
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>1. Integrate Your Coinbase Wallet</h3>
+                  <p>Setup your coinbase integration so you can give bitcoins to projects.</p>
+                  <p><a class="btn btn-primary" href="{% url 'cb_auth_redirect' %}" role="button">Connect Account &raquo;</a></p>
+                </div><!--/span-->
+                {% endif %}
+
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>2. Sponsor An Issue</h3>
+                  <p>Once you have your funding set up choose important issues you would like to support.</p>
+                  <div>
+
+                    <form class="form-inline" role="form">
+                      <div class="form-group" style="margin-bottom: 5px;">
+                        <label class="sr-only" for="repo_name">Repo Name</label>
+                        <input type="email" class="form-control" id="repo_name" placeholder="Enter repo name">
+                      </div>
+
+                      <a class="btn btn-primary" href="#" role="button">Find Repo &raquo;</a>
+                    </form>
+
+                  </div>
+
+                </div><!--/span-->
+              </div>
+              <hr>
+              <div class="row">
+                <h2>For Repo Owners</h2>
+
+                {% if patron.coinbase_access_token %}
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>1. Integrate Your Coinbase Wallet</h3>
+                  <h3>Done!</h3>
+                </div><!--/span-->
+                {% else %}
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>1. Integrate Your Coinbase Wallet</h3>
+                  <p>Setup your coinbase integration so you can give bitcoins to projects.</p>
+                  <p><a class="btn btn-primary" href="{% url 'cb_auth_redirect' %}" role="button">Connect Account &raquo;</a></p>
+                </div><!--/span-->
+                {% endif %}
+
+                {% if patron.coinbase_access_token %}
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>2. Publish a Repo</h3>
+                  <p>Identify which repo that could benefit from patron contributions.</p>
+                  <p id="repo_container">
+                      <select id="e1" style="width:100%">
+                        {% for repo in github_repos %}
+                        <option value="{{ repo.id }}" data-fullname="{{ repo.full_name }}">{{ repo.name }}</option>
+                        {% endfor %}
+                      </select>
+                      <p id="publish_repo"><a class="btn btn-primary" href="#" role="button">Publish &raquo;</a></p>
+                  </p>
+                </div><!--/span-->
+                {% else %}
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>2. Publish a Repo</h3>
+                  <p>Identify which repo that could benifit from patron contributions.</p>
+                  <p><a class="btn btn-primary" href="{% url 'cb_auth_redirect' %}" role="button">Learn More &raquo;</a></p>
+                </div><!--/span-->
+                {% endif %}
+
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>3. Pay a committer</h3>
+                  <p>Pay contributors or for pull requests that resolved sponsored issues.</p>
+                  <p><a class="btn btn-primary" href="#" role="button">View details &raquo;</a></p>
+                </div><!--/span-->
+
+              </div>
+              <hr>
+              <div class="row">
+                <h2>For Committers</h2>
+
+                {% if patron.coinbase_access_token %}
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>1. Integrate Your Coinbase Wallet</h3>
+                  <h3>Done!</h3>
+                </div><!--/span-->
+                {% else %}
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>1. Integrate Your Coinbase Wallet</h3>
+                  <p>Setup your coinbase integration so you can give bitcoins to projects.</p>
+                  <p><a class="btn btn-primary" href="{% url 'cb_auth_redirect' %}" role="button">Connect Account &raquo;</a></p>
+                </div><!--/span-->
+                {% endif %}
+
+                <div class="col-6 col-sm-6 col-lg-4">
+                  <h3>2. Claim an Issue</h3>
+                  <p>Choose an issue you would like to fix..</p>
+                  <p><a class="btn btn-primary" href="#" role="button">View details &raquo;</a></p>
+                </div><!--/span-->
+
+              </div>
+
+            </div><!--/span-->
+            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                {% include 'sidebar.html' %}
+            </div><!--/span-->
+        </div><!--/row-->
+ <!-- end home -->
+
+      </div>
+      <div class="tab-pane" id="updates">Updates</div>
+      <div class="tab-pane" id="patrons">Patrons</div>
+      <div class="tab-pane" id="published_repos">
+            <div class="col-xs-12 col-sm-9">
+                <h1>Published Repos</h1>
+                {% include 'repos_table.html' %}
+            </div>
+            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                {% include 'sidebar.html' %}
+            </div><!--/span-->
+      </div>
+
+    </div>
+
+        <hr>
+        <footer>
+            <p>&copy; gitpatron 2014</p>
+        </footer>
+    </div> <!-- /container -->
+</body>
+</html>

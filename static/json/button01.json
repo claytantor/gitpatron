@@ -1,0 +1,15 @@
+{
+   "button": {
+     "name": "button_test",
+     "type": "buy_now",
+     "price_string": "1.23",
+     "price_currency_iso": "USD",
+     "custom": "bbd57181-ea63-4d7f-8790-04a11a8ee650",
+     "callback_url": "http://gitpatron.com/button?id=bbd57181-ea63-4d7f-8790-04a11a8ee650",
+     "description": "Sample description",
+     "type": "buy_now",
+     "style": "custom_large",
+     "include_email": true
+   }
+}
+

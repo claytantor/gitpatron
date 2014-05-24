@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+    $('#project_tabs a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    })
+
+});
+
+</script>
+<body>
+    {% load makenextags  %}
+    {% load markdown_deux_tags %}
+    {% include 'topbar.html' %}
+    <div class="container" style="margin-top: 40px;">
+        <div class="col-md-12" style="margin-bottom: 0px;">
+            <h1 class="project-title">{{ project.name }}</h1>
+            <div>by {% for organization in project.company_set.all %} <a href="{% url 'organization' organization.id %}">{{ organization.name }}</a> {% endfor %}</div>
+        </div>
+        <div class="col-md-7">
+            <ul id="project_tabs" class="nav nav-pills" style="margin-top: 15px;">
+              <li class="active"><a href="#home">Home</a></li>
+              <li><a href="#updates" data-toggle="tab">Updates <span class="badge">{{ project.updates.all|length }}</span></a></li>
+              <li><a href="#patrons" data-toggle="tab">Patrons <span class="badge">{{ patron_counter }}</span></a></li>
+              <li><a href="#comments" data-toggle="tab">Comments <span class="badge">{{ project.comments.all|length }}</span></a></li>
+            </ul>
+        </div>
+        <div class="col-md-5">
+            Oakland CA
+        </div>
+
+
+        <!-- Tab panes -->
+        <div class="col-md-12 tab-content">
+          <div class="tab-pane active" id="home">
+                <div class="jumbotron col-md-12" style="padding-top: 10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px; margin-top: 10px;">
+                    <div class="col-md-8" style="padding-right: 0px; padding-left: 0px;">
+                        <div id="project-video">
+                            <iframe width="560" height="315" src="{{ project.video }}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+
+                        <div>
+{% markdown  %}
+{{ project.markdown }}
+{% endmarkdown %}
+                        </div>
+
+                    </div>
+                    {% include "project_sidebar.html" %}
+                </div>
+          </div>
+          <div class="tab-pane" id="updates">
+                <div class="jumbotron col-md-12" style="padding-top: 10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px; margin-top: 10px;">
+                    <div class="col-md-8" style="padding-right: 0px; padding-left: 0px;">
+
+                        <h1 class="project-title">Updates</h1>
+                        <div>
+                            {% for update in project.updates.all %}
+                                <div class="project-update">
+                                    <div><strong>{{ update.subject }}</strong></div>
+                                    <div>
+{% markdown  %}
+{{ update.text }}
+{% endmarkdown %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% include "project_sidebar.html" %}
+                </div>
+
+          </div>
+          <div class="tab-pane" id="patrons">
+                <div class="jumbotron col-md-12" style="padding-top: 10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px; margin-top: 10px;">
+                    <div class="col-md-8" style="padding-right: 0px; padding-left: 0px;">
+                        <h1 class="project-title">Patrons</h1>
+                        <div>
+                            <table class="table">
+                              {% for reward in rewards %}
+                                  {% for patron in reward.patrons.all %}
+                                      <tr>
+                                            <td style="width:70px;"><img src="{{ patron.img }}" style="width: 64px; height: 64px;"/></td>
+                                            <td><a href="{% url 'patron' patron.id %}">{{ patron.name }}</a></td>
+                                      </tr>
+                                  {% endfor %}
+                              {% endfor %}
+                            </table>
+
+                        </div>
+                    </div>
+                    {% include "project_sidebar.html" %}
+                </div>
+          </div>
+          <div class="tab-pane" id="comments">
+
+                <div class="jumbotron col-md-12" style="padding-top: 10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px; margin-top: 10px;">
+                    <div class="col-md-8" style="padding-right: 0px; padding-left: 0px;">
+                        <h1 class="project-title">Comments</h1>
+                        <div>
+                            <table class="table">
+                              {% for comment in project.comments.all %}
+                                  <tr>
+                                        <td style="width:70px;"><img src="{{ comment.patron.img }}" style="width: 64px; height: 64px;"/></td>
+                                        <td><div>{{ comment.patron.name }} on {{ comment.created_at|date:"N j Y" }}</div>
+{% markdown  %}
+{{ comment.text }}
+{% endmarkdown %}
+
+                                        </td>
+                                  </tr>
+                              {% endfor %}
+                            </table>
+
+                        </div>
+                    </div>
+                    {% include "project_sidebar.html" %}
+
+
+          </div>
+        </div>
+
+
+    </div> <!-- /container -->
+
+
+</body>
+</html>

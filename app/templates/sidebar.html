@@ -1,0 +1,39 @@
+<span class="sidebar-title">From Github</span>
+  <div class="list-group">
+    <a href="{% url 'user_repos' %}" class="list-group-item">Browse Github Repos</a>
+    <a href="#" class="list-group-item">Invite a Repo</a>
+    <a href="#" class="list-group-item">Browse Follow</a>
+  </div>
+  </hr>
+
+  <span class="sidebar-title">Patrons</span>
+  <div class="list-group">
+    <a href="{% url 'browse_published_repos' %}" class="list-group-item">Find A Published Repo</a>
+    <a href="{% url 'user_repos' %}" class="list-group-item">Browse Published Repos</a>
+    <a href="{% url 'user_repos' %}" class="list-group-item">Support An Issue</a>
+  </div>
+  </hr>
+
+  <span class="sidebar-title">Repo Owners</span>
+  <div class="list-group">
+    {% if patron.coinbase_access_token %}
+    <a href="#" class="list-group-item disabled">Activate My Wallet - DONE</a>
+    {% else %}
+    <a href="{% url 'cb_auth_redirect' %}" class="list-group-item">Activate My Wallet</a>
+    {% endif %}
+
+    <a href="{% url 'user_repos' %}" class="list-group-item">Publish A Repo</a>
+    <a href="{% url 'user_repos' %}" class="list-group-item">Pay A Committer</a>
+  </div>
+  </hr>
+
+  <span class="sidebar-title">Committers</span>
+  <div class="list-group">
+    {% if patron.coinbase_access_token %}
+    <a href="#" class="list-group-item disabled">Activate My Wallet - DONE</a>
+    {% else %}
+    <a href="{% url 'cb_auth_redirect' %}" class="list-group-item">Activate My Wallet</a>
+    {% endif %}
+    <a href="{% url 'user_repos' %}" class="list-group-item">Publish A Repo</a>
+    <a href="{% url 'user_repos' %}" class="list-group-item">Pay A Committer</a>
+  </div>

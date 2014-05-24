@@ -1,0 +1,65 @@
+{% if is_published %}
+<div class="row">
+    <ul id="repo_tabs" class="nav nav-pills" style="margin-top: 15px;">
+      <li class="active"><a href="#repo">Repo</a></li>
+{#      <li><a href="#updates" data-toggle="tab">Updates <span class="badge">0</span></a></li>#}
+      <li><a href="#issues" data-toggle="tab">Monitize Issues <span class="badge">{{ issues|length }}</span></a></li>
+    </ul>
+</div>
+{% endif %}
+<div class="row row-offcanvas row-offcanvas-right" style="margin-top: 15px;">
+    <!-- Tab panes -->
+    <div class="col-md-12 tab-content">
+        <div class="tab-pane active" id="repo">
+            <div class="row" style="margin-bottom: 10px;">
+                <div class="col-md-10 repo-title" style="margin-bottom: 10px;">{{ repo.name }}</div>
+                {% if not is_published %}
+                <div class="col-md-2" id="publish_repo">
+                    <button class="btn btn-primary has-spinner" href="#" role="button" id="publish_repo">
+                    <span class="glyphicon glyphicon-refresh" style="display: none"></span>&nbsp;Publish Repo</button>
+                </div>
+                {% else %}
+                <div>
+                    <div class="col-xs-18 col-sm-6 col-md-3">
+                      <div class="thumbnail">
+                        <img src="http://placehold.it/500x300" alt="">
+                          <div class="caption">
+                            <h4>Thumbnail label</h4>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere, soluta, eligendi doloribus sunt minus amet sit debitis repellat. Consectetur, culpa itaque odio similique suscipit</p>
+                            <p><a href="#" class="btn btn-info btn-xs" role="button">Button</a> <a href="#" class="btn btn-default btn-xs" role="button">Button</a></p>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if is_published %}
+        <div class="tab-pane" id="updates">
+            <div class="row" style="margin-bottom: 10px;">
+                <div class="col-md-12 repo-title">{{ repo.name }} Updates</div>
+            </div>
+        </div>
+        <div class="tab-pane" id="issues">
+            <div class="row" style="margin-bottom: 10px;">
+                <div class="col-md-10 repo-title">{{ repo.name }} Issues</div>
+                <div class="col-md-2" id="issue_sync">
+                    <button class="btn btn-primary has-spinner" href="#" role="button" id="issue_sync">
+                    <span class="glyphicon glyphicon-refresh" style="display: none" id="issue_sync_icon"></span>&nbsp;Sync Issues</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12" id="issues_area">
+                    {% include 'issues_ajax.html' %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+            <div>
+                This repo has not been published, and is not available for patrons to
+                make contributions. To make this project available please publish it.
+            </div>
+        {% endif %}
+    </div>
+</div><!--/row-->
