@@ -1,14 +1,9 @@
 import urllib2
 import json
-import nonse
 from django.conf import settings
 import hashlib
 import hmac
-import urllib2
 import time
-import os
-
-
 
 # GET /api/v1/account/balance HTTP/1.1
 # Accept: */*

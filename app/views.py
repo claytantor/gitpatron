@@ -1,12 +1,9 @@
 import json
-import math
-from datetime import datetime
+
 
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
@@ -16,7 +13,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-from django.forms.models import model_to_dict
 
 from app.util.githubv3 import GithubV3
 from app.util.coinbasev1 import CoinbaseV1
@@ -184,7 +180,7 @@ def repo(request,git_username,repo_name,
         repo = github_client.get_repo(git_username,repo_name)
 
     return render_to_response(template_name,
-        {'repo':repo, 'issues':issues, 'is_published':is_published },
+        {'repo':repo, 'issues':issues, 'is_published':is_published,'settings':settings },
         context_instance=RequestContext(request))
 
 @login_required()

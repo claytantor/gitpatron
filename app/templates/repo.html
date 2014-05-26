@@ -23,7 +23,7 @@ $(document).ready(function() {
         $(this).find('span').toggleClass('glyphicon-refresh-animate');
         issue_id = $(this).data('issue')
         $.ajax({
-            url:"http://local.gitpatron.com:8000/monetize_issue_ajax/"+issue_id+"/",
+            url:"{{ settings.GITPATRON_APP_URL }}/monetize_issue_ajax/"+issue_id+"/",
             success:function(result){
                 $("#issue_button_"+issue_id).html(result);
             }
