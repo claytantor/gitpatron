@@ -10,7 +10,6 @@ import os
 
 
 
-
 # GET /api/v1/account/balance HTTP/1.1
 # Accept: */*
 # User-Agent: Python
@@ -21,20 +20,85 @@ import os
 # Host: coinbase.com
 class CoinbaseV1():
 
-    def get_http_token(
+    # this really neads to be refactored to always return an object
+    # so that the client refresh can have control over the model.
+    def get_http_oauth(
             self,
             url,
             access_token,
-            body=None):
+            refresh_token,
+            app_client_id,
+            app_client_secret,
+            body=None,
+            count=0):
 
         opener = urllib2.build_opener()
 
         try:
-            response = opener.open(urllib2.Request('{0}?access_token={1}'.format(url,access_token),body,{'Content-Type': 'application/json'}))
-            return response
+            response_stream = opener.open(urllib2.Request('{0}?access_token={1}'.format(url,access_token),body,{'Content-Type': 'application/json'}))
+
+            #return the valid access token, this will be updated if needed to be refreshed
+            response_string = response_stream.read()
+            response_object = json.loads(response_string)
+            response_object['access_token'] = access_token
+            response_object['refresh_token'] = refresh_token
+            response_object['error_code'] = None
+
+            return response_object
+
         except urllib2.HTTPError as e:
-            print e
-            return e
+
+            # we should attempt to refresh the token if the code is a 401
+            # update the token and recurse
+            if e.code == 401 and count==0:
+
+                # claygraham@Clays-MacBook-Pro:~/Sites$ curl 'https://coinbase.com/oauth/token'
+                #     -H "Content-Type: application/json" -d
+                #     '{"grant_type":"refresh_token",' \
+                #     '"refresh_token":"16b357f62c4fc12ea9b3goober4fb815de2d90175f674b",' \
+                #     '"client_id":"842f2bebc677bgoobera2ba6967a3a143b511c4511437b70a",' \
+                #     '"client_secret":"db56a8cb4ffegooberba11bff69c5eea4476c8df75794b33fa5c45039c458"}'
+                #
+
+                refresh_body = {
+                    'grant_type':'refresh_token',
+                    'refresh_token':refresh_token,
+                    'client_id':app_client_id,
+                    'client_secret':app_client_secret
+                }
+
+                refresh_response = opener.open(urllib2.Request(
+                    'https://coinbase.com/oauth/token',
+                    refresh_body,
+                    {'Content-Type': 'application/json'}))
+
+                # response:
+                # {"access_token":
+                #      "aec27f9f9c72e847c0dbgoober060c3256f0486727002ee313b0",
+                #  "token_type":"bearer","expires_in":7200,
+                #  "refresh_token":"ab12edebdec15bfgoober7f0307638f762899bf1f2",
+                #  "scope":"all"}
+
+
+                # now use the token to make the button but return the
+                # new access token
+
+                response_object = self.get_http_token(url,
+                    refresh_response['access_token'],
+                    refresh_response['refresh_token'],
+                    app_client_id,
+                    app_client_secret,
+                    body,
+                    1)
+
+                return response_object
+
+            else:
+                return {'error_code':e.code,'message':'HTTP Error'}
+
+
+
+
 
 
     def get_http(
@@ -108,10 +172,21 @@ class CoinbaseV1():
 #     }
 #   }
 # }
-    def post_button(self, button_obj,access_token):
-        response = self.get_http_token('https://coinbase.com/api/v1/buttons',access_token,json.dumps(button_obj))
-        response_body = response.read()
-        return json.loads(response_body)
+    def post_button_oauth(self,
+            button_obj,
+            access_token,
+            refresh_token,
+            app_client_id,
+            app_secret_id):
+        response_object = self.get_http_oauth('https://coinbase.com/api/v1/buttons',
+                                       access_token,
+                                       refresh_token,
+                                       app_client_id,
+                                       app_secret_id,
+                                       json.dumps(button_obj))
+        return response_object
+
+
 
 # Redirect the user to this page
 # https://coinbase.com/oauth/authorize?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_CALLBACK_URL

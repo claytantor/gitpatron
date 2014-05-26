@@ -33,6 +33,7 @@ $(document).ready(function() {
                 {% include 'repos_table.html' %}
                 <table class="table table-striped">
                     {% for repo in repos %}
+                        {% if repo.private == False %}
                         <tr>
                             <td class="col-md-10">{{ repo.name }}</td>
 
@@ -45,8 +46,8 @@ $(document).ready(function() {
                                 </div>
                                 {% endif %}
                             </td>
-
                         </tr>
+                        {% endif %}
 {#                    <tr>#}
 {#                        {% if repo.private == True %}#}
 {#                            <td class="col-md-1"><img src="{{ STATIC_URL }}img/repo_icon_private.png"></td>#}

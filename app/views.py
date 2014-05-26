@@ -291,17 +291,35 @@ def monetize_issue_ajax(request, issue_id,
         }
     }
 
-    button_response = client_coinbase.post_button(button_request,patron.coinbase_access_token)
+    button_response = client_coinbase.post_button_oauth(
+            button_request,
+            patron.coinbase_access_token,
+            patron.coinbase_refresh_token,
+            settings.COINBASE_OAUTH_CLIENT_ID,
+            settings.COINBASE_OAUTH_CLIENT_SECRET)
 
-    button_created = CoinbaseButton.objects.create(
-        code=button_response['button']['code'],
-        external_id=issue.github_api_url,
-        button_response=json.dumps(button_response),
-        issue=issue)
 
-    return render_to_response(template_name,
-        { 'issue':issue },
-        context_instance=RequestContext(request))
+    if(button_response['error_code'] != None):
+        return render_to_response('error_ajax.html',
+            button_response,
+            context_instance=RequestContext(request))
+
+    else:
+        #always update tokens on every oauth call
+        patron.coinbase_access_token = button_response['access_token']
+        patron.coinbase_refresh_token = button_response['refresh_token']
+        patron.save()
+
+        #create the button
+        button_created = CoinbaseButton.objects.create(
+            code=button_response['button']['code'],
+            external_id=issue.github_api_url,
+            button_response=json.dumps(button_response),
+            issue=issue)
+
+        return render_to_response(template_name,
+            { 'issue':issue },
+            context_instance=RequestContext(request))
 
 def cb_auth_redirect(request):
     coinbase_client = CoinbaseV1()
