@@ -96,24 +96,28 @@ def cbcallback(request,github_username):
         return HttpResponse(json.dumps(response), mimetype='application/json')
     else:
         return render_to_response("error.html",
-        {'repos':repos},
+        {'message':'could not find secret in response callback.'},
         context_instance=RequestContext(request))
 
 
 
 def login_user(request):
-
-    print 'login_user'
-    return redirect(
-        'https://github.com/login/oauth/authorize?client_id={0}&redirect_uri={1}&scope={2}'.format(
-            settings.GIT_APP_CLIENT_ID,
-            settings.GIT_APP_REDIRECT,
-            settings.GIT_OAUTH_SCOPES), foo='bar')
+	print 'https://github.com/login/oauth/authorize?client_id={0}&redirect_uri={1}&scope={2}'.format(
+		settings.GIT_APP_CLIENT_ID,
+		settings.GIT_APP_REDIRECT,
+		settings.GIT_OAUTH_SCOPES)        
+	return redirect(
+		'https://github.com/login/oauth/authorize?client_id={0}&redirect_uri={1}&scope={2}'.format(
+		settings.GIT_APP_CLIENT_ID,
+        	settings.GIT_APP_REDIRECT,
+        	settings.GIT_OAUTH_SCOPES), foo='bar')
 
 
 def oauth_redirect(request,
           template_name="home.html"):
-
+          
+    print 'oauth_redirect'
+ 
     if request.method == 'GET':
 
         #use the code to POST and get an access_token
@@ -129,14 +133,15 @@ def oauth_redirect(request,
         except ObjectDoesNotExist:
             user = \
                 User.objects.create_user(
-                    oauth_user['login'], None, '')
+                    oauth_user['login'], None, settings.GITPATRON_PW_SECRET_KEY)
             patron =\
                 Patron.objects.create(
                     github_access_token = response_obj['access_token'],
                     github_login = oauth_user['login'],
                     user = user
                 )
-        auth_user = authenticate(username=oauth_user['login'], password='')
+	print 'user from github {0}'.format(oauth_user['login'])
+        auth_user = authenticate(username=oauth_user['login'], password=settings.GITPATRON_PW_SECRET_KEY)
         if auth_user is not None:
             if auth_user.is_active:
                 login(request, auth_user)
@@ -147,14 +152,17 @@ def oauth_redirect(request,
             else:
                 # # Return a 'disabled account' error message
                 # context['message']=request.POST['username']+' account has been suspended.'
-                return render_to_response('error.html',{},context_instance=RequestContext(request))
+                print 'oauth_redirect error1'
+                return render_to_response('error.html',{'message':'auth user is not empty but us unactive'},context_instance=RequestContext(request))
         else:
-            return render_to_response('error.html',{},context_instance=RequestContext(request))
+            print 'oauth_redirect error2'
+            return render_to_response('error.html',{'message':'auth user is empty'},context_instance=RequestContext(request))
 
 
     else:
+    	print 'oauth_redirect error3'
         return render_to_response('error.html',
-            {},
+            {'message':'response is not GET'},
             context_instance=RequestContext(request))
 
 def logout_user(request):

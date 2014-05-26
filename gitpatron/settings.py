@@ -17,6 +17,7 @@ config.read('{0}/conf/settings.ini'.format(BASE_DIR))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config.get('secrets','DJANGO_SECRET_KEY')
+GITPATRON_PW_SECRET_KEY = config.get('secrets','GITPATRON_PW_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
