@@ -61,10 +61,12 @@ class CoinbaseV1():
                     'client_id':app_client_id,
                     'client_secret':app_client_secret
                 }
+		
+		print json.dumps(refresh_body)
 
                 refresh_response = opener.open(urllib2.Request(
                     'https://coinbase.com/oauth/token',
-                    refresh_body,
+                    json.dumps(refresh_body),
                     {'Content-Type': 'application/json'}))
 
                 # response:
@@ -78,7 +80,7 @@ class CoinbaseV1():
                 # now use the token to make the button but return the
                 # new access token
 
-                response_object = self.get_http_token(url,
+                response_object = self.get_http_oauth(url,
                     refresh_response['access_token'],
                     refresh_response['refresh_token'],
                     app_client_id,
