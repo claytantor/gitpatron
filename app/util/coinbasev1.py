@@ -61,8 +61,8 @@ class CoinbaseV1():
                     'client_id':app_client_id,
                     'client_secret':app_client_secret
                 }
-		
-		print json.dumps(refresh_body)
+
+                print json.dumps(refresh_body)
 
                 refresh_response = opener.open(urllib2.Request(
                     'https://coinbase.com/oauth/token',

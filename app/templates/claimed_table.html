@@ -1,0 +1,13 @@
+<table class="table table-striped">
+{% for claimed_issue in claimed.all %}
+    <tr>
+        <td class="col-md-10">{{ claimed_issue.issue.title }}</td>
+        <td class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
+            {% if not claimed_issue.fixed %}
+            <button class="btn btn-primary has-spinner fixed_claimed_issue" data-claimed="{{ claimed_issue.id }}">
+                <span class="glyphicon glyphicon-refresh" style="display: none"></span>&nbsp;Notify Fixed</button>
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+</table>

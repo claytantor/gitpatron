@@ -13,10 +13,13 @@ urlpatterns = patterns('',
     url(r'^logout.html', 'app.views.logout_user', name='logout'),
     url(r'^login.html', 'app.views.login_user', name='login'),
     url(r'^repos.html', 'app.views.repos',name='user_repos'),
+    url(r'^claimed.html', 'app.views.claimed',name='user_claimed'),
 
 
 
     url(r'^repo/([-\w]+)/([-\w]+)/$', 'app.views.repo', name='repo'),
+    url(r'^public/repos.html', 'app.views.public_repos',name='public_repos'),
+
 
     #publish_repo_ajax
     url(r'^publish_repo_ajax/([-\w]+)/([-\w]+)/$',
@@ -29,6 +32,16 @@ urlpatterns = patterns('',
     #monetize_issue_ajax
     url(r'^monetize_issue_ajax/([\w]+)/$',
         'app.views.monetize_issue_ajax',name='monetize_issue_ajax'),
+
+    #claim issue
+    url(r'^claim_issue_ajax/([\w]+)/$',
+        'app.views.claim_issue_ajax',name='claim_issue_ajax'),
+
+    #fix issue
+    url(r'^fix_issue_ajax/([\w]+)/$',
+        'app.views.fix_issue_ajax',name='fix_issue_ajax'),
+
+
 
     #coin oauth
     url(r'^cbauthredirect.html', 'app.views.cb_auth_redirect',name='cb_auth_redirect'),

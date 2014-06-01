@@ -30,7 +30,18 @@ $(document).ready(function() {
         });
     });
 
+    $('button.claim_issue').click(function (e) {
+        $(this).find('span').show();
+        $(this).find('span').toggleClass('glyphicon-refresh-animate');
+        issue_id = $(this).data('issue')
+        $.ajax({
+            url:"{{ settings.GITPATRON_APP_URL }}/claim_issue_ajax/"+issue_id+"/",
+            success:function(result){
+                $("#claim_section_"+issue_id).html(result);
+            }
+        });
 
+    });
 
 });
 

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+    $('button.fixed_claimed_issue').click(function (e) {
+        $(this).find('span').show();
+        $(this).find('span').toggleClass('glyphicon-refresh-animate');
+        claimed_issue_id = $(this).data('claimed')
+        $.ajax({
+            url:"{{ settings.GITPATRON_APP_URL }}/fix_issue_ajax/"+claimed_issue_id+"/",
+            success:function(result){
+                $("#fixed_button_"+claimed_issue_id).html(result);
+            }
+        });
+
+    });
+
+
+});
+
+</script>
+<body>
+    {% include 'topbar.html' %}
+    <div class="container" style="margin-top: 60px;">
+
+        <div class="row">
+            <h1>Claimed Issues</h1>
+            Issues Claimed: {{ claimed.all|length }}
+            <div class="col-md-12">
+                {% include 'claimed_table.html' %}
+            </div>
+        </div>
+
+        <footer style="margin-top: 60px;">
+            <p>&copy; gitpatron 2014</p>
+        </footer>
+    </div> <!-- /container -->
+
+</body>
+</html>
