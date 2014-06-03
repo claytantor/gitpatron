@@ -286,7 +286,7 @@ def monetize_issue_ajax(request, issue_id,
             'price4':100.00
         }
     }
-    print 'user:{0} refresh_token:{1}'.format(patron.user.username,patron.coinbase_refresh_token)
+
     button_response = client_coinbase.post_button_oauth(
             button_request,
             patron.coinbase_access_token,
