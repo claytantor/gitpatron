@@ -15,7 +15,8 @@ $(document).ready(function() {
     <div class="container" style="margin-top: 60px;">
         <div class="row" style="margin-bottom: 60px;">
             <h2>Congratulations {{ request.user.username }}, your gitpatron account has been linked to coinbase.</h2>
-            <div style="margin-bottom: 60px;">Your access token is: <code>{{ access_token }}</code></div>
+            <div>Your access token is: <code>{{ access_token }}</code></div>
+            <div style="margin-bottom: 60px;">Your coinbase callback url is: <code>{{ user_coinbase_callback }}</code></div>
             <a class="btn btn-primary" href="{% url 'patron_home' %}" role="button">Go To Hone &raquo;</a>
         </div>
 

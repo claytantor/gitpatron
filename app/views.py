@@ -1,5 +1,6 @@
 import json
-
+import string
+import random
 
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -18,7 +19,7 @@ from app.util.githubv3 import GithubV3
 from app.util.coinbasev1 import CoinbaseV1
 
 from app.models import Patron, CallbackMessage, CoinbaseButton, \
-    Issue, Repository
+    Issue, Repository, ClaimedIssue
 
 # Create your views here.
 
@@ -43,7 +44,7 @@ def home(request,
     return render_to_response(template_name,
         {
             'patron':patron,
-            'published_repos':published_repos,
+            'repos':published_repos,
             'github_repos':github_repos
         },
         context_instance=RequestContext(request))
@@ -57,6 +58,17 @@ def repos(request,
 
     client = GithubV3()
     repos = client.get_oauth_user_repos(patron.github_access_token)
+
+    return render_to_response(template_name,
+        {'repos':repos},
+        context_instance=RequestContext(request))
+
+@login_required()
+def public_repos(request,
+          template_name="repos.html"):
+
+
+    repos = Repository.objects.all()
 
     return render_to_response(template_name,
         {'repos':repos},
@@ -136,15 +148,17 @@ def oauth_redirect(request,
                     github_login = oauth_user['login'],
                     user = user
                 )
-	print 'user from github {0}'.format(oauth_user['login'])
+
         auth_user = authenticate(username=oauth_user['login'], password=settings.GITPATRON_PW_SECRET_KEY)
         if auth_user is not None:
             if auth_user.is_active:
                 login(request, auth_user)
                 # Redirect to a success page.
-                return render_to_response(template_name,
-                    {'patron':patron},
-                    context_instance=RequestContext(request))
+                # return render_to_response(template_name,
+                #     {'patron':patron},
+                #     context_instance=RequestContext(request))
+
+                return HttpResponseRedirect('/home.html')
             else:
                 # # Return a 'disabled account' error message
                 # context['message']=request.POST['username']+' account has been suspended.'
@@ -199,6 +213,7 @@ def publish_repo_ajax(request, git_username,repo_name,
             name=repo_response['name'],
             fullname = repo_response['full_name'],
             github_description=repo_response['description'],
+            private= repo_response['private'] in ['true', 'True'],
             owner = patron
         )
 
@@ -304,6 +319,7 @@ def monetize_issue_ajax(request, issue_id,
         #always update tokens on every oauth call
         patron.coinbase_access_token = button_response['access_token']
         patron.coinbase_refresh_token = button_response['refresh_token']
+        # patron.coinbase_callback_secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
         patron.save()
 
         #create the button
@@ -311,19 +327,109 @@ def monetize_issue_ajax(request, issue_id,
             code=button_response['button']['code'],
             external_id=issue.github_api_url,
             button_response=json.dumps(button_response),
-            issue=issue)
+            issue=issue,
+            type="patronage")
 
         return render_to_response(template_name,
             { 'issue':issue },
             context_instance=RequestContext(request))
 
+@login_required()
+def claim_issue_ajax(request, issue_id,
+          template_name="claim_button_ajax.html"):
+
+    committer = Patron.objects.get(user__username=request.user.username)
+    issue  = get_object_or_404(Issue, pk=issue_id)
+    claim_issue_ajax = ClaimedIssue.objects.create(committer=committer, issue=issue)
+
+
+    return render_to_response(template_name,
+        { 'issue':issue },
+        context_instance=RequestContext(request))
+
+@login_required()
+def fix_issue_ajax(request, fix_issue_id,
+          template_name="fixed_ajax.html"):
+
+    patron = Patron.objects.get(user__username=request.user.username)
+
+    # look we need to make a button and it should
+    # be interactive like it asks me
+    # how much I want to be paid. righT?
+    # lets assume they are crazy, and that they arent
+    # paid shit until we get a form model going
+    claim_issue_ajax = ClaimedIssue.objects.get(id=fix_issue_id)
+
+
+    #ok make a gd button!
+    client_coinbase = CoinbaseV1()
+
+    # issue  = get_object_or_404(Issue, pk=issue_id)
+    button_request = {
+        'button':{
+            'name':'Fix for {0} {1}'.format(claim_issue_ajax.issue.github_id, claim_issue_ajax.issue.title),
+            'custom':claim_issue_ajax.issue.github_api_url,
+            'description':'Fix for {0}'.format(claim_issue_ajax.issue.title),
+            'price_string':1.00,
+            'price_currency_iso':'USD',
+            'button_type':'buy_now',
+            'style':'donation_small',
+            'choose_price':False
+        }
+    }
+
+    button_response = client_coinbase.post_button_oauth(
+            button_request,
+            patron.coinbase_access_token,
+            patron.coinbase_refresh_token,
+            settings.COINBASE_OAUTH_CLIENT_ID,
+            settings.COINBASE_OAUTH_CLIENT_SECRET)
+
+
+    if(button_response['error_code'] != None):
+        return render_to_response('error_ajax.html',
+            button_response,
+            context_instance=RequestContext(request))
+
+    else:
+
+
+        #always update tokens on every oauth call
+        patron.coinbase_access_token = button_response['access_token']
+        patron.coinbase_refresh_token = button_response['refresh_token']
+        patron.save()
+
+        #create the button
+        button_created = CoinbaseButton.objects.create(
+            code=button_response['button']['code'],
+            external_id=claim_issue_ajax.issue.github_api_url,
+            button_response=json.dumps(button_response),
+            issue=claim_issue_ajax.issue,
+            type="fix")
+
+
+        claim_issue_ajax.fixed = True
+        claim_issue_ajax.button = button_created
+        claim_issue_ajax.save()
+
+        return render_to_response(template_name,
+            { 'button_created':button_created },
+            context_instance=RequestContext(request))
+
+
+
+
+def claimed(request, template_name="claimed.html"):
+    committer = Patron.objects.get(user__username=request.user.username)
+    claimed = ClaimedIssue.objects.filter(committer=committer )
+
+    return render_to_response(template_name,
+        {'claimed':claimed, 'settings':settings },
+        context_instance=RequestContext(request))
+
 def cb_auth_redirect(request):
     coinbase_client = CoinbaseV1()
     return HttpResponseRedirect(coinbase_client.get_oauth_redirect())
-
-
-
-
 
 # the login is required because we want to make
 # sure we know what user to lookup for callback
@@ -351,9 +457,13 @@ def coinbase_callback(request,template_name="coinbase_auth.html"):
         if patron:
             context = {}
             context['access_token']=response_obj['access_token']
+            #http://gitpatron.com/cbcallback/claytantor/?secret=a8b693bf-668c-461d-9a91-78f4b083e288
+
             patron.coinbase_access_token=response_obj['access_token']
             patron.coinbase_refresh_token=response_obj['refresh_token']
+            patron.coinbase_callback_secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
             patron.save()
+            context['user_coinbase_callback']='{0}?secret={1}'.format(settings.COINBASE_OAUTH_CLIENT_CALLBACK,patron.coinbase_callback_secret)
 
         else:
             context['message'] = 'error finding patron account.'

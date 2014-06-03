@@ -31,40 +31,25 @@ $(document).ready(function() {
             <h1>Repos</h1>
             <div class="col-md-12">
                 {% include 'repos_table.html' %}
-                <table class="table table-striped">
-                    {% for repo in repos %}
-                        {% if repo.private == False %}
-                        <tr>
-                            <td class="col-md-10">{{ repo.name }}</td>
-
-                            <td class="col-md-2">
-                                {% if repo.pushed_at %}
-                                    {{ repo.owner.owner }} <br/>
-                                    {{ request.user.username }} <br/>
-                                <div id="publish_area_{{ repo.id }}" class="publish_area">
-                                    <button type="button" class="btn btn-primary btn-publish" data-repoid="{{ repo.id }}" data-fullname="{{ repo.full_name }}">Publish</button>
-                                </div>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endif %}
-{#                    <tr>#}
-{#                        {% if repo.private == True %}#}
-{#                            <td class="col-md-1"><img src="{{ STATIC_URL }}img/repo_icon_private.png"></td>#}
-{#                        {% elif repo.fork == True %}#}
-{#                            <td class="col-md-1"><img src="{{ STATIC_URL }}img/repo_icon_forked.png"></td>#}
-{#                        {% else %}#}
-{#                            <td class="col-md-1"><img src="{{ STATIC_URL }}img/repo_icon_repo.png"></td>#}
+{#                <table class="table table-striped">#}
+{#                    {% for repo in repos %}#}
+{#                        {% if repo.private == False %}#}
+{#                        <tr>#}
+{#                            <td class="col-md-10">{{ repo.name }}</td>#}
+{##}
+{#                            <td class="col-md-2">#}
+{#                                {% if repo.pushed_at %}#}
+{#                                    {{ repo.owner.owner }} <br/>#}
+{#                                    {{ request.user.username }} <br/>#}
+{#                                <div id="publish_area_{{ repo.id }}" class="publish_area">#}
+{#                                    <button type="button" class="btn btn-primary btn-publish" data-repoid="{{ repo.id }}" data-fullname="{{ repo.full_name }}">Publish</button>#}
+{#                                </div>#}
+{#                                {% endif %}#}
+{#                            </td>#}
+{#                        </tr>#}
 {#                        {% endif %}#}
-{#                        <td class="col-md-10"><a href="{% url 'repo' repo.owner.login repo.name %}">{{ repo.name }}</a></td>#}
-{#                        <td class="col-md-1">#}
-{#                            <div id="publish_area_{{ repo.id }}" class="publish_area">#}
-{#                                <button type="button" class="btn btn-primary btn-publish" data-repoid="{{ repo.id }}" data-fullname="{{ repo.full_name }}">Publish</button>#}
-{#                            </div>#}
-{#                        </td>#}
-{#                    </tr>#}
-                    {% endfor %}
-                </table>
+{#                    {% endfor %}#}
+{#                </table>#}
 
             </div>
         </div>

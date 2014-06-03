@@ -92,10 +92,6 @@ class CoinbaseV1():
                 return {'error_code':e.code,'message':'HTTP Error'}
 
 
-
-
-
-
     def get_http(
             self,
             url,

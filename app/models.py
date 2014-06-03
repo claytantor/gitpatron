@@ -47,6 +47,8 @@ class Patron(models.Model):
 
     coinbase_refresh_token = models.CharField(max_length=250, unique=False, blank=True,  null=True)
 
+    coinbase_callback_secret = models.CharField(max_length=128, unique=False, blank=True,  null=True)
+
     def __unicode__(self):
         return self.github_login
 
@@ -58,6 +60,7 @@ class Repository(models.Model):
     github_description = models.TextField( default="", verbose_name='Repository Description')
     markdown = models.TextField( default="", verbose_name='Published Repo Info')
     owner = models.ForeignKey('Patron',null=True,blank=True)
+    private = models.NullBooleanField(default=False, null=True)
 
     def __unicode__(self):
         return self.name
@@ -128,6 +131,7 @@ class Question(models.Model):
 class CallbackMessage(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     message = models.TextField()
+    owner = models.ForeignKey('Patron',null=True,blank=True)
 
 # {
 #     "order": {
@@ -212,8 +216,28 @@ class CoinbaseButton(models.Model):
     external_id = models.TextField()
     button_response = models.TextField()
     issue = models.ForeignKey('Issue',null=True,blank=True)
+    type = models.CharField(max_length=16,null=True,blank=True)
     def __unicode__(self):
-        return self.issue.title
+        return '{0} for {1}'.format(self.type,self.issue.title)
+
+class Patronage(models.Model):
+    issue = models.ForeignKey('Issue',null=True,blank=True)
+    patron = models.ForeignKey('Patron',null=True,blank=True)
+    cents = models.BigIntegerField(default=0, null=True, verbose_name="Patronage Cents")
+    coinbase_id =models.CharField(max_length=8)
+    receive_address = models.CharField(max_length=128,null=True,blank=True)
+    refund_address = models.CharField(max_length=128,null=True,blank=True)
+    transaction_id = models.CharField(max_length=128,null=True,blank=True)
+
+class ClaimedIssue(models.Model):
+    issue = models.ForeignKey('Issue',null=True,blank=True)
+    committer = models.ForeignKey('Patron',null=True,blank=True)
+    button = models.ForeignKey('CoinbaseButton',null=True,blank=True)
+    fixed = models.NullBooleanField(default=False, null=True)
+    def __unicode__(self):
+        return '{0} has claimed {1}'.format(self.committer.user.username,self.issue.title)
+
+
 
 
 
