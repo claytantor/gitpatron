@@ -332,7 +332,7 @@ def monetize_issue_ajax(request, issue_id,
             'price2':10.00,
             'price3':25.00,
             'price4':100.00,
-            'calback_url':'{0}?'.format(settings.COINBASE_OAUTH_CLIENT_CALLBACK)
+            'callback_url':'{0}?'.format(settings.COINBASE_OAUTH_CLIENT_CALLBACK)
         }
     }
     print 'user:{0} refresh_token:{1}'.format(patron.user.username,patron.coinbase_refresh_token)
