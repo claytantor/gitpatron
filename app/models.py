@@ -132,6 +132,10 @@ class CallbackMessage(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     message = models.TextField()
     owner = models.ForeignKey('Patron',null=True,blank=True)
+    processed_at = models.DateTimeField(null=True,blank=True)
+    is_processed = models.NullBooleanField(default=False)
+    def __unicode__(self):
+        return 'message {0}'.format(self.id)
 
 # {
 #     "order": {
@@ -173,12 +177,17 @@ class CallbackMessage(models.Model):
 # }
 class CoinOrder(models.Model):
      #"id": "5RTQNACF",
-    external_id = models.CharField(max_length=12)
-    status = models.CharField(max_length=12)
-    total_coin_cents = models.DecimalField(max_digits=8, decimal_places=8, default="", verbose_name="Order BTC Amount")
+    external_id = models.CharField(max_length=128)
+    status = models.CharField(max_length=36)
+    total_coin_cents = models.BigIntegerField(default=0, verbose_name="Order BTC Amount")
     total_coin_currency_iso = models.CharField(max_length=3)
     receive_address = models.CharField(max_length=36)
     refund_address = models.CharField(max_length=36)
+    button = models.ForeignKey('CoinbaseButton',null=True,blank=True)
+    def __unicode__(self):
+        return '{0} order for button {1}'.format(self.id, self.button.code)
+
+
 
 #         "customer": {
 #             "email": "coinbase@example.com",
@@ -215,10 +224,11 @@ class CoinbaseButton(models.Model):
     code = models.CharField(max_length=64)
     external_id = models.TextField()
     button_response = models.TextField()
-    issue = models.ForeignKey('Issue',null=True,blank=True)
     type = models.CharField(max_length=16,null=True,blank=True)
+    issue = models.ForeignKey('Issue',null=True,blank=True)
+    owner = models.ForeignKey('Patron',null=True,blank=True)
     def __unicode__(self):
-        return '{0} for {1}'.format(self.type,self.issue.title)
+        return '{0} for {1} {2}'.format(self.type,self.issue.github_id,self.issue.title)
 
 class Patronage(models.Model):
     issue = models.ForeignKey('Issue',null=True,blank=True)

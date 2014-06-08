@@ -19,7 +19,7 @@ from app.util.githubv3 import GithubV3
 from app.util.coinbasev1 import CoinbaseV1
 
 from app.models import Patron, CallbackMessage, CoinbaseButton, \
-    Issue, Repository, ClaimedIssue
+    Issue, Repository, ClaimedIssue, CoinOrder
 
 # Create your views here.
 
@@ -189,12 +189,45 @@ def repo(request,git_username,repo_name,
         repo = Repository.objects.get(owner__user__username=git_username,name=repo_name)
         is_published = True
         issues = repo.issue_set.all()
+
+        #calculate all patronage
+        #get all orders for the specifc repo
+        repo_patronage_orders = CoinOrder.objects.filter(
+            button__issue__repository = repo,
+            button__type='patronage'
+        )
+        #sum order values
+        if repo_patronage_orders:
+            sum_patronage_cents = reduce(lambda x,y: x.total_coin_cents+y.total_coin_cents, repo_patronage_orders.all())
+        else:
+            sum_patronage_cents=0
+
+        #calculate all fixes
+        repo_fix_orders = CoinOrder.objects.filter(
+            button__issue__repository = repo,
+            button__type='fix'
+        )
+
+        if repo_fix_orders:
+            sum_fix_cents = reduce(lambda x,y: x.total_coin_cents+y.total_coin_cents, repo_fix_orders.all())
+        else:
+            sum_fix_cents=0
+
+
+
     except ObjectDoesNotExist:
         github_client = GithubV3()
         repo = github_client.get_repo(git_username,repo_name)
 
     return render_to_response(template_name,
-        {'repo':repo, 'issues':issues, 'is_published':is_published,'settings':settings },
+        {
+            'repo':repo,
+            'issues':issues,
+            'is_published':is_published,
+            'settings':settings,
+            'sum_patronage_cents':sum_patronage_cents,
+            'sum_fix_cents':sum_fix_cents
+            },
         context_instance=RequestContext(request))
 
 @login_required()
@@ -298,7 +331,8 @@ def monetize_issue_ajax(request, issue_id,
             'price1':5.00,
             'price2':10.00,
             'price3':25.00,
-            'price4':100.00
+            'price4':100.00,
+            'calback_url':'{0}?'.format(settings.COINBASE_OAUTH_CLIENT_CALLBACK)
         }
     }
 
@@ -328,7 +362,8 @@ def monetize_issue_ajax(request, issue_id,
             external_id=issue.github_api_url,
             button_response=json.dumps(button_response),
             issue=issue,
-            type="patronage")
+            type="patronage",
+            owner=patron)
 
         return render_to_response(template_name,
             { 'issue':issue },
@@ -405,7 +440,8 @@ def fix_issue_ajax(request, fix_issue_id,
             external_id=claim_issue_ajax.issue.github_api_url,
             button_response=json.dumps(button_response),
             issue=claim_issue_ajax.issue,
-            type="fix")
+            type="fix",
+            owner=patron)
 
 
         claim_issue_ajax.fixed = True
