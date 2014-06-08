@@ -1,6 +1,7 @@
 import json
 import string
 import random
+import uuid
 
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -14,7 +15,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-
+from django.utils import timezone
 from app.util.githubv3 import GithubV3
 from app.util.coinbasev1 import CoinbaseV1
 
@@ -95,17 +96,49 @@ def browse_published_repos(request,
 @csrf_exempt
 def cbcallback(request,github_username):
 
-    if request.GET['secret'] and request.GET['secret']==settings.COINBASE_SECRET:
-        # model = json.loads(request.body)
-        # #print model
-        CallbackMessage.objects.create(
-            message=request.body)
-        response = {'message':'SUCCEED'}
-        return HttpResponse(json.dumps(response), mimetype='application/json')
-    else:
-        return render_to_response("error.html",
-        {'message':'could not find secret in response callback.'},
-        context_instance=RequestContext(request))
+	print "order callback received"
+	patron = Patron.objects.get(user__username=github_username)
+		
+
+	if request.GET['secret'] and request.GET['secret']==patron.coinbase_callback_secret:
+
+		callback_message = json.loads(request.body)
+
+		order_message = callback_message['order']
+
+            	#find the button related to this order
+            	order_button = CoinbaseButton.objects.get(code=order_message['button']['id'])
+
+            	order = CoinOrder.objects.create(
+                	# external_id = models.CharField(max_length=12)
+                	external_id = order_message['id'],
+                	# status = models.CharField(max_length=12)
+                	status = order_message['status'],
+                	# total_coin_cents = models.DecimalField(max_digits=8, decimal_places=8, default="", verbose_name="Order BTC Amount")
+                	total_coin_cents = order_message['total_btc']['cents'],
+                	# total_coin_currency_iso = models.CharField(max_length=3)
+                	total_coin_currency_iso = order_message['total_btc']['currency_iso'],
+                	# receive_address = models.CharField(max_length=36)
+                	receive_address = order_message['receive_address'],
+                	# refund_address = models.CharField(max_length=36)
+                	refund_address = order_message['refund_address'],
+                	button = order_button
+            	)
+
+		CallbackMessage.objects.create(
+			is_processed = True,
+                        owner=patron,
+			processed_at = timezone.now(),
+                        message=request.body)
+
+
+
+        	response = {'message':'SUCCEED'}
+        	return HttpResponse(json.dumps(response), mimetype='application/json')
+	else:
+        	return render_to_response("error.html",
+        		{'message':'could not find secret in response callback.'},
+        		context_instance=RequestContext(request))
 
 
 
@@ -317,11 +350,20 @@ def monetize_issue_ajax(request, issue_id,
     client_coinbase = CoinbaseV1()
 
     issue  = get_object_or_404(Issue, pk=issue_id)
+    
+    #make a button id that will persist for callback
+    button_guid = str(uuid.uuid1())
+    callback_url = '{0}/{1}/?secret={2}'.format(
+    	settings.COINBASE_ORDER_CALLBACK,
+    	patron.user.username,
+    	patron.coinbase_callback_secret)
+    	
+    print callback_url
 
     button_request = {
         'button':{
             'name':'{0} {1}'.format(issue.github_id, issue.title),
-            'custom':issue.github_api_url,
+            'custom':button_guid,
             'description':issue.title,
             'price_string':10.00,
             'price_currency_iso':'USD',
@@ -332,7 +374,7 @@ def monetize_issue_ajax(request, issue_id,
             'price2':10.00,
             'price3':25.00,
             'price4':100.00,
-            'calback_url':'{0}?'.format(settings.COINBASE_OAUTH_CLIENT_CALLBACK)
+            'callback_url':callback_url
         }
     }
 
@@ -361,6 +403,8 @@ def monetize_issue_ajax(request, issue_id,
             code=button_response['button']['code'],
             external_id=issue.github_api_url,
             button_response=json.dumps(button_response),
+            button_guid=button_guid,
+            callback_url=callback_url,
             issue=issue,
             type="patronage",
             owner=patron)
@@ -398,20 +442,30 @@ def fix_issue_ajax(request, fix_issue_id,
 
     #ok make a gd button!
     client_coinbase = CoinbaseV1()
+    
+    #make a button id that will persist for callback
+    button_guid = str(uuid.uuid1())
+    callback_url = '{0}?secret={1}'.format(settings.COINBASE_OAUTH_CLIENT_CALLBACK,patron.coinbase_callback_secret)
+
 
     # issue  = get_object_or_404(Issue, pk=issue_id)
     button_request = {
         'button':{
             'name':'Fix for {0} {1}'.format(claim_issue_ajax.issue.github_id, claim_issue_ajax.issue.title),
-            'custom':claim_issue_ajax.issue.github_api_url,
+            'custom':button_guid,
             'description':'Fix for {0}'.format(claim_issue_ajax.issue.title),
             'price_string':1.00,
             'price_currency_iso':'USD',
             'button_type':'buy_now',
             'style':'donation_small',
-            'choose_price':False
+            'choose_price':False,
+            'callback_url':callback_url
         }
     }
+    
+    print 'callback url:{0}?secret={1}'.format(
+            	settings.COINBASE_OAUTH_CLIENT_CALLBACK,
+            	patron.coinbase_callback_secret)
 
     button_response = client_coinbase.post_button_oauth(
             button_request,
@@ -438,6 +492,8 @@ def fix_issue_ajax(request, fix_issue_id,
         button_created = CoinbaseButton.objects.create(
             code=button_response['button']['code'],
             external_id=claim_issue_ajax.issue.github_api_url,
+            button_guid=button_guid,
+            callback_url=callback_url,
             button_response=json.dumps(button_response),
             issue=claim_issue_ajax.issue,
             type="fix",

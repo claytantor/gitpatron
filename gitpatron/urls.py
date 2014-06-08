@@ -45,9 +45,10 @@ urlpatterns = patterns('',
 
     #coin oauth
     url(r'^cbauthredirect.html', 'app.views.cb_auth_redirect',name='cb_auth_redirect'),
-
-    #coin calls
+    #coing oauth callback
     url(r'^coin_callback.html', 'app.views.coinbase_callback',name='coinbase_callback'),
+    
+    #coin calls this is when an user pays coin
     url(r'^cbcallback/([\w]+)/$', 'app.views.cbcallback',name='cbcallback'),
 
     #coin result pages

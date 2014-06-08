@@ -7,5 +7,5 @@ static/admin/*
 static/admin/*.*
 static/admin
 app/management/__init__.py
-
 app/management/commands/__init__.py
+gitpatron/fixtures/initial_data.json
