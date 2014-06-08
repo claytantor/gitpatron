@@ -358,8 +358,6 @@ def monetize_issue_ajax(request, issue_id,
     	patron.user.username,
     	patron.coinbase_callback_secret)
     	
-    print callback_url
-
     button_request = {
         'button':{
             'name':'{0} {1}'.format(issue.github_id, issue.title),
