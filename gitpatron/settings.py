@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'app',
+    'app.templatetags',
     'markdown_deux',
 )
 

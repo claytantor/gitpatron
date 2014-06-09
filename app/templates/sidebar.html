@@ -24,7 +24,7 @@
 
     <a href="{% url 'user_repos' %}" class="list-group-item">Publish A Repo</a>
     <a href="{% url 'user_repos' %}" class="list-group-item">Pay A Committer</a>
-    <a href="{% url 'user_repos' %}" class="list-group-item">All Patronage</a>
+    <a href="{% url 'patronage' %}" class="list-group-item">Patronage</a>
   </div>
   </hr>
 
@@ -36,5 +36,5 @@
     <a href="{% url 'cb_auth_redirect' %}" class="list-group-item">Activate My Wallet</a>
     {% endif %}
     <a href="{% url 'user_claimed' %}" class="list-group-item">Claimed Issues</a>
-    <a href="{% url 'user_repos' %}" class="list-group-item">All Payments</a>
+    <a href="{% url 'payments' %}" class="list-group-item">Payments</a>
   </div>

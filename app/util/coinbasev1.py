@@ -15,6 +15,35 @@ import time
 # Host: coinbase.com
 class CoinbaseV1():
 
+    def refresh_token(
+            self,
+            access_token,
+            refresh_token,
+            app_client_id,
+            app_client_secret):
+
+        opener = urllib2.build_opener()
+        refresh_body = {
+            'grant_type':'refresh_token',
+            'refresh_token':refresh_token,
+            'client_id':app_client_id,
+            'client_secret':app_client_secret
+        }
+
+        print refresh_body
+
+        refresh_response = opener.open(urllib2.Request(
+            'https://coinbase.com/oauth/token',
+            json.dumps(refresh_body),
+            {'Content-Type': 'application/json'}))
+
+        response_string = refresh_response.read()
+
+        print response_string
+
+        return json.loads(response_string)
+
+
     # this really neads to be refactored to always return an object
     # so that the client refresh can have control over the model.
     def get_http_oauth(

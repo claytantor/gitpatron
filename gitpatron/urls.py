@@ -41,7 +41,13 @@ urlpatterns = patterns('',
     url(r'^fix_issue_ajax/([\w]+)/$',
         'app.views.fix_issue_ajax',name='fix_issue_ajax'),
 
+    #repo owner view patronage
+    url(r'^patronage.html',
+            'app.views.patronage',name='patronage'),
 
+    #committer payments
+    url(r'^payments.html',
+            'app.views.payments',name='payments'),
 
     #coin oauth
     url(r'^cbauthredirect.html', 'app.views.cb_auth_redirect',name='cb_auth_redirect'),

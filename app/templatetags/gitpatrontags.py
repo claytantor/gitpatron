@@ -20,6 +20,13 @@ def replace(text):
 def percentage(value):
     return "{0:.0f}%".format(value * 100)
 
+@register.filter
+def btc_cents(value):
+    return "{0:g}".format(float(value) / 100000000)
+
+
+
+
 
 
 class SetVarNode(template.Node):

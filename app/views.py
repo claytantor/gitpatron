@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from app.util.githubv3 import GithubV3
 from app.util.coinbasev1 import CoinbaseV1
+from app.util.gitpatronhelper import GitpatronHelper
 
 from app.models import Patron, CallbackMessage, CoinbaseButton, \
     Issue, Repository, ClaimedIssue, CoinOrder
@@ -335,7 +336,11 @@ def monetize_issue_ajax(request, issue_id,
             'callback_url':'{0}?'.format(settings.COINBASE_OAUTH_CLIENT_CALLBACK)
         }
     }
-    print 'user:{0} refresh_token:{1}'.format(patron.user.username,patron.coinbase_refresh_token)
+
+    #refresh the user token before any coinbase call
+    helper = GitpatronHelper()
+    helper.refresh_user_token(patron.user.username)
+
     button_response = client_coinbase.post_button_oauth(
             button_request,
             patron.coinbase_access_token,
@@ -409,9 +414,14 @@ def fix_issue_ajax(request, fix_issue_id,
             'price_currency_iso':'USD',
             'button_type':'buy_now',
             'style':'donation_small',
-            'choose_price':False
+            'choose_price':False,
+            'callback_url':'{0}?'.format(settings.COINBASE_OAUTH_CLIENT_CALLBACK)
         }
     }
+
+    #refresh the user token before any coinbase call
+    helper = GitpatronHelper()
+    helper.refresh_user_token(patron.user.username)
 
     button_response = client_coinbase.post_button_oauth(
             button_request,
@@ -472,12 +482,19 @@ def cb_auth_redirect(request):
 @login_required()
 def coinbase_callback(request,template_name="coinbase_auth.html"):
 
+    patron = Patron.objects.get(user__username=request.user.username)
+
     if request.method == 'GET':
 
         context = {}
 
         #use the code to POST and get an access_token
         coinbase_client = CoinbaseV1()
+
+        #refresh the user token before any coinbase call
+        helper = GitpatronHelper()
+        helper.refresh_user_token(patron.user.username)
+
         response_obj = coinbase_client.get_oauth_response(request.GET['code'])
         # {
         #     u'access_token': u'76af04cab8413dc39e7affe408673fbb75d4a02143a6cc21732af6d470bbab8b',
@@ -486,10 +503,8 @@ def coinbase_callback(request,template_name="coinbase_auth.html"):
         #     u'refresh_token': u'4deb04b689ae38165af92edb1077e07ef0eba692107cb97796260b9f56be0899',
         #     u'scope': u'all'
         # }
+
         #update the Patron object
-
-        patron = Patron.objects.get(user__username=request.user.username)
-
         if patron:
             context = {}
             context['access_token']=response_obj['access_token']
@@ -532,4 +547,33 @@ def coin_info(request,
 
     return render_to_response(template_name,
         {},
+        context_instance=RequestContext(request))
+
+@login_required()
+def patronage(request,
+          template_name="orders.html"):
+
+    repo_owner = Patron.objects.get(user__username=request.user.username)
+    orders = CoinOrder.objects.filter(
+        button__owner=repo_owner,
+        button__type='patronage'
+    )
+
+    return render_to_response(template_name,
+        {
+            'title':'Patronage',
+            'orders':orders
+        },
+        context_instance=RequestContext(request))
+
+@login_required()
+def payments(request,
+          template_name="orders.html"):
+
+    committer = Patron.objects.get(user__username=request.user.username)
+
+    return render_to_response(template_name,
+        {
+            'title':'Payments'
+        },
         context_instance=RequestContext(request))

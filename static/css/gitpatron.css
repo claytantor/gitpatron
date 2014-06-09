@@ -274,3 +274,8 @@ a.list-group-item.disabled:focus {
     margin-bottom: 0px;
     font-size: x-large;
 }
+
+/* ------- orders --------*/
+.coin-order-cents {
+    font-size: x-large;
+}
