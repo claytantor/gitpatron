@@ -231,8 +231,10 @@ def repo(request,git_username,repo_name,
             button__type='patronage'
         )
         #sum order values
-        if repo_patronage_orders:
+        if len(repo_patronage_orders)>1:
             sum_patronage_cents = reduce(lambda x,y: x.total_coin_cents+y.total_coin_cents, repo_patronage_orders.all())
+        elif len(repo_patronage_orders)==1:
+            sum_patronage_cents = repo_patronage_orders[0].total_coin_cents
         else:
             sum_patronage_cents=0
 
@@ -242,8 +244,10 @@ def repo(request,git_username,repo_name,
             button__type='fix'
         )
 
-        if repo_fix_orders:
+        if len(repo_fix_orders)>1:
             sum_fix_cents = reduce(lambda x,y: x.total_coin_cents+y.total_coin_cents, repo_fix_orders.all())
+        elif len(repo_fix_orders)==1:
+            sum_fix_cents = repo_fix_orders[0].total_coin_cents
         else:
             sum_fix_cents=0
 
@@ -380,6 +384,7 @@ def monetize_issue_ajax(request, issue_id,
     #refresh the user token before any coinbase call
     helper = GitpatronHelper()
     helper.refresh_user_token(patron.user.username)
+    patron = Patron.objects.get(user__username=request.user.username)
 
 
     button_response = client_coinbase.post_button_oauth(
@@ -449,8 +454,11 @@ def fix_issue_ajax(request, fix_issue_id,
     
     #make a button id that will persist for callback
     button_guid = str(uuid.uuid1())
-    callback_url = '{0}?secret={1}'.format(settings.COINBASE_OAUTH_CLIENT_CALLBACK,patron.coinbase_callback_secret)
 
+    callback_url = '{0}/{1}/?secret={2}'.format(
+    	settings.COINBASE_ORDER_CALLBACK,
+    	patron.user.username,
+    	patron.coinbase_callback_secret)
 
     # issue  = get_object_or_404(Issue, pk=issue_id)
     button_request = {
@@ -466,14 +474,11 @@ def fix_issue_ajax(request, fix_issue_id,
             'callback_url':callback_url
         }
     }
-    
-    print 'callback url:{0}?secret={1}'.format(
-            	settings.COINBASE_OAUTH_CLIENT_CALLBACK,
-            	patron.coinbase_callback_secret)
 
     #refresh the user token before any coinbase call
     helper = GitpatronHelper()
     helper.refresh_user_token(patron.user.username)
+    patron = Patron.objects.get(user__username=request.user.username)
 
     button_response = client_coinbase.post_button_oauth(
             button_request,
@@ -625,9 +630,13 @@ def payments(request,
           template_name="orders.html"):
 
     committer = Patron.objects.get(user__username=request.user.username)
+    orders = CoinOrder.objects.filter(
+        button__owner=committer
+    )
 
     return render_to_response(template_name,
         {
-            'title':'Payments'
+            'title':'Payments',
+            'orders':orders
         },
         context_instance=RequestContext(request))

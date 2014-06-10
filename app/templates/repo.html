@@ -1,3 +1,4 @@
+{% load gitpatrontags %}
 <!DOCTYPE html>
 <html>
 {% include 'head.html' %}
@@ -60,8 +61,8 @@ $(document).ready(function() {
                 {% endif %}
                 <div>
                     <h1>{{ repo.name }}</h1>
-                    <h4>Patronage: {{ sum_patronage_cents }} BTC Cents</h4>
-                    <h4>Fix Payments: {{ sum_fix_cents }} BTC Cents</h4>
+                    <h4>Patronage: {{ sum_patronage_cents|btc_cents }} BTC</h4>
+                    <h4>Fix Payments: {{ sum_fix_cents|btc_cents }} BTC</h4>
                     <p>{{ repo.github_description }}</p>
                     <div id="issues_area">
                         {% include 'issues_ajax.html' %}

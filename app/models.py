@@ -225,7 +225,7 @@ class CoinbaseButton(models.Model):
     external_id = models.TextField()
     button_response = models.TextField()
     type = models.CharField(max_length=16,null=True,blank=True)
-    button_guid = models.CharField(max_length=128,null=True,blank=True)    
+    button_guid = models.CharField(max_length=128,null=True,blank=True)
     issue = models.ForeignKey('Issue',null=True,blank=True)
     owner = models.ForeignKey('Patron',null=True,blank=True)
     callback_url = models.CharField(max_length=256,null=True,blank=True)

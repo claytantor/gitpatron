@@ -71,54 +71,7 @@ class CoinbaseV1():
             return response_object
 
         except urllib2.HTTPError as e:
-
-            # we should attempt to refresh the token if the code is a 401
-            # update the token and recurse
-            if e.code == 401 and count==0:
-
-                # claygraham@Clays-MacBook-Pro:~/Sites$ curl 'https://coinbase.com/oauth/token'
-                #     -H "Content-Type: application/json" -d
-                #     '{"grant_type":"refresh_token",' \
-                #     '"refresh_token":"16b357f62c4fc12ea9b3goober4fb815de2d90175f674b",' \
-                #     '"client_id":"842f2bebc677bgoobera2ba6967a3a143b511c4511437b70a",' \
-                #     '"client_secret":"db56a8cb4ffegooberba11bff69c5eea4476c8df75794b33fa5c45039c458"}'
-                #
-
-                refresh_body = {
-                    'grant_type':'refresh_token',
-                    'refresh_token':refresh_token,
-                    'client_id':app_client_id,
-                    'client_secret':app_client_secret
-                }
-
-                refresh_response = opener.open(urllib2.Request(
-                    'https://coinbase.com/oauth/token',
-                    refresh_body,
-                    {'Content-Type': 'application/json'}))
-
-                # response:
-                # {"access_token":
-                #      "aec27f9f9c72e847c0dbgoober060c3256f0486727002ee313b0",
-                #  "token_type":"bearer","expires_in":7200,
-                #  "refresh_token":"ab12edebdec15bfgoober7f0307638f762899bf1f2",
-                #  "scope":"all"}
-
-
-                # now use the token to make the button but return the
-                # new access token
-
-                response_object = self.get_http_token(url,
-                    refresh_response['access_token'],
-                    refresh_response['refresh_token'],
-                    app_client_id,
-                    app_client_secret,
-                    body,
-                    1)
-
-                return response_object
-
-            else:
-                return {'error_code':e.code,'message':'HTTP Error'}
+            return {'error_code':e.code,'message':'HTTP Error'}
 
 
     def get_http(
