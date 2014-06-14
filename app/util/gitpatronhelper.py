@@ -29,3 +29,5 @@ class GitpatronHelper():
         patron.coinbase_refresh_token = refresh_response['refresh_token']
         patron.save()
 
+        return {'access_token':refresh_response['access_token'],'refresh_token':refresh_response['refresh_token']}
+

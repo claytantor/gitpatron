@@ -1,0 +1,76 @@
+{% load gitpatrontags %}
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+    $('button.fixed_issue').click(function (e) {
+            $(this).find('span').show();
+            $(this).find('span').toggleClass('glyphicon-refresh-animate');
+            claimed_issue_id = $(this).data('claimed')
+            $.ajax({
+                url:"{{ settings.GITPATRON_APP_URL }}/fix_issue_ajax/"+claimed_issue_id+"/",
+                success:function(result){
+                    $("#fix_section").html(result);
+                }
+            });
+
+        });
+
+    });
+
+</script>
+<body>
+    {% include 'topbar.html' %}
+    <div class="container" style="margin-top: 60px;" id="repo_container">
+        <div class="row" style="margin-top: 30px;">
+
+            <div class="col-xs-12 col-sm-9">
+                <h1>Claimed Issue</h1>
+                <h4>Fix Payment Requested: {{ claimed.button.total_coin_cents|btc_cents }} BTC</h4>
+                <div>
+                    claimed by: <strong>{{ claimed.committer.user.username }}</strong>
+                </div>
+                {% if claimed.issue|is_repo_owner:request.user and not claimed.fixed  %}
+                <div>
+                    <div class="nav navbar-right" id="fix_section">
+                    <button class="btn btn-primary fixed_issue" href="#" role="button" data-claimed="{{ claimed.id }}">
+                        <span class="glyphicon glyphicon-refresh"
+                      style="display: none"
+                      id="issue_sync_icon"></span>&nbsp;Mark As Fixed</button>
+                    </div>
+                </div>
+                <div>
+                    <a class="coinbase-button"
+                       data-code="{{ claimed.button.code }}"
+                       data-button-text="Pay {{ claimed.committer.user.username }}"
+                       data-button-style="custom_small"
+                       href="https://coinbase.com/checkouts/{{ claimed.button.code }}">
+                        Pay {{ claimed.committer.user.username }}</a>
+                    <script src="https://coinbase.com/assets/button.js" type="text/javascript"></script>
+                </div>
+                {% else %}
+                <div>
+                    This issue is fixed.
+                </div>                   
+                {% endif %}
+
+                <div>
+                    See commit on github: <a href="{{ claimed.github_commit_id }}">{{ claimed.github_commit_id }}</a>
+                </div>
+
+
+            </div>
+            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                {% include 'sidebar.html' %}
+            </div><!--/span-->
+        </div>
+
+
+
+
+    </div> <!-- /container -->
+</body>
+</html>

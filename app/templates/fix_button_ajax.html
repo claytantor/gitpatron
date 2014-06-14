@@ -1,0 +1,27 @@
+{% load gitpatrontags %}
+{% if not issue|is_fixed %}
+    {% if not issue|is_repo_owner:request.user %}
+        <td class="col-md-1" id="claim_section_{{ issue.id }}">
+            {% if issue|is_claimer:request.user  %}
+                You Claimed This Issue
+            {% else %}
+                {% if not issue|is_monetized %}
+                    Not Montetized
+                {% else %}
+                    <button class="btn btn-primary claim_issue" data-issue="{{ issue.id }}"><span class="glyphicon glyphicon-refresh"
+                              style="display: none"
+                              id="issue_sync_icon"></span>&nbsp;Claim Issue</button>
+                {% endif %}
+
+            {% endif %}&nbsp;
+        </td>
+    {% else %}
+        {% for claimed in issue.claimedissue_set.all %}
+                {% if not claimed.fixed %}
+                    <a href="{% url 'claimed_issue' claimed.id %}" type="button" class="btn btn-primary btn-xs">fix by {{ claimed.committer.user.username }}</a><br>
+                {% endif %}
+        {% endfor %}
+    {% endif %}
+{% else %}
+<td class="col-md-1">&nbsp;</td>
+{% endif %}

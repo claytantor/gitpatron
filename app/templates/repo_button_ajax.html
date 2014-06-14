@@ -1,0 +1,32 @@
+{% load gitpatrontags %}
+<table>
+<tr>
+{% if not issue|is_fixed%}
+    {% if  issue|is_repo_owner:request.user %}
+        {% if issue|is_monetized_owner:request.user %}
+             <td>You Monetized This Issue</td>
+        {% else %}
+             <td id="issue_monetize_{{ issue.id }}">
+                <button class="btn btn-primary has-spinner monetize_issue" role="button" data-issue="{{ issue.id }}">
+                <span class="glyphicon glyphicon-refresh"
+                      style="display: none"
+                      id="issue_sync_icon"></span>&nbsp;Monetize Issue</button>
+             </td>
+        {% endif %}
+    {% else %}
+            <td>
+            {% for button in issue.coinbasebutton_set.all %}
+                <a class="coinbase-button"
+                   data-code="{{ button.code }}"
+                   data-button-style="donation_small"
+                   href="https://coinbase.com/checkouts/{{ button.code }}">
+                    Donate Bitcoins</a>
+                <script src="https://coinbase.com/assets/button.js" type="text/javascript"></script>
+            {% endfor %}&nbsp;
+            </td>
+    {% endif %}
+{% else %}
+<td>Fixed</td>
+{% endif %}
+</tr>
+</table>

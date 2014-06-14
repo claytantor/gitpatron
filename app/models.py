@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
 
 import re
 
@@ -92,6 +94,9 @@ class Issue(models.Model):
 
     def __unicode__(self):
         return '{0} {1}'.format(self.github_id,self.title)
+
+
+
 
 
 class Reward(models.Model):
@@ -229,8 +234,15 @@ class CoinbaseButton(models.Model):
     issue = models.ForeignKey('Issue',null=True,blank=True)
     owner = models.ForeignKey('Patron',null=True,blank=True)
     callback_url = models.CharField(max_length=256,null=True,blank=True)
+    total_coin_cents = models.BigIntegerField(default=0,null=True,blank=True)
+    total_coin_currency_iso = models.CharField(max_length=3,null=True,blank=True)
     def __unicode__(self):
         return '{0} for {1} {2}'.format(self.type,self.issue.github_id,self.issue.title)
+
+    def is_owned_by(self, user_test):
+        return self.owner.user == user_test
+
+
 
 class Patronage(models.Model):
     issue = models.ForeignKey('Issue',null=True,blank=True)
@@ -246,8 +258,35 @@ class ClaimedIssue(models.Model):
     committer = models.ForeignKey('Patron',null=True,blank=True)
     button = models.ForeignKey('CoinbaseButton',null=True,blank=True)
     fixed = models.NullBooleanField(default=False, null=True)
+    github_commit_id = models.CharField(max_length=255,null=True,blank=True)
+    committer_type = models.CharField(max_length=16,null=True,blank=True)
+
     def __unicode__(self):
         return '{0} has claimed {1}'.format(self.committer.user.username,self.issue.title)
+
+
+# class HasOwner(object):
+#     """
+#     If a model's objects are potentially "owned" by a user (or multiple users),
+#     the model's class should inherit from this class and implement is_owned_by.
+#     """
+#     def is_owned_by(self, user):
+#         """
+#         Abstract method for determining if a given user owns a given object.
+#         """
+#         klass = self.__class__.__name__
+#         raise NotImplementedError, "method not overridden for class " + klass
+#
+#     @classmethod
+#     def get_mine(klass, user, *args, **kargs):
+#         """
+#         Utility function to check for existance and ownership of an object and
+#         return it or raise either a 404 or PermissionDenied error.
+#         """
+#         object = get_object_or_404(klass, *args, **kargs)
+#         if not object.is_owned_by(user):
+#             raise PermissionDenied
+#         return object
 
 
 

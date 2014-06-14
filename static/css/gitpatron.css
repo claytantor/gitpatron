@@ -279,3 +279,15 @@ a.list-group-item.disabled:focus {
 .coin-order-cents {
     font-size: x-large;
 }
+
+.bs-callout-danger {
+background-color: #fdd8da;
+border-color: #d9534f;
+    color: #672428;
+}
+.bs-callout {
+margin: 20px 0;
+padding: 20px;
+border-left: 3px solid #e11;
+    /*display: none;*/
+}

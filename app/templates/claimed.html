@@ -5,17 +5,30 @@
 
 $(document).ready(function() {
 
-    $('button.fixed_claimed_issue').click(function (e) {
-        $(this).find('span').show();
-        $(this).find('span').toggleClass('glyphicon-refresh-animate');
-        claimed_issue_id = $(this).data('claimed')
-        $.ajax({
-            url:"{{ settings.GITPATRON_APP_URL }}/fix_issue_ajax/"+claimed_issue_id+"/",
-            success:function(result){
-                $("#fixed_button_"+claimed_issue_id).html(result);
-            }
+        $('button.fix_submit').click(function (e) {
+            $(this).find('span').show();
+            $(this).find('span').toggleClass('glyphicon-refresh-animate');
+            $.ajax({
+                type: "POST",
+                data: $("#fix_form").serialize(),
+                url:"{% url 'fix_form_ajax' %}",
+                success:function(result){
+                    $("#fix_form_ajax").html(result);
+                }
+            });
+
         });
 
+    $('button.fixed_claimed_issue').click(function (e) {
+        params = { fixed_issue_id:$(this).data('fixed') } ;
+        $.ajax({
+            url:"{% url 'fix_form_ajax' %}",
+            data:params,
+            success:function(result){
+                $("#fix_form_ajax").html(result);
+                $('#fix_modal').modal({});
+            }
+        });
     });
 
 
@@ -38,6 +51,24 @@ $(document).ready(function() {
             <p>&copy; gitpatron 2014</p>
         </footer>
     </div> <!-- /container -->
-
+<!-- Modal -->
+    <div class="modal fade" id="fix_modal" tabindex="-1" role="dialog" aria-labelledby="fix_modal_label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="fix_modal_label">Monetize fix</h4>
+              <p>You are proving you have fixed the issue by submitting your commit id and setting the
+                  donation you would like to accept for the fix.</p>
+          </div>
+          <div class="modal-body" id="fix_form_ajax">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary fix_submit">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
 </body>
 </html>
