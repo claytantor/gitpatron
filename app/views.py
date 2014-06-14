@@ -492,7 +492,7 @@ def coinbase_callback(request,template_name="coinbase_auth.html"):
         #refresh the user token before any coinbase call
         helper = GitpatronHelper()
 
-        refresh_response = helper.refresh_user_token(patron.user.username)
+        # refresh_response = helper.refresh_user_token(patron.user.username)
 
         response_obj = coinbase_client.get_oauth_response(request.GET['code'])
         # {

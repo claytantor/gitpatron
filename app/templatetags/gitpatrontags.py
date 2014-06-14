@@ -56,6 +56,11 @@ def is_repo_owner(issue,repo_user):
     return len(owned_repo) > 0
 
 @register.filter
+def is_wallet_activated(wallet_user):
+    patron=Patron.objects.get(user=wallet_user)
+    return (patron.coinbase_access_token is not None and patron.coinbase_access_token != '')
+
+@register.filter
 def is_monetized_owner(monetized_issue,repo_user):
     monetize_for_user = CoinbaseButton.objects.filter(issue=monetized_issue,type="patronage",owner__user=repo_user)
     return len(monetize_for_user) > 0

@@ -1,0 +1,14 @@
+DROP TABLE IF EXISTS "app_update";
+DROP TABLE IF EXISTS "app_repository";
+DROP TABLE IF EXISTS "app_reward";
+DROP TABLE IF EXISTS "app_comment";
+DROP TABLE IF EXISTS "app_question";
+DROP TABLE IF EXISTS "app_callbackmessage";
+DROP TABLE IF EXISTS "app_patron";
+DROP TABLE IF EXISTS "app_coinbasebutton";
+DROP TABLE IF EXISTS "app_coincustomer";
+DROP TABLE IF EXISTS "app_cointransaction";
+DROP TABLE IF EXISTS "app_coinorder";
+DROP TABLE IF EXISTS "app_claimedissue";
+DROP TABLE IF EXISTS "app_patronage";
+DROP TABLE IF EXISTS "app_issue";

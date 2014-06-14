@@ -6,12 +6,16 @@
         {% if issue|is_monetized_owner:request.user %}
              <td>You Monetized This Issue</td>
         {% else %}
+            {% if request.user|is_wallet_activated %}
              <td id="issue_monetize_{{ issue.id }}">
                 <button class="btn btn-primary has-spinner monetize_issue" role="button" data-issue="{{ issue.id }}">
                 <span class="glyphicon glyphicon-refresh"
                       style="display: none"
                       id="issue_sync_icon"></span>&nbsp;Monetize Issue</button>
              </td>
+             {% else %}
+                Activate wallet to monetize.
+             {% endif %}
         {% endif %}
     {% else %}
             <td>

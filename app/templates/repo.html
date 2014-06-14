@@ -64,6 +64,17 @@ $(document).ready(function() {
                     <h4>Patronage: {{ sum_patronage_cents|btc_cents }} BTC</h4>
                     <h4>Fix Payments: {{ sum_fix_cents|btc_cents }} BTC</h4>
                     <p>{{ repo.github_description }}</p>
+                    {% if repo.owner.user.username == request.user.username and not request.user|is_wallet_activated %}
+                    <p>
+                        <div class="form_errors bs-callout bs-callout-danger">
+                            <h4>Wallet Not Activated</h4>
+                            <p>You own this repo but have not activated your coinbase wallet
+                            so you are not able to monetize issues. Activate your wallet and
+                            you will be able to create donation buttons and pay committers.</p>
+                            <p><a class="btn btn-danger" href="{% url 'cb_auth_redirect' %}" role="button">Activate My Wallet Now &raquo;</a></p>
+                        </div>
+                    </p>
+                    {% endif %}
                     <div id="issues_area">
                         {% include 'issues_ajax.html' %}
                     </div>

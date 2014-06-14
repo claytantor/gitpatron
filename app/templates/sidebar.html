@@ -1,3 +1,4 @@
+{% load gitpatrontags %}
 <span class="sidebar-title">From Github</span>
   <div class="list-group">
     <a href="{% url 'user_repos' %}" class="list-group-item">Browse My Github Repos</a>
@@ -16,7 +17,7 @@
 
   <span class="sidebar-title">Repo Owners</span>
   <div class="list-group">
-    {% if patron.coinbase_access_token %}
+    {% if request.user|is_wallet_activated %}
     <a href="#" class="list-group-item disabled">Activate My Wallet - DONE</a>
     {% else %}
     <a href="{% url 'cb_auth_redirect' %}" class="list-group-item">Activate My Wallet</a>
@@ -30,7 +31,7 @@
 
   <span class="sidebar-title">Committers</span>
   <div class="list-group">
-    {% if patron.coinbase_access_token %}
+    {% if request.user|is_wallet_activated %}
     <a href="#" class="list-group-item disabled">Activate My Wallet - DONE</a>
     {% else %}
     <a href="{% url 'cb_auth_redirect' %}" class="list-group-item">Activate My Wallet</a>
