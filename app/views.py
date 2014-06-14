@@ -300,7 +300,8 @@ def publish_repo_ajax(request, git_username,repo_name,
                     github_issue_no=issue_response['number'],
                     json_body=json.dumps(issue_response),
                     description=issue_response['body'],
-                    repository=repo_created
+                    repository=repo_created,
+                    status=issue_response['state']
                 )
         is_published = True
 
@@ -327,6 +328,8 @@ def sync_issues_ajax(request, git_username,repo_name,
              #try to look up the issue
             try:
                 issue = Issue.objects.get(github_id=issue_response['id'])
+                issue.status = issue_response['state']
+                issue.save()
                 issues.append(issue)
             except ObjectDoesNotExist:
                 issue = Issue.objects.create(
@@ -336,7 +339,8 @@ def sync_issues_ajax(request, git_username,repo_name,
                     title=issue_response['title'],
                     github_issue_no=issue_response['number'],
                     json_body=json.dumps(issue_response),
-                    repository=repo_saved
+                    repository=repo_saved,
+                    status=issue_response['state']
                 )
                 issues.append(issue)
 

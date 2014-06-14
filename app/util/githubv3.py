@@ -237,7 +237,7 @@ class GithubV3():
 #     "id": 8657138
 # }
     def get_repo_issues(self,username,repo_name):
-        repos_obj = self.get_json('https://api.github.com/repos/{0}/{1}/issues'.format(username,repo_name))
+        repos_obj = self.get_json('https://api.github.com/repos/{0}/{1}/issues?state=all'.format(username,repo_name))
         return repos_obj
 
 

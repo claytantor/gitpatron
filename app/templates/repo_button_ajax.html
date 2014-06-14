@@ -1,7 +1,7 @@
 {% load gitpatrontags %}
 <table>
 <tr>
-{% if not issue|is_fixed%}
+{% if not issue|is_fixed and issue.status != 'closed'%}
     {% if  issue|is_repo_owner:request.user %}
         {% if issue|is_monetized_owner:request.user %}
              <td>You Monetized This Issue</td>
@@ -30,7 +30,11 @@
             </td>
     {% endif %}
 {% else %}
-<td>Fixed</td>
+    {% if issue.status == 'closed' %}
+        <td>Closed</td>
+    {% else %}
+        <td>Fixed</td>
+    {% endif %}
 {% endif %}
 </tr>
 </table>

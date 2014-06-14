@@ -92,6 +92,8 @@ class Issue(models.Model):
 
     repository = models.ForeignKey('Repository',null=True,blank=True)
 
+    status = models.CharField(max_length=16, unique=False)
+
     def __unicode__(self):
         return '{0} {1}'.format(self.github_id,self.title)
 
