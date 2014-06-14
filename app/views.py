@@ -333,8 +333,11 @@ def sync_issues_ajax(request, git_username,repo_name,
                 #if closed then remove monetization
                 if issue.status == 'closed':
                     owner = Patron.objects.get(user__username=git_username)
-                    monetization_buttons = CoinbaseButton.objects.get(issue=issue,owner=owner,type="patronage").delete()
-                    
+                    monetization_buttons = CoinbaseButton.objects.filter(issue=issue,owner=owner,type="patronage")
+                    if len(monetization_buttons)>0:
+                        for button in monetization_buttons:
+                            button.delete()
+
 
                 issue.save()
                 issues.append(issue)

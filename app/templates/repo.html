@@ -17,6 +17,7 @@ $(document).ready(function() {
                 $('#issue_sync_icon').hide();
             }
         });
+        return false;
     });
 
     $('button.monetize_issue').click(function (e) {
@@ -29,6 +30,7 @@ $(document).ready(function() {
                 $("#issue_monetize_"+issue_id).html(result);
             }
         });
+        return false;
     });
 
     $('button.claim_issue').click(function (e) {
@@ -41,6 +43,7 @@ $(document).ready(function() {
                 $("#claim_section_"+issue_id).html(result);
             }
         });
+        return false;
 
     });
 
