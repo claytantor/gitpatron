@@ -2,7 +2,7 @@ from django import forms
 
 
 class FixForm(forms.Form):
-    git_commit_id = forms.CharField(label='Commit ID In GitHub', max_length=40, required=True, error_messages={'required': 'A commit ID from github is required.'})
+    git_commit_id = forms.URLField(label='Commit URL In GitHub', max_length=128, required=True, error_messages={'required': 'A commit URL from github is required.'})
     message = forms.CharField( widget=forms.Textarea(attrs={'rows': 4 }),
                                label='Describe Your Fix',
                                max_length=500,

@@ -71,6 +71,11 @@ def is_monetized_fixer(monetized_issue,repo_user):
     return len(monetize_for_user) > 0
 
 @register.filter
+def is_monetized_fix(monetized_issue):
+    monetize_for_user = CoinbaseButton.objects.filter(issue=monetized_issue,type="fix")
+    return len(monetize_for_user) > 0
+
+@register.filter
 def is_monetized(issue):
     return len(CoinbaseButton.objects.filter(issue=issue,type='patronage'))>0
 

@@ -17,7 +17,7 @@
         </td>
     {% else %}
         {% for claimed in issue.claimedissue_set.all %}
-                {% if not claimed.fixed %}
+                {% if claimed.issue|is_monetized_fix %}
                     <a href="{% url 'claimed_issue' claimed.id %}" type="button" class="btn btn-primary btn-xs">fix by {{ claimed.committer.user.username }}</a><br>
                 {% endif %}
         {% endfor %}
