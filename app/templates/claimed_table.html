@@ -11,13 +11,17 @@
                         Waiting for payment.
                     </td>
                     <td>&nbsp;</td>
-                {% else %}
+                {% elif request.user|is_wallet_activated %}
                     <td class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
                         <button class="btn btn-primary has-spinner fixed_claimed_issue" data-fixed="{{ claimed_issue.id }}">
                         <span class="glyphicon glyphicon-refresh" data-toggle="modal" data-target="#fix_modal"  style="display: none"></span>&nbsp;Monetize Fix</button>
                     </td>
                     <td>&nbsp;</td>
-
+                {% else %}
+                    <td class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
+                        Wallet not activated!
+                    </td>
+                    <td>&nbsp;</td>
                 {% endif %}
             {% else %}
             <td class="col-md-1" id="fixed_button_{{ claimed_issue.id }}">

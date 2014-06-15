@@ -1,3 +1,4 @@
+{% load gitpatrontags %}
 <!DOCTYPE html>
 <html>
 {% include 'head.html' %}
@@ -42,7 +43,19 @@ $(document).ready(function() {
         <div class="row">
             <h1>Claimed Issues</h1>
             Issues Claimed: {{ claimed.all|length }}
+
+
             <div class="col-md-12">
+                {% if not request.user|is_wallet_activated %}
+                <p>
+                    <div class="form_errors bs-callout bs-callout-danger">
+                        <h4>Wallet Not Activated</h4>
+                        <p>To monetize fixes for issues on this site you must activate your coinbase wallet.
+                            Activate your wallet and you will be able to create fix buttons.</p>
+                        <p><a class="btn btn-danger" href="{% url 'cb_auth_redirect' %}" role="button">Activate My Wallet Now &raquo;</a></p>
+                    </div>
+                </p>
+                {% endif %}
                 {% include 'claimed_table.html' %}
             </div>
         </div>
