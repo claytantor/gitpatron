@@ -634,7 +634,7 @@ def fix_form_ajax(request,
                     'custom':button_guid,
                     'description':'Fix for {0}'.format(claim_issue_ajax.issue.title),
                     'price_string':fixform.cleaned_data['min_amount'],
-                    'price_currency_iso':'USD',
+                    'price_currency_iso':'BTC',
                     'button_type':'buy_now',
                     'style':'donation_small',
                     'choose_price':False,
@@ -665,6 +665,10 @@ def fix_form_ajax(request,
                 patron.coinbase_refresh_token = button_response['refresh_token']
                 patron.save()
 
+                #make coin cents a bigint
+                coin_val = fixform.cleaned_data['min_amount'] * 100000000
+                coin_cents = "%.0f" % coin_val
+
                 #create the button
                 button_created = CoinbaseButton.objects.create(
                     code=button_response['button']['code'],
@@ -674,7 +678,9 @@ def fix_form_ajax(request,
                     button_response=json.dumps(button_response),
                     issue=claim_issue_ajax.issue,
                     type="fix",
-                    owner=patron)
+                    owner=patron,
+                    total_coin_cents=coin_cents,
+                    total_coin_currency_iso="BTC")
 
                 # claim_issue_ajax.fixed = True
                 claim_issue_ajax.button = button_created
