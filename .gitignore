@@ -11,3 +11,5 @@ app/management/commands/__init__.py
 gitpatron/fixtures/initial_data.json
 fixtures
 fixtures/*.*
+
+projectFilesBackup/.idea/workspace.xml
