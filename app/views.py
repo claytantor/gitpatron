@@ -595,6 +595,21 @@ def payments(request,
         },
         context_instance=RequestContext(request))
 
+def about_gitpatron(request,
+          template_name="about_gitpatron.html"):
+
+    return render_to_response(template_name,
+        { },
+        context_instance=RequestContext(request))
+
+def attribution(request,
+          template_name="attribution.html"):
+
+    return render_to_response(template_name,
+        { },
+        context_instance=RequestContext(request))
+
+
 def fix_form_ajax(request,
           template_name="fix_form_ajax.html"):
 

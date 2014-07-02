@@ -14,6 +14,8 @@ urlpatterns = patterns('',
     url(r'^login.html', 'app.views.login_user', name='login'),
     url(r'^repos.html', 'app.views.repos',name='user_repos'),
     url(r'^claimed.html', 'app.views.claimed',name='user_claimed'),
+    url(r'^about.html', 'app.views.about_gitpatron',name='about_gitpatron'),
+    url(r'^attribution.html', 'app.views.attribution',name='attribution'),
 
 
 

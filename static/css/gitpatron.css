@@ -13,13 +13,22 @@
 /*--- carousel */
 /* GLOBAL STYLES
 -------------------------------------------------- */
-/* Padding below the footer and lighter body text */
-
 body {
     font-family: 'Titillium Web', sans-serif;
-    padding-bottom: 40px;
     color: #5a5a5a;
 }
+
+
+/*footer*/
+.gitpatron-footer{
+    margin-top: 100px;
+}
+
+.gitpatron-top-container{
+    margin-top: 100px;
+}
+
+
 
 
 /* CUSTOMIZE THE NAVBAR
@@ -56,6 +65,7 @@ body {
 
 /* Carousel base class */
 .carousel {
+  margin-top: 60px;
   height: 500px;
   margin-bottom: 60px;
 }
@@ -77,6 +87,13 @@ body {
   height: 500px;
 }
 
+.carousel-caption-byline  a {
+  color: #ff9140;
+}
+
+.carousel-caption-byline  a:hover {
+    color: #ffcc6c;
+}
 
 
 /* MARKETING CONTENT
@@ -115,6 +132,19 @@ body {
   line-height: 1;
   letter-spacing: -1px;
 }
+
+.featurette-img {
+    width: 400px;
+    height: 400px;
+}
+
+/*attribution*/
+.attribution-img {
+    width: 200px;
+    height: 200px;
+}
+
+
 
 
 

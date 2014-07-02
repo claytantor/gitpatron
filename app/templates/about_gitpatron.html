@@ -1,0 +1,89 @@
+{% load staticfiles %}
+<html xmlns="http://www.w3.org/1999/xhtml">
+{% include "head.html" %}
+<!-- NAVBAR
+================================================== -->
+  <body>
+
+    <!-- navbar -->
+    {% include "topbar.html" %}
+
+
+
+    <div class="container gitpatron-top-container">
+
+       <div class="row" style="font-size: 2.0em; margin-bottom: 20px;">
+            About <span style="font-family: 'Titillium Web', sans-serif; font-weight: 600;">gitpatron</span>
+       </div>
+
+       <div class="row featurette">
+        <div class="col-md-5">
+            <img src="{{ STATIC_URL }}img/about-mashup.png" class="featurette-img"/>
+        </div>
+        <div class="col-md-7">
+          <h2 class="featurette-heading" style="margin-top: 10px;"><span style="font-family: 'Titillium Web', sans-serif; font-weight: 600;">gitpatron</span> Monetizes GitHub with coinbase.
+              <span class="text-muted">Quick and easy donations for open source projects.</span></h2>
+          <p class="lead">Using gitpatron is like puting a donation box on your open source projects, except the
+              donationas can be targeted to specific issues that patrons would like to see fixed.
+                GitHub is the best place to share code with friends. Coinbase is an international digital wallet that allows you
+                to securely buy, use, and accept bitcoin currency. When you put them together you get an easy and safe way to support your
+                favorite open source projects.
+
+          </p>
+        </div>
+      </div>
+
+       <hr class="featurette-divider">
+
+       <div class="row featurette">
+        <div class="col-md-5">
+            <img src="{{ STATIC_URL }}img/feature_process.png" class="featurette-img"/>
+        </div>
+        <div class="col-md-7">
+          <h2 class="featurette-heading" style="margin-top: 10px;">How does <span style="font-family: 'Titillium Web', sans-serif; font-weight: 600;">gitpatron</span> work?
+              <span class="text-muted">By letting bitcoin move with the development process.</span></h2>
+          <p class="lead">The flow of bit coin comes starts from the patron. If a patron wants to donate to a specific issue they would like fixed it
+              is sent to the repo owners wallet. Committers identify which issues they would like to fix, and how much the minimum they should
+                be paid for the fix. Once the fix is made and proof is provided via a github commit id; the repo owner chooses to pay
+                for the full amount that all the patrons have donated. Every contribution and payout is visible to all parties in the process.</p>
+        </div>
+      </div>
+
+       <hr class="featurette-divider">
+
+       <div class="row featurette">
+        <div class="col-md-5">
+            <img src="{{ STATIC_URL }}img/feature_lock.png" class="featurette-img"/>
+        </div>
+        <div class="col-md-7">
+          <h2 class="featurette-heading" style="margin-top: 10px;">Is <span style="font-family: 'Titillium Web', sans-serif; font-weight: 600;">gitpatron</span> safe?
+              <span class="text-muted">Sunshine is the best disinfectant.</span></h2>
+          <p class="lead">Our project is 100% open source that means its safe because we allow our community to critique and improve our security procedures.
+              All commerce is managed via the <a href="https://coinbase.com/docs/api/overview">coinbase API</a>, and we use delegated
+              authority to <a href="https://developer.github.com/v3/oauth/">github using the Oauth2 API</a> an accepted standard for safe user authorization.</p>
+        </div>
+      </div>
+
+      <hr class="featurette-divider">
+
+       <div class="row featurette">
+        <div class="col-md-5">
+            <img src="{{ STATIC_URL }}img/feature_money.png" class="featurette-img"/>
+        </div>
+        <div class="col-md-7">
+          <h2 class="featurette-heading" style="margin-top: 10px;">How much money does <span style="font-family: 'Titillium Web', sans-serif; font-weight: 600;">gitpatron</span> make on a donation?
+              <span class="text-muted">We haven't figured that out yet...</span></h2>
+          <p class="lead">Money is oxygen for projects. Thats why gitpatron exists. One day we would like to make money,
+              we just havent figured out how to do that in a way that everybody thinks is fair.
+              We will probably spend some time as this gets more mature experimenting with ways to monetize that work for the community.
+              For now just use it to help your project succeed, that's pretty rewarding to us. If we we ever make it too expensive tell us.</p>
+        </div>
+      </div>
+
+
+    </div><!-- /.container -->
+    {% include "footer.html" %}
+
+
+  </body>
+</html>
