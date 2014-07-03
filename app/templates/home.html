@@ -73,7 +73,8 @@ $(document).ready(function() {
                     <table class="table table-striped">
                     {% for order in orders %}
                         <tr>
-                            <td class="col-md-10"><strong>{{ order.button.issue.repository.name }}</strong> {{ order.button.issue.title }} {{ order.external_id }} {{ order.status }} </td>
+                        	<td class="col-md-1"><h4>Payment</h4></td>
+                            <td class="col-md-9"><strong>{{ order.button.issue.repository.name }}</strong> {{ order.button.issue.title }} {{ order.external_id }} {{ order.status }} </td>
                             <td class="col-md-2 coin-order-cents">{{ order.total_coin_cents|btc_cents }} {{ order.total_coin_currency_iso }}</td>
                         </tr>
                     {% endfor %}
