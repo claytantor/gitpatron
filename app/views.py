@@ -42,10 +42,15 @@ def home(request,
     published_repos = Repository.objects.filter(owner=patron)
     client = GithubV3()
     github_repos = client.get_oauth_user_repos(patron.github_access_token)
-    print repos
+
+
+    orders = CoinOrder.objects.filter(
+        button__owner=patron
+    )
 
     return render_to_response(template_name,
         {
+            'orders':orders,
             'patron':patron,
             'repos':published_repos,
             'github_repos':github_repos

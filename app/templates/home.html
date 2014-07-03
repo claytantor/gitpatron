@@ -1,3 +1,4 @@
+{% load gitpatrontags %}
 <!DOCTYPE html>
 <html>
 {% include 'head.html' %}
@@ -66,6 +67,18 @@ $(document).ready(function() {
                           </td>
                       </tr>
                   </table>
+              </div>
+              <div>
+                  <h2>Your Feed</h2>
+                    <table class="table table-striped">
+                    {% for order in orders %}
+                        <tr>
+                            <td class="col-md-10"><strong>{{ order.button.issue.repository.name }}</strong> {{ order.button.issue.title }} {{ order.external_id }} {{ order.status }} </td>
+                            <td class="col-md-2 coin-order-cents">{{ order.total_coin_cents|btc_cents }} {{ order.total_coin_currency_iso }}</td>
+                        </tr>
+                    {% endfor %}
+                    </table>
+
               </div>
             </div><!--/span-->
             <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">

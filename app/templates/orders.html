@@ -14,14 +14,13 @@ $(document).ready(function() {
 </script>
 <body>
     {% include 'topbar.html' %}
-    <div class="container" style="margin-top: 60px;">
+    <div class="container gitpatron-top-container" style="margin-top: 60px;">
         <div class="row">
             <h1>{{ title }}</h1>
         </div>
         <div class="row">
             <table class="table table-striped">
             {% for order in orders %}
-
                 <tr>
                     <td class="col-md-10"><strong>{{ order.button.issue.repository.name }}</strong> {{ order.button.issue.title }} {{ order.external_id }} {{ order.status }} </td>
                     <td class="col-md-2 coin-order-cents">{{ order.total_coin_cents|btc_cents }} {{ order.total_coin_currency_iso }}</td>
