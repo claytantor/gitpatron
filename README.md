@@ -1,6 +1,8 @@
 gitpatron
 =========
 
+[Visit gitpatron!](www.gitpatron.com)
+
 ##gitpatron Monetizes GitHub with coinbase. 
 *Quick and easy donations for open source projects.*
 Using gitpatron is like puting a donation box on your open source projects, except the donationas can be targeted to specific issues that patrons would like to see fixed. GitHub is the best place to share code with friends. Coinbase is an international digital wallet that allows you to securely buy, use, and accept bitcoin currency. When you put them together you get an easy and safe way to support your favorite open source projects.
