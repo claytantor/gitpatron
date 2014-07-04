@@ -20,7 +20,10 @@
                   <a href="{% url 'about_gitpatron' %}">About</a>
                 </li>
               </ul>
+
               <ul class="nav navbar-nav navbar-right" style="margin-top: 10px;">
+                    <li><a style="padding: 5px 5px;" href="https://twitter.com/github" style="margin-left:10px;"><img src="{{ STATIC_URL }}img/twitter-logo.png" width="32" height="32"></a></li>
+                    <li><a style="padding: 5px 5px;" href="https://github.com/claytantor/gitpatron" style="margin-left:10px;"><img src="{{ STATIC_URL }}img/github-logo.png" width="32" height="32"></a></li>
                 {% if request.user.is_authenticated %}
                     <li><a href="{% url 'logout' %}">Logout {{ request.user.username }}</a></li>
                 {% else %}
