@@ -47,6 +47,10 @@ urlpatterns = patterns('',
     url(r'^claimed/([\w]+)/$',
         'app.views.claimed_issue',name='claimed_issue'),
 
+    #watch a repo
+    url(r'^watch_repo_ajax/([\w]+)/$',
+            'app.views.watch_repo_ajax',name='watch_repo_ajax'),
+
 
     #fix form
     url(r'^fix_form_ajax.html',

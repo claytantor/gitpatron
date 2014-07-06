@@ -266,6 +266,12 @@ class ClaimedIssue(models.Model):
     def __unicode__(self):
         return '{0} has claimed {1}'.format(self.committer.user.username,self.issue.title)
 
+class WatchedRepository(models.Model):
+    repository = models.ForeignKey('Repository',null=True,blank=True)
+    watcher = models.ForeignKey('Patron',null=True,blank=True)
+    def __unicode__(self):
+        return '{0} is watching {1}'.format(self.watcher.user.username,self.repository.name)
+
 
 # class HasOwner(object):
 #     """

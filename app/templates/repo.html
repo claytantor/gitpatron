@@ -47,6 +47,7 @@ $(document).ready(function() {
 
     });
 
+
 });
 
 </script>
@@ -58,9 +59,11 @@ $(document).ready(function() {
                 {% if repo.owner.user.username == request.user.username %}
                 <div>
                     <div class="nav navbar-right" id="publish_repo">
-                    <a class="btn btn-primary" href="#" role="button">Sync Issues &raquo;</a>
+                        <a class="btn btn-primary" href="#" role="button">Sync Issues &raquo;</a>
                     </div>
                 </div>
+                {% else%}
+                    {% include 'watch_repo_ajax.html' %}
                 {% endif %}
                 <div>
                     <h1>{{ repo.name }}</h1>
@@ -87,10 +90,7 @@ $(document).ready(function() {
                 {% include 'sidebar.html' %}
             </div><!--/span-->
         </div>
-
-
-
-
     </div> <!-- /container -->
+    {% include "footer.html" %}
 </body>
 </html>

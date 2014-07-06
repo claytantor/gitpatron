@@ -3,7 +3,7 @@ import json
 from django import template
 from django.conf import settings
 
-from app.models import Issue,Patron,CoinbaseButton,ClaimedIssue,Repository
+from app.models import Issue,Patron,CoinbaseButton,ClaimedIssue,Repository,WatchedRepository
 
 
 register = template.Library()
@@ -79,6 +79,11 @@ def is_monetized_fix(monetized_issue):
 def is_monetized(issue):
     return len(CoinbaseButton.objects.filter(issue=issue,type='patronage'))>0
 
+
+@register.filter
+def is_watched(repository,repo_user):
+    watching_for_user = WatchedRepository.objects.filter(watcher__user=repo_user, repository=repository)
+    return len(watching_for_user) > 0
 
 
 

@@ -21,7 +21,8 @@ from app.util.coinbasev1 import CoinbaseV1
 from app.util.gitpatronhelper import GitpatronHelper
 
 from app.models import Patron, CallbackMessage, CoinbaseButton, \
-    Issue, Repository, ClaimedIssue, CoinOrder
+    Issue, Repository, ClaimedIssue, CoinOrder, WatchedRepository
+
 from app.forms import FixForm
 
 # Create your views here.
@@ -612,6 +613,27 @@ def attribution(request,
 
     return render_to_response(template_name,
         { },
+        context_instance=RequestContext(request))
+
+
+@login_required
+def watch_repo_ajax(request,repoid,
+          template_name="watch_repo_ajax.html"):
+
+    watching_for_user = WatchedRepository.objects.filter(watcher__user=request.user, repository__id=repoid)
+    repository = Repository.objects.get(id=repoid)
+    if len(watching_for_user) > 0:
+        #set to unwatch by delete
+        watching_for_user.delete()
+    else:
+         #set to watch by create
+        watcher = Patron.objects.get(user=request.user)
+        watched = WatchedRepository.objects.create(
+                    repository=repository,
+                    watcher=watcher)
+
+    return render_to_response(template_name,
+        { 'repo':repository },
         context_instance=RequestContext(request))
 
 

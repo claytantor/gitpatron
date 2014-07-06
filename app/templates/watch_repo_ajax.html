@@ -1,0 +1,33 @@
+{% load gitpatrontags %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+    $('button.watching_repo').click(function (e) {
+        $(this).find('span').show();
+        $(this).find('span').toggleClass('glyphicon-refresh-animate');
+        repo_id = $(this).data('repoid')
+        $.ajax({
+            url:"http://local.gitpatron.com:8000/watch_repo_ajax/"+repo_id+"/",
+            success:function(result){
+                $("#watching_section").html(result);
+            }
+        });
+        return false;
+    });
+
+});
+
+</script>
+{% if repo|is_watched:request.user %}
+<div id="watching_section">
+    <div class="nav navbar-right">
+        <button class="btn btn-primary watching_repo" role="button" data-repoid="{{ repo.id }}">Stop Watching</button>
+    </div>
+</div>
+{% else %}
+<div id="watching_section">
+    <div class="nav navbar-right">
+        <button class="btn btn-primary watching_repo" role="button"  data-repoid="{{ repo.id }}">Watch This</button>
+    </div>
+</div>
+{% endif %}
