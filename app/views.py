@@ -199,7 +199,8 @@ def oauth_redirect(request,
                 #     {'patron':patron},
                 #     context_instance=RequestContext(request))
 
-                return HttpResponseRedirect('/home.html')
+                #needs the full app url for redirect
+                return HttpResponseRedirect(settings.GITPATRON_APP_URL+'/home.html')
             else:
                 # # Return a 'disabled account' error message
                 # context['message']=request.POST['username']+' account has been suspended.'

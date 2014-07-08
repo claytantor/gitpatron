@@ -1,7 +1,7 @@
 gitpatron
 =========
 
-[Visit gitpatron!](http://www.gitpatron.com)
+[Visit gitpatron!](https://www.gitpatron.com)
 
 ##gitpatron Monetizes GitHub with coinbase. 
 *Quick and easy donations for open source projects.*

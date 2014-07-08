@@ -7,7 +7,7 @@ $(document).ready(function() {
         $(this).find('span').toggleClass('glyphicon-refresh-animate');
         repo_id = $(this).data('repoid')
         $.ajax({
-            url:"http://local.gitpatron.com:8000/watch_repo_ajax/"+repo_id+"/",
+            url:"/watch_repo_ajax/"+repo_id+"/",
             success:function(result){
                 $("#watching_section").html(result);
             }
