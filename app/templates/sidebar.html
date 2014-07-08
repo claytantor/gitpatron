@@ -17,7 +17,7 @@
 
   <span class="sidebar-title">Repo Owners</span>
   <div class="list-group">
-    {% if request.user|is_wallet_activated %}
+    {% if  request.user and request.user|is_wallet_activated %}
     <a href="#" class="list-group-item disabled">Activate My Wallet - DONE</a>
     {% else %}
     <a href="{% url 'cb_auth_redirect' %}" class="list-group-item">Activate My Wallet</a>
@@ -31,7 +31,7 @@
 
   <span class="sidebar-title">Committers</span>
   <div class="list-group">
-    {% if request.user|is_wallet_activated %}
+    {% if  request.user and request.user|is_wallet_activated %}
     <a href="#" class="list-group-item disabled">Activate My Wallet - DONE</a>
     {% else %}
     <a href="{% url 'cb_auth_redirect' %}" class="list-group-item">Activate My Wallet</a>
