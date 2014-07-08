@@ -200,7 +200,7 @@ def oauth_redirect(request,
                 #     context_instance=RequestContext(request))
 
                 #needs the full app url for redirect
-                return HttpResponseRedirect(settings.GITPATRON_APP_URL+'/home.html')
+                return HttpResponseRedirect('{0}/home.html'.format(settings.GITPATRON_APP_URL))
             else:
                 # # Return a 'disabled account' error message
                 # context['message']=request.POST['username']+' account has been suspended.'
@@ -219,7 +219,7 @@ def oauth_redirect(request,
 
 def logout_user(request):
     logout(request)
-    return redirect('index.html', foo='bar')
+    return redirect('{0}/index.html'.format(settings.GITPATRON_APP_URL), foo='bar')
 
 
 def repo(request,git_username,repo_name,
