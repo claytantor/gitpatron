@@ -18,13 +18,13 @@ $(document).ready(function() {
 });
 
 </script>
-{% if request.user and repo|is_watched:request.user %}
+{% if request.user.is_authenticated and repo|is_watched:request.user %}
 <div id="watching_section">
     <div class="nav navbar-right">
         <button class="btn btn-primary watching_repo" role="button" data-repoid="{{ repo.id }}">Stop Watching</button>
     </div>
 </div>
-{% else %}
+{% elif request.user.is_authenticated  %}
 <div id="watching_section">
     <div class="nav navbar-right">
         <button class="btn btn-primary watching_repo" role="button"  data-repoid="{{ repo.id }}">Watch This</button>

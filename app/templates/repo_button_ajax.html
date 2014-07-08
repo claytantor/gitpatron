@@ -2,7 +2,7 @@
 <table>
 <tr>
 {% if not issue|is_fixed and issue.status != 'closed'%}
-    {% if request.user and issue|is_repo_owner:request.user %}
+    {% if request.user.is_authenticated and issue|is_repo_owner:request.user %}
         {% if issue|is_monetized_owner:request.user %}
              <td>You Monetized This Issue</td>
         {% else %}
