@@ -96,16 +96,21 @@ $(document).ready(function() {
 
       </div>
       <div class="tab-pane" id="watched">
-          <h1>Watched</h1>
-          {% include 'watching_table.html' %}
+            <div class="col-md-9" style="padding-left: 0px;">
+              <h1>Watched</h1>
+              {% include 'watching_table.html' %}
+            </div>
+            <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                {% include 'sidebar.html' %}
+            </div><!--/span-->               
       </div>
       <div class="tab-pane" id="patrons">Patrons</div>
       <div class="tab-pane" id="published_repos">
-            <div class="col-xs-12 col-sm-9">
+            <div class="col-md-9" style="padding-left: 0px;">
                 <h1>Published Repos</h1>
                 {% include 'repos_table.html' %}
             </div>
-            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+            <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
                 {% include 'sidebar.html' %}
             </div><!--/span-->
       </div>
