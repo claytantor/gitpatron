@@ -36,7 +36,7 @@ $(document).ready(function() {
               <li class="active"><a href="#home" data-toggle="tab">Dashboard</a></li>
 {#              <li><a href="#updates" data-toggle="tab">Updates <span class="badge">0</span></a></li>#}
 {#              <li><a href="#patrons" data-toggle="tab">Supported Issues<span class="badge">0</span></a></li>#}
-              <li><a href="#watching" data-toggle="tab">Watching <span class="badge">0</span></a></li>
+              <li><a href="#watched" data-toggle="tab">Watched <span class="badge">{{ watched|length }}</span></a></li>
               {% if repos %}
               <li><a href="#published_repos" data-toggle="tab">Published Repos <span class="badge">{{ repos|length }}</span></a></li>
               {% endif %}
@@ -45,11 +45,10 @@ $(document).ready(function() {
 
 
         <!-- Tab panes -->
-    <div class="tab-content">
+    <div class="tab-content row row-offcanvas row-offcanvas-right" style="margin-top: 10px;">
       <div class="tab-pane active" id="home">
  <!-- home -->
-        <div class="row row-offcanvas row-offcanvas-right" style="margin-top: 10px;">
-            <div class="col-xs-12 col-sm-9">
+            <div class="col-md-9" style="padding-left: 0px;">
               <p class="pull-right visible-xs">
                 <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
               </p>
@@ -90,14 +89,16 @@ $(document).ready(function() {
 
 
             </div><!--/span-->
-            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+            <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
                 {% include 'sidebar.html' %}
             </div><!--/span-->
-        </div><!--/row-->
  <!-- end home -->
 
       </div>
-      <div class="tab-pane" id="updates">Updates</div>
+      <div class="tab-pane" id="watched">
+          <h1>Watched</h1>
+          {% include 'watching_table.html' %}
+      </div>
       <div class="tab-pane" id="patrons">Patrons</div>
       <div class="tab-pane" id="published_repos">
             <div class="col-xs-12 col-sm-9">

@@ -1,0 +1,56 @@
+<table class="table table-striped">
+    {% for watch in watched %}
+{#        published by owner #}
+        {% if watch.repository.owner.user.username and watch.repository.owner.user.username == request.user.username %}
+        <tr>
+            <td class="col-md-10">
+                <div>{{ watch.repository.name }}</div>
+                <div>{{ watch.repository.github_description }}</div>
+            </td>
+            <td class="col-md-1">
+
+            </td>
+            <td class="col-md-1">
+                <a href="{% url 'repo' watch.repository.owner.user.username watch.repository.name %}"
+                   class="btn btn-primary btn-publish" data-repoid="{{ watch.repository.id }}"
+                   data-fullname="{{ watch.repository.full_name }}">View Details</a>
+            </td>
+        </tr>
+
+{#        unpublished by owner #}
+        {% elif watch.repository.owner.login and watch.repository.owner.login == request.user.username and not watch.repository.private %}
+        <tr>
+            <td class="col-md-10">
+                <div>{{ watch.repository.name }}</div>
+                <div>{{ watch.repository.description }}</div>
+            </td>
+            <td class="col-md-1">
+                <div id="publish_area_{{ watch.repository.id }}" class="publish_area">
+                    <button type="button" class="btn btn-primary btn-publish" data-repoid="{{ watch.repository.id }}" data-fullname="{{ watch.repository.full_name }}">Publish</button>
+                </div>
+            </td>
+            <td class="col-md-1">
+                <a href="http://github.com/{{ watch.repository.full_name }}" class="btn btn-primary btn-publish">View on Github</a>
+            </td>
+        </tr>
+
+{#        published by other #}
+        {% elif watch.repository.owner.user.username and watch.repository.owner.user.username != request.user.username %}
+        <tr>
+            <td class="col-md-10">
+                <div>{{ watch.repository.name }}</div>
+                <div>{{ watch.repository.github_description }}</div>
+            </td>
+            <td class="col-md-1">
+            </td>
+            <td class="col-md-1">
+                <a href="{% url 'repo' watch.repository.owner.user.username watch.repository.name %}"
+                   class="btn btn-primary btn-publish" data-repoid="{{ watch.repository.id }}"
+                   data-fullname="{{ watch.repository.full_name }}">View Details</a>
+            </td>
+        </tr>
+
+        {% endif %}
+
+    {% endfor %}
+</table>
