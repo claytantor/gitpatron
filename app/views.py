@@ -232,7 +232,7 @@ def repo(request,git_username,repo_name,
     try:
         repo = Repository.objects.get(owner__user__username=git_username,name=repo_name)
         is_published = True
-        issues = repo.issue_set.all()
+        issues = Issue.objects.filter(repository=repo).order_by('github_issue_no')
 
         #calculate all patronage
         #get all orders for the specifc repo

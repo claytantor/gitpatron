@@ -2,7 +2,8 @@
 <table class="table table-striped" >
 {% for issue in issues %}
      <tr>
-        <td class="col-md-10">{{ issue.title }} <a href="{{ issue.github_html_url }}">view on github</a></td>
+        <td class="col-md-1"><h1>{{ issue.github_issue_no }}</h1></td>
+        <td class="col-md-9">{{ issue.title }} <a href="{{ issue.github_html_url }}">view on github</a></td>
         <td class="col-md-1">{% include 'repo_button_ajax.html' %}</td>
         <td class="col-md-1">{% include 'fix_button_ajax.html' %}</td>
      </tr>
