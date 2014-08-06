@@ -53,7 +53,7 @@ $(document).ready(function() {
 </script>
 <body>
     {% include 'topbar.html' %}
-    <div class="container" style="margin-top: 60px;" id="repo_container">
+    <div class="container gitpatron-top-container" style="margin-top: 60px;" id="repo_container">
         <div class="row" style="margin-top: 30px;">
             <div class="col-xs-12 col-sm-9">
                 {% if repo.owner.user.username == request.user.username %}
@@ -67,6 +67,7 @@ $(document).ready(function() {
                 {% endif %}
                 <div>
                     <h1>{{ repo.name }}</h1>
+                    <p>owned by <a href="{%  url 'patron' repo.owner.user.username %}">{{ repo.owner.user.username }}</a></p>
                     <h4>Patronage: {{ sum_patronage_cents|btc_cents }} BTC</h4>
                     <h4>Fix Payments: {{ sum_fix_cents|btc_cents }} BTC</h4>
                     <p>{{ repo.github_description }}</p>

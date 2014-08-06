@@ -79,6 +79,9 @@ def is_monetized_fix(monetized_issue):
 def is_monetized(issue):
     return len(CoinbaseButton.objects.filter(issue=issue,type='patronage'))>0
 
+@register.filter
+def is_issue_owner(issue,user):
+    return len(Issue.objects.filter(repository__owner__user=user, id=issue.id))>0
 
 @register.filter
 def is_watched(repository,repo_user):

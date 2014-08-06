@@ -31,26 +31,6 @@ $(document).ready(function() {
             <h1>Repos</h1>
             <div class="col-md-12">
                 {% include 'repos_table.html' %}
-{#                <table class="table table-striped">#}
-{#                    {% for repo in repos %}#}
-{#                        {% if repo.private == False %}#}
-{#                        <tr>#}
-{#                            <td class="col-md-10">{{ repo.name }}</td>#}
-{##}
-{#                            <td class="col-md-2">#}
-{#                                {% if repo.pushed_at %}#}
-{#                                    {{ repo.owner.owner }} <br/>#}
-{#                                    {{ request.user.username }} <br/>#}
-{#                                <div id="publish_area_{{ repo.id }}" class="publish_area">#}
-{#                                    <button type="button" class="btn btn-primary btn-publish" data-repoid="{{ repo.id }}" data-fullname="{{ repo.full_name }}">Publish</button>#}
-{#                                </div>#}
-{#                                {% endif %}#}
-{#                            </td>#}
-{#                        </tr>#}
-{#                        {% endif %}#}
-{#                    {% endfor %}#}
-{#                </table>#}
-
             </div>
         </div>
 

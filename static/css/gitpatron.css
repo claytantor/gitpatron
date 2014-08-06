@@ -26,6 +26,16 @@ body {
 
 .gitpatron-top-container{
     margin-top: 100px;
+    min-height: 800px;
+}
+
+.gitpatron-avatar-128 {
+    width: 128px;
+    height: 128px;
+}
+
+.topline-divider {
+margin: 30px 10px 0px 0px
 }
 
 

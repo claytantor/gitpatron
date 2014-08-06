@@ -24,6 +24,19 @@ $(document).ready(function() {
         return false;
     });
 
+    $('#chart').gpchart();
+
+{#    //make this jquery please#}
+{#    var chart = c3.generate({#}
+{#        bindto: '#chart',#}
+{#        data: {#}
+{#          columns: [#}
+{#            ['data1', 30, 200, 100, 400, 150, 250],#}
+{#            ['data2', 50, 20, 10, 40, 15, 25]#}
+{#          ]#}
+{#        }#}
+{#    });#}
+
 });
 
 </script>
@@ -57,17 +70,22 @@ $(document).ready(function() {
                   <table>
                       <tr>
                           <td style="width: 128px; vertical-align: 0px;padding-right: 10px">
-{#                              <img src="{{  patron.github_avatar_url }}" alt="github avatar" style="width: 128px; height: 128px;">#}
+                              <img src="{{  patron.github_avatar_url }}" class="gitpatron-avatar-128" alt="github avatar" >
                           </td>
                           <td>
                              <h1>Hello, {{ patron.github_login }}!</h1>
                             <p>This is where we want to show you a basic overview of
                                 funding activity related to repos that you own as well
                                 as projects you are a patron of.</p>
+                            <p><a href="{%  url 'patron' patron.user.username %}">view profile</a></p>
                           </td>
                       </tr>
                   </table>
-              </div>
+            </div>
+            <div>
+                <h2>Your Payments</h2>
+                <div id="chart"></div>
+            </div>
 
             <div>
                 <h2>Your Feed</h2>

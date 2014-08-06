@@ -1,8 +1,8 @@
 {% load gitpatrontags %}
 {% if not issue|is_fixed %}
-    {% if not issue|is_repo_owner:request.user %}
-        <td class="col-md-1" id="claim_section_{{ issue.id }}">
-            {% if issue|is_claimer:request.user  %}
+    {% if request.user and not issue|is_repo_owner:request.user %}
+{#        <td class="col-md-1" id="claim_section_{{ issue.id }}">#}
+            {% if equest.user and issue|is_claimer:request.user  %}
                 You Claimed This Issue
             {% else %}
                 {% if not issue|is_monetized %}
@@ -14,7 +14,7 @@
                 {% endif %}
 
             {% endif %}&nbsp;
-        </td>
+{#        </td>#}
     {% else %}
         {% for claimed in issue.claimedissue_set.all %}
                 {% if claimed.issue|is_monetized_fix %}
@@ -23,5 +23,7 @@
         {% endfor %}
     {% endif %}
 {% else %}
-<td class="col-md-1">&nbsp;</td>
+{#<td class="col-md-1">#}
+    &nbsp;
+{#</td>#}
 {% endif %}

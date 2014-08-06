@@ -1,0 +1,57 @@
+{% load gitpatrontags %}
+{% load markdown_deux_tags %}
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+    $('#chart').gpchart();
+});
+
+</script>
+<body>
+    {% include 'topbar.html' %}
+    <div class="container gitpatron-top-container" id="issue_container">
+        <div class="col-md-9">
+            <div class="row">
+
+                <div class="nav navbar-right">
+                    <table class="table" style="margin-bottom: -30px;">
+                         <tr>
+                            <td style="border-top: 0px solid #ddd;">{% include 'repo_button_ajax.html' %}</td>
+                            <td style="border-top: 0px solid #ddd;">{% include 'fix_button_ajax.html' %}</td>
+                            <td style="border-top: 0px solid #ddd;"><button class="btn btn-primary tweet-this" role="button">Tweet This</button></td>
+                            {% if request.user and issue|is_issue_owner:request.user %}
+                            <td style="border-top: 0px solid #ddd;"><button class="btn btn-primary sync-issue" role="button">Sync With Github</button></td>
+                            {% endif %}
+                         </tr>
+                    </table>
+                </div>
+            </div>
+            <hr class="topline-divider">
+            <div>
+                <h1>{{ issue.title }}</h1>
+                <div><a href="{% url 'patron' issue.repository.owner.user.username %}">{{ issue.repository.owner.user.username }}</a>/<a href="{% url 'repo' issue.repository.owner.user.username issue.repository.name %}">{{ issue.repository.name }}</a></div>
+                <h4>Patronage: 0.0 BTC</h4>
+                <h4>Fix Payments: 0.0 BTC</h4>
+            </div>
+            <dv>
+                <h4>Donations To This Issue</h4>
+                <div id="chart"></div>
+            </dv>
+            <div>
+<h4>Issue Description</h4>
+{% markdown %}
+{{ issue.description }}
+{% endmarkdown %}
+            </div>
+        </div>
+        <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+            {% include 'sidebar.html' %}
+        </div><!--/span-->
+
+    </div> <!-- /container -->
+    {% include "footer.html" %}
+</body>
+</html>

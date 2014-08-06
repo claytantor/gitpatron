@@ -35,7 +35,8 @@ def index(request,
         {},
         context_instance=RequestContext(request))
 
-@login_required()
+#(login_url='/login.html')
+@login_required(login_url='/login.html')
 def home(request,
           template_name="home.html"):
 
@@ -60,7 +61,7 @@ def home(request,
         },
         context_instance=RequestContext(request))
 
-@login_required()
+@login_required(login_url='/login.html')
 def repos(request,
           template_name="repos.html"):
 
@@ -74,7 +75,7 @@ def repos(request,
         {'repos':repos},
         context_instance=RequestContext(request))
 
-@login_required()
+@login_required(login_url='/login.html')
 def public_repos(request,
           template_name="repos.html"):
 
@@ -85,7 +86,7 @@ def public_repos(request,
         {'repos':repos},
         context_instance=RequestContext(request))
 
-@login_required()
+@login_required(login_url='/login.html')
 def browse_published_repos(request,
           template_name="repos.html"):
 
@@ -278,7 +279,7 @@ def repo(request,git_username,repo_name,
             },
         context_instance=RequestContext(request))
 
-@login_required()
+@login_required(login_url='/login.html')
 def publish_repo_ajax(request, git_username,repo_name,
           template_name="publish_ajax.html"):
 
@@ -321,7 +322,7 @@ def publish_repo_ajax(request, git_username,repo_name,
             {'repo':repo_created, 'issues':repo_created.issue_set.all(),'is_published':is_published  },
             context_instance=RequestContext(request))
 
-@login_required()
+@login_required(login_url='/login.html')
 def sync_issues_ajax(request, git_username,repo_name,
           template_name="issues_ajax.html"):
 
@@ -370,7 +371,7 @@ def sync_issues_ajax(request, git_username,repo_name,
         {'issues':issues },
         context_instance=RequestContext(request))
 
-@login_required()
+@login_required(login_url='/login.html')
 def monetize_issue_ajax(request, issue_id,
           template_name="repo_button_ajax.html"):
 
@@ -448,7 +449,7 @@ def monetize_issue_ajax(request, issue_id,
             { 'issue':issue },
             context_instance=RequestContext(request))
 
-@login_required()
+@login_required(login_url='/login.html')
 def claim_issue_ajax(request, issue_id,
           template_name="claim_button_ajax.html"):
 
@@ -461,7 +462,7 @@ def claim_issue_ajax(request, issue_id,
         context_instance=RequestContext(request))
 
 
-@login_required()
+@login_required(login_url='/login.html')
 def claimed_issue(request, claimed_issue_id,
           template_name="claimed_issue.html"):
 
@@ -472,7 +473,7 @@ def claimed_issue(request, claimed_issue_id,
         context_instance=RequestContext(request))
 
 
-@login_required()
+@login_required(login_url='/login.html')
 def fix_issue_ajax(request, fix_issue_id,
           template_name="ajax_result.html"):
 
@@ -485,7 +486,7 @@ def fix_issue_ajax(request, fix_issue_id,
         context_instance=RequestContext(request))
 
 
-
+@login_required(login_url='/login.html')
 def claimed(request, template_name="claimed.html"):
     committer = Patron.objects.get(user__username=request.user.username)
     claimed = ClaimedIssue.objects.filter(committer=committer )
@@ -500,7 +501,7 @@ def cb_auth_redirect(request):
 
 # the login is required because we want to make
 # sure we know what user to lookup for callback
-@login_required()
+@login_required(login_url='/login.html')
 def coinbase_callback(request,template_name="coinbase_auth.html"):
 
     patron = Patron.objects.get(user__username=request.user.username)
@@ -571,7 +572,7 @@ def coin_info(request,
         {},
         context_instance=RequestContext(request))
 
-@login_required()
+@login_required(login_url='/login.html')
 def patronage(request,
           template_name="orders.html"):
 
@@ -588,7 +589,7 @@ def patronage(request,
         },
         context_instance=RequestContext(request))
 
-@login_required()
+@login_required(login_url='/login.html')
 def payments(request,
           template_name="orders.html"):
 
@@ -619,7 +620,7 @@ def attribution(request,
         context_instance=RequestContext(request))
 
 
-@login_required
+@login_required(login_url='/login.html')
 def watch_repo_ajax(request,repoid,
           template_name="watch_repo_ajax.html"):
 
@@ -639,7 +640,7 @@ def watch_repo_ajax(request,repoid,
         { 'repo':repository },
         context_instance=RequestContext(request))
 
-
+@login_required(login_url='/login.html')
 def fix_form_ajax(request,
           template_name="fix_form_ajax.html"):
 
@@ -739,6 +740,41 @@ def fix_form_ajax(request,
         form = FixForm(initial={'issue_id': request.GET.get('fixed_issue_id')})
         context['form'] = form
 
+
+    return render_to_response(template_name,
+    context,
+    context_instance=RequestContext(request))
+
+def issue(request,
+          owner,
+          reponame,
+          issue_no,
+          template_name="issue.html"):
+    issue = Issue.objects.get(repository__fullname='{0}/{1}'.format(owner,reponame),github_issue_no=issue_no)
+    context = {
+        'issue':issue
+    }
+
+    return render_to_response(template_name,
+    context,
+    context_instance=RequestContext(request))
+
+
+def patron(request,
+          patron_name,
+          template_name="patron.html"):
+    patron = Patron.objects.get(user__username=patron_name)
+    published_repos = Repository.objects.filter(owner=patron)
+
+    client = GithubV3()
+    github_user = client.get_user(patron_name)
+
+    context = {
+        'patron':patron,
+        'avatar':github_user['avatar_url'],
+        'github_user':github_user,
+        'repos':published_repos,
+    }
 
     return render_to_response(template_name,
     context,

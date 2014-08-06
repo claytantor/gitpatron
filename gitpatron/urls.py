@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     url(r'^home.html', 'app.views.home', name='patron_home'),
     url(r'^logout.html', 'app.views.logout_user', name='logout'),
     url(r'^login.html', 'app.views.login_user', name='login'),
-    url(r'^repos.html', 'app.views.repos',name='user_repos'),
+    url(r'^repos.html', 'app.views.repos', name='user_repos'),
     url(r'^claimed.html', 'app.views.claimed',name='user_claimed'),
     url(r'^about.html', 'app.views.about_gitpatron',name='about_gitpatron'),
     url(r'^attribution.html', 'app.views.attribution',name='attribution'),
@@ -51,6 +51,13 @@ urlpatterns = patterns('',
     url(r'^watch_repo_ajax/([\w]+)/$',
             'app.views.watch_repo_ajax',name='watch_repo_ajax'),
 
+    #issue
+    url(r'^issue/([-\w]+)/([-\w]+)/([-\w]+)/$',
+        'app.views.issue',name='issue'),
+
+    #issue
+    url(r'^patron/([-\w]+)/$',
+        'app.views.patron',name='patron'),
 
     #fix form
     url(r'^fix_form_ajax.html',
