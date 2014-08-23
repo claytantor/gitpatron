@@ -46,10 +46,12 @@ $(document).ready(function() {
                     <a class="coinbase-button"
                        data-code="{{ claimed.button.code }}"
                        data-button-text="Pay {{ claimed.committer.user.username }}"
-                       data-button-style="custom_small"
+                       data-button-style="buy_now_small"
                        href="https://coinbase.com/checkouts/{{ claimed.button.code }}">
                         Pay {{ claimed.committer.user.username }}</a>
                     <script src="https://coinbase.com/assets/button.js" type="text/javascript"></script>
+
+
                 </div>
                 {% else %}
                 <div>

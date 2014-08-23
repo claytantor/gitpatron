@@ -1,12 +1,40 @@
 {% load gitpatrontags %}
+<h3>Issues</h3>
 <table class="table table-striped" >
 {% for issue in issues %}
      <tr>
         <td class="col-md-1"><h1><a href="{% url 'issue' issue.repository.owner.user.username issue.repository.name issue.github_issue_no %}">{{ issue.github_issue_no }}</a></h1></td>
-        <td class="col-md-9">{{ issue.title }} <a href="{{ issue.github_html_url }}">view on github</a></td>
+        <td class="col-md-9">
+            <div>{{ issue.title }} <a href="{{ issue.github_html_url }}">view on github</a></div>
+            {% if issue.pullrequest_set.all %}
+                <div style="font-weight: 800">Pull Requests</div>
+                {% for pull_request in issue.pullrequest_set.all %}
+                    <div>#{{ pull_request.github_issue_no }}  {{ pull_request.title }} submitted by {{ pull_request.issue_user.user.username }}&nbsp;<a href="{{ pull_request.github_html_url }}">view on github</a></div>
+                {% endfor %}
+            {% endif %}
+        </td>
         <td class="col-md-1">{% include 'repo_button_ajax.html' %}</td>
         <td class="col-md-1">{% include 'fix_button_ajax.html' %}</td>
      </tr>
 {% endfor %}
 </table>
+{% if pull_requests|length > 0  %}
+<h3>Pull Requests</h3>
+<table class="table table-striped" >
+    {% for pull_request in pull_requests %}
+         <tr>
+            <td class="col-md-1"><h1><a href="#">{{ pull_request.github_issue_no }}</a></h1></td>
+            <td class="col-md-6">
+                <div>{{ pull_request.title }} <a href="{{ pull_request.github_html_url }}">view on github</a></div>
+                <div id="update_section_{{ pull_request.id }}">
+                    {% if pull_request.fix_issue != None %}
+                        {% include 'pull_mapping_ajax.html' %}
+                    {% endif %}
+                </div>
+            </td>
+            <td class="col-md-5">{% include 'pull_button_ajax.html' %}</td>
+         </tr>
+    {% endfor %}
+</table>
+{% endif %}
 

@@ -17,6 +17,8 @@
                 Activate wallet to monetize.
              {% endif %}
         {% endif %}
+    {% elif request.user and issue|is_claimer:request.user  %}
+        &nbsp;
     {% else %}
             <td>
             {% for button in issue.coinbasebutton_set.all %}

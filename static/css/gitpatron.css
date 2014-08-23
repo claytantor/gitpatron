@@ -320,6 +320,14 @@ a.list-group-item.disabled:focus {
     font-size: x-large;
 }
 
+.coin-order-positive {
+    color: #00ad00;
+}
+
+.coin-order-negative {
+    color: #9a0c16;
+}
+
 .bs-callout-danger {
 background-color: #fdd8da;
 border-color: #d9534f;
@@ -330,4 +338,20 @@ margin: 20px 0;
 padding: 20px;
 border-left: 3px solid #e11;
     /*display: none;*/
+}
+
+/*-- issue   ----*/
+.issue-sidebar{
+    margin-bottom: 10px;
+    padding: 7px;
+    width:100%;
+    height:300px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    border:0px solid #777;
+    background-color: #eee;
+    -webkit-box-shadow: #8C8C8C 9px 9px 9px;
+    -moz-box-shadow: #8C8C8C 9px 9px 9px;
+    box-shadow: #8C8C8C 9px 9px 9px;
 }

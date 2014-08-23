@@ -19,8 +19,9 @@ class GithubV3():
             data_json = json.dumps(data_obj)
             req = urllib2.Request(url, data_json, {'Content-Type': 'application/json'})
             f = urllib2.urlopen(req)
-            response_obj = json.loads(f.read())
+            val_response = f.read()
             f.close()
+            response_obj = json.loads(val_response)
             return response_obj
         except HTTPError:
             return json.loads('{}')

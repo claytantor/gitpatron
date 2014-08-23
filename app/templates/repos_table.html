@@ -3,18 +3,20 @@
 {#        published by owner #}
         {% if repo.owner.user.username and repo.owner.user.username == request.user.username %}
         <tr>
-            <td class="col-md-10">
-                <div>{{ repo.name }}</div>
+            <td>
+                <div><a href="{% url 'repo' repo.owner.user.username repo.name %}"
+                   data-repoid="{{ repo.id }}"
+                   data-fullname="{{ repo.full_name }}">{{ repo.name }}</a></div>
                 <div>{{ repo.github_description }}</div>
             </td>
-            <td class="col-md-1">
-
-            </td>
-            <td class="col-md-1">
-                <a href="{% url 'repo' repo.owner.user.username repo.name %}"
-                   class="btn btn-primary" data-repoid="{{ repo.id }}"
-                   data-fullname="{{ repo.full_name }}">View Details</a>
-            </td>
+{#            <td class="col-md-1">#}
+{##}
+{#            </td>#}
+{#            <td class="col-md-1">#}
+{#                <a href="{% url 'repo' repo.owner.user.username repo.name %}"#}
+{#                   class="btn btn-primary" data-repoid="{{ repo.id }}"#}
+{#                   data-fullname="{{ repo.full_name }}">View Details</a>#}
+{#            </td>#}
         </tr>
 
 {#        unpublished by owner #}

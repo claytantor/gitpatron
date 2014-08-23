@@ -1,10 +1,15 @@
 {% load gitpatrontags %}
 {% if request.user.is_authenticated %}
-<span class="sidebar-title">From Github</span>
+  <span class="sidebar-title">Gitpatron</span>
   <div class="list-group">
+    <a href="{% url 'patron_settings' %}" class="list-group-item">Settings</a>
+  </div>
+  </hr>
+  <span class="sidebar-title">Github</span>
+  <div class="list-group">
+    <a href=#" class="list-group-item">Sync with Github</a>
     <a href="{% url 'user_repos' %}" class="list-group-item">Browse My Github Repos</a>
     <a href="#" class="list-group-item">Invite a Repo</a>
-    <a href="#" class="list-group-item">Browse Follow</a>
   </div>
   </hr>
 

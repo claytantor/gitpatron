@@ -4,33 +4,36 @@
     <tr>
         <td class="col-md-10">
                 <a href="{% url 'repo' claimed_issue.issue.repository.owner.user.username claimed_issue.issue.repository.name %}">
-                    {{ claimed_issue.issue.repository.name }}</a> {{ claimed_issue.issue.title }}</td>
-            {% if not claimed_issue.fixed %}
-                {% if claimed_issue.issue|is_monetized_fixer:request.user %}
-                    <td class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
-                        Waiting for payment.
-                    </td>
-                    <td>&nbsp;</td>
-                {% elif request.user|is_wallet_activated %}
-                    <td class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
-                        <button class="btn btn-primary has-spinner fixed_claimed_issue" data-fixed="{{ claimed_issue.id }}">
-                        <span class="glyphicon glyphicon-refresh" data-toggle="modal" data-target="#fix_modal"  style="display: none"></span>&nbsp;Monetize Fix</button>
-                    </td>
-                    <td>&nbsp;</td>
-                {% else %}
-                    <td class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
-                        Wallet not activated!
-                    </td>
-                    <td>&nbsp;</td>
-                {% endif %}
+                    {{ claimed_issue.issue.repository.name }}</a>
+                    <a href="{% url 'issue' claimed_issue.issue.repository.owner.user.username claimed_issue.issue.repository.name claimed_issue.issue.github_issue_no %}">
+                    #{{ claimed_issue.issue.github_issue_no }} {{ claimed_issue.issue.title }}</a>
+        </td>
+        {% if not claimed_issue.fixed %}
+            {% if claimed_issue.issue|is_monetized_fixer:request.user %}
+                <td class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
+                    Waiting for payment.
+                </td>
+                <td>&nbsp;</td>
+            {% elif request.user|is_wallet_activated %}
+                <td class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
+                    <button class="btn btn-primary has-spinner fixed_claimed_issue" data-fixed="{{ claimed_issue.id }}">
+                    <span class="glyphicon glyphicon-refresh" data-toggle="modal" data-target="#fix_modal"  style="display: none"></span>&nbsp;Monetize Fix</button>
+                </td>
+                <td>&nbsp;</td>
             {% else %}
-            <td class="col-md-1" id="fixed_button_{{ claimed_issue.id }}">
-            Fixed
-            </td>
-            <td class="col-md-1" id="fixed_button_{{ claimed_issue.id }}">
-            <button class="btn btn-primary has-spinner">View Proof</button>
-            </td>
+                <td class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
+                    Wallet not activated!
+                </td>
+                <td>&nbsp;</td>
             {% endif %}
+        {% else %}
+        <td class="col-md-1" id="fixed_button_{{ claimed_issue.id }}">
+        Fixed
+        </td>
+        <td class="col-md-1" id="fixed_button_{{ claimed_issue.id }}">
+        <button class="btn btn-primary has-spinner">View Proof</button>
+        </td>
+        {% endif %}
     </tr>
 {% endfor %}
 </table>

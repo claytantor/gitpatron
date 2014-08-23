@@ -20,6 +20,12 @@ urlpatterns = patterns('',
 
 
     url(r'^repo/([-\w]+)/([-\w]+)/$', 'app.views.repo', name='repo'),
+
+
+    #json
+    url(r'^repo/([-\w]+)/([-\w]+)/chart.json$',
+        'app.views.repo_chart_json', name='repo_chart_json'),
+
     url(r'^public/repos.html', 'app.views.public_repos',name='public_repos'),
 
 
@@ -43,6 +49,10 @@ urlpatterns = patterns('',
     url(r'^fix_issue_ajax/([\w]+)/$',
         'app.views.fix_issue_ajax',name='fix_issue_ajax'),
 
+    #monetize fix issue
+    url(r'^monetize_fix_ajax/([\w]+)/([\w]+)/$',
+        'app.views.monetize_fix_ajax',name='monetize_fix_ajax'),
+
     #fix
     url(r'^claimed/([\w]+)/$',
         'app.views.claimed_issue',name='claimed_issue'),
@@ -55,12 +65,16 @@ urlpatterns = patterns('',
     url(r'^issue/([-\w]+)/([-\w]+)/([-\w]+)/$',
         'app.views.issue',name='issue'),
 
-    #issue
+    #json
+    url(r'^issue/([-\w]+)/([-\w]+)/([-\w]+)/chart.json$',
+        'app.views.issue_chart_json',name='issue_chart_json'),
+
+    #patron
     url(r'^patron/([-\w]+)/$',
         'app.views.patron',name='patron'),
 
     #fix form
-    url(r'^fix_form_ajax.html',
+    url(r'^fix_form_ajax/([-\w]+)/([-\w]+)/([-\w]+)/$',
         'app.views.fix_form_ajax',name='fix_form_ajax'),
 
 
@@ -72,7 +86,9 @@ urlpatterns = patterns('',
     url(r'^payments.html',
             'app.views.payments',name='payments'),
 
-
+    #associate pull
+    url(r'^pull_mapping_ajax/([-\w]+)/([-\w]+)/([-\w]+)/$',
+        'app.views.pull_mapping_ajax',name='pull_mapping_ajax'),
 
     #coin oauth
     url(r'^cbauthredirect.html', 'app.views.cb_auth_redirect',name='cb_auth_redirect'),
@@ -86,6 +102,11 @@ urlpatterns = patterns('',
     url(r'^coin_success.html', 'app.views.coin_success',name='coin_success'),
     url(r'^coin_cancel.html', 'app.views.coin_cancel',name='coin_cancel'),
     url(r'^coin_info.html', 'app.views.coin_info',name='coin_info'),
+
+    url(r'^settings.html', 'app.views.patron_settings',name='patron_settings'),
+
+
+
 
     #admin
     url(r'^admin/', include(admin.site.urls)),

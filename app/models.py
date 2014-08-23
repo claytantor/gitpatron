@@ -13,9 +13,9 @@ reply_re = re.compile("^@(\w+)")
 
 class Patron(models.Model):
     user = models.ForeignKey(User)
-    name = models.CharField(max_length=250, unique=False)
+    name = models.CharField(max_length=250, unique=False, blank=True,  null=True)
     img = models.URLField(default="", verbose_name='Image URL', blank=True, null=True)
-    bio = models.TextField( default="", verbose_name='Patron Bio')
+    bio = models.TextField( default="", verbose_name='Patron Bio', blank=True,  null=True)
 
     # "login": "claytantor",
     github_login = models.CharField(max_length=250, unique=False)
@@ -24,7 +24,7 @@ class Patron(models.Model):
     github_id = models.BigIntegerField(unique=True, blank=True,  null=True)
 
     #   "avatar_url": "https://avatars.githubusercontent.com/u/407854?",
-    github_avatar_url = models.CharField(max_length=250, unique=False)
+    github_avatar_url = models.CharField(max_length=250, unique=False, blank=True, null=True)
 
     #   "gravatar_id": "c88d7ef134a9779657d7d63257b5f725",
     #   "url": "https://api.github.com/users/claytantor",
@@ -41,7 +41,7 @@ class Patron(models.Model):
     #   "received_events_url": "https://api.github.com/users/claytantor/received_events",
 
     #   "type": "User",
-    github_type = models.CharField(max_length=16, unique=False)
+    github_type = models.CharField(max_length=16, unique=False, blank=True,  null=True, default='User')
 
     github_access_token = models.CharField(max_length=64, unique=False)
 
@@ -58,9 +58,9 @@ class Patron(models.Model):
 class Repository(models.Model):
     name = models.CharField(max_length=250)
     fullname = models.CharField(max_length=250)
-    tagline = models.CharField(max_length=250)
-    github_description = models.TextField( default="", verbose_name='Repository Description')
-    markdown = models.TextField( default="", verbose_name='Published Repo Info')
+    tagline = models.CharField(max_length=250,null=True,blank=True)
+    github_description = models.TextField( default="", verbose_name='Repository Description',null=True,blank=True)
+    markdown = models.TextField( default="", verbose_name='Published Repo Info',null=True,blank=True)
     owner = models.ForeignKey('Patron',null=True,blank=True)
     private = models.NullBooleanField(default=False, null=True)
 
@@ -86,13 +86,15 @@ class Issue(models.Model):
     # "title": "Message length check",  
     title = models.CharField(max_length=250, unique=False)
 
-    json_body = models.TextField( default="", verbose_name='Issue JSON')
+    json_body = models.TextField( default="", verbose_name='Issue JSON', unique=False, null=True)
 
-    description = models.TextField( default="", verbose_name='Issue Description')
+    description = models.TextField( default="", verbose_name='Issue Description', unique=False, null=True)
 
     repository = models.ForeignKey('Repository',null=True,blank=True)
 
     status = models.CharField(max_length=16, unique=False)
+
+    issue_user = models.ForeignKey('Patron',null=True,blank=True)
 
     def __unicode__(self):
         return '{0} {1}'.format(self.github_id,self.title)
@@ -191,6 +193,7 @@ class CoinOrder(models.Model):
     receive_address = models.CharField(max_length=36)
     refund_address = models.CharField(max_length=36)
     button = models.ForeignKey('CoinbaseButton',null=True,blank=True)
+    created_at = models.DateTimeField(auto_now=True)
     def __unicode__(self):
         return '{0} order for button {1}'.format(self.id, self.button.code)
 
@@ -239,7 +242,10 @@ class CoinbaseButton(models.Model):
     total_coin_cents = models.BigIntegerField(default=0,null=True,blank=True)
     total_coin_currency_iso = models.CharField(max_length=3,null=True,blank=True)
     def __unicode__(self):
-        return '{0} for {1} {2}'.format(self.type,self.issue.github_id,self.issue.title)
+        if self.issue:
+            return '{0} for {1} {2}'.format(self.type,self.issue.github_id,self.issue.title)
+        else:
+            return 'unlinked button of type:{0}'.format(self.type)
 
     def is_owned_by(self, user_test):
         return self.owner.user == user_test
@@ -272,6 +278,39 @@ class WatchedRepository(models.Model):
     def __unicode__(self):
         return '{0} is watching {1}'.format(self.watcher.user.username,self.repository.name)
 
+
+class PullRequest(models.Model):
+
+    # # "url": "https://api.github.com/repos/claytantor/grailo/issues/4",
+    # name = models.CharField(max_length=250, unique=False)
+    github_api_url = models.CharField(max_length=250, unique=False)
+
+    # "html_url": "https://github.com/claytantor/grailo/issues/4",
+    github_html_url = models.CharField(max_length=250, unique=False)
+
+    # "id": 8657138,
+    github_id = models.BigIntegerField(unique=True, null=True)
+
+    # "number": 4,
+    github_issue_no = models.BigIntegerField(unique=False, null=True)
+
+    # "title": "Message length check",
+    title = models.CharField(max_length=250, unique=False)
+
+    json_body = models.TextField( default="", verbose_name='Issue JSON', unique=False, null=True)
+
+    description = models.TextField( default="", verbose_name='Issue Description', unique=False, null=True)
+
+    repository = models.ForeignKey('Repository',null=True,blank=True)
+
+    status = models.CharField(max_length=16, unique=False)
+
+    issue_user = models.ForeignKey('Patron',null=True,blank=True)
+
+    fix_issue = models.ForeignKey('Issue',null=True,blank=True)
+
+    def __unicode__(self):
+        return '{0} {1}'.format(self.github_id,self.title)
 
 # class HasOwner(object):
 #     """

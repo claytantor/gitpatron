@@ -4,13 +4,18 @@ from ConfigParser import RawConfigParser
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PROJECT_DIR = os.path.dirname(__file__)
+CONF_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+
 
 here = lambda x: os.path.join(os.path.abspath(os.path.dirname(__file__)), x)
 
 # you will need to copy the example and make custom
 # settings for the environment
 config = RawConfigParser()
-config.read('{0}/conf/settings.ini'.format(BASE_DIR))
+
+#place in a dir that is not managed in the code base
+# print 'config dir: {0}/conf/gitpatron_settings.ini'.format(CONF_DIR)
+config.read('{0}/conf/gitpatron_settings.ini'.format(CONF_DIR))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -37,6 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+    'django.contrib.humanize',
     'app',
     'app.templatetags',
     'markdown_deux',
@@ -151,3 +157,5 @@ COINBASE_ORDER_CALLBACK=config.get('coinbase','COINBASE_ORDER_CALLBACK')
 #gitpatron
 #http://local.gitpatron.com:8000
 GITPATRON_APP_URL = config.get('gitpatron','GITPATRON_APP_URL')
+GITPATRON_VERSION = config.get('gitpatron','GITPATRON_VERSION')
+GITPATRON_STATE = config.get('gitpatron','GITPATRON_STATE')

@@ -5,19 +5,25 @@
     <p>Please fix the errors below and re-submit.</p>
     <ul>
     {% for error in form.git_commit_id.errors %}
-        <li><strong>{{ error|escape }}</strong></li>
+        <li>git_commit_id:&nbsp;<strong>{{ error|escape }}</strong></li>
     {% endfor %}
     {% for error in form.message.errors %}
-        <li><strong>{{ error|escape }}</strong></li>
+        <li>message:&nbsp;<strong>{{ error|escape }}</strong></li>
     {% endfor %}
     {% for error in form.min_amount.errors %}
-        <li><strong>{{ error|escape }}</strong></li>
+        <li>min_amount:&nbsp;<strong>{{ error|escape }}</strong></li>
+    {% endfor %}
+    {% for error in form.issue_id.errors %}
+        <li>issue_id:&nbsp;<strong>{{ error|escape }}</strong></li>
+    {% endfor %}
+    {% for error in form.type.errors %}
+        <li>type:&nbsp;<strong>{{ error|escape }}</strong></li>
     {% endfor %}
     </ul>
 </div>
 {% endif %}
 
-<form action="{% url 'fix_form_ajax' %}" method="post" id="fix_form">{% csrf_token %}
+<form action="{% url 'fix_form_ajax' issue.repository.owner.user.username issue.repository.name issue.github_issue_no  %}" method="post" id="fix_form">{% csrf_token %}
     {# Include the hidden fields #}
     {% for hidden in form.hidden_fields %}
     {{ hidden }}

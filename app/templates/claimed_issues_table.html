@@ -1,0 +1,64 @@
+{% load gitpatrontags %}
+{% if claimed_issues|length > 0 %}
+<div>
+    <table class="table table-striped">
+    {% for claimed in claimed_issues %}
+    <tr>
+        {% if claimed.issue|is_monetized_fix %}
+
+            {% if claimed.issue|is_paid %}
+
+
+                {% with claimed.issue|paid_order as order%}
+                <td class="col-md-2">{{ order.created_at|date:"P D M d, Y" }}</td>
+                <td class="col-md-1">{{ order.external_id }}</td>
+                <td class="col-md-1">paid <a href="{% url 'patron' claimed.committer.user.username %}">{{ claimed.committer.user.username }}</a></td>
+                <td class="col-md-1"><a href="{% url 'repo' order.button.issue.repository.owner.user.username order.button.issue.repository.name %}">{{ order.button.issue.repository.name }}</a>  </td>
+                <td class="col-md-3"><a href="{% url 'issue' order.button.issue.repository.owner.user.username order.button.issue.repository.name order.button.issue.github_issue_no %}">#{{ order.button.issue.github_issue_no }} {{ order.button.issue.title }}</a></td>
+                <td class="col-md-1">{{ order.status }}</td>
+                <td class="col-md-3 coin-order-cents">
+                    <span class="coin-order-cents coin-order-negative">- {{ claimed.issue|payment_amount }} BTC</span>
+                </td>
+                {% endwith %}
+
+
+
+            {% elif claimed.issue|is_repo_owner:request.user %}
+
+
+                <td class="col-md-5">Payment requested by <a href="{% url 'patron' claimed.committer.user.username %}">{{ claimed.committer.user.username }}</a></td>
+                <td class="col-md-1"><a href="{% url 'repo' claimed.issue.repository.owner.user.username claimed.issue.repository.name %}">{{ claimed.issue.repository.name }}</a>  </td>
+                <td class="col-md-3"><a href="{% url 'issue' claimed.issue.repository.owner.user.username claimed.issue.repository.name claimed.issue.github_issue_no %}">#{{ claimed.issue.github_issue_no }} {{ claimed.issue.title }}</a></td>
+                <td class="col-md-3 coin-order-cents">
+                    <a class="coinbase-button"#}
+                       data-code="{{ claimed.button.code }}"
+                       data-button-text="Pay {{ claimed.committer.user.username }}"
+                       data-button-style="buy_now_small"
+                       href="https://coinbase.com/checkouts/{{ claimed.button.code }}">
+                        Pay {{ claimed.committer.user.username }}</a>
+                        <script src="https://coinbase.com/assets/button.js" type="text/javascript"></script>
+
+                </td>
+
+
+
+            {% else %}
+                <td class="col-md-12"><a href="{% url 'claimed_issue' claimed.id %}">view fix details</a></td>
+            {% endif %}
+
+        {% else %}
+
+            <td class="col-md-2">Unfixed Claim by <a href="{% url 'patron' claimed.committer.user.username %}">{{ claimed.committer.user.username }}</a></td>
+            <td class="col-md-1">&nbsp;</td>
+            <td class="col-md-1">&nbsp;</td>
+            <td class="col-md-1"><a href="{% url 'repo' claimed.issue.repository.owner.user.username claimed.issue.repository.name %}">{{ claimed.issue.repository.name }}</a>  </td>
+            <td class="col-md-3"><a href="{% url 'issue' claimed.issue.repository.owner.user.username claimed.issue.repository.name claimed.issue.github_issue_no %}">#{{ claimed.issue.github_issue_no }} {{ claimed.issue.title }}</a></td>
+            <td class="col-md-1">claimed</td>
+            <td class="col-md-3 coin-order-cents">+ 0.00 BTC</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+    </table>
+
+</div>
+{% endif %}

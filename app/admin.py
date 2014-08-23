@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from app.models import Patron,Repository,Issue,Reward,\
     Update,Comment,Question,CallbackMessage,\
-    CoinOrder,CoinCustomer,CoinTransaction,CoinbaseButton, ClaimedIssue, WatchedRepository
+    CoinOrder,CoinCustomer,CoinTransaction,CoinbaseButton, ClaimedIssue, \
+    WatchedRepository,PullRequest
 
 admin.site.register(Patron)
 admin.site.register(Repository)
@@ -18,5 +19,6 @@ admin.site.register(CoinTransaction)
 admin.site.register(CoinbaseButton)
 admin.site.register(ClaimedIssue)
 admin.site.register(WatchedRepository)
+admin.site.register(PullRequest)
 
 

@@ -1,0 +1,63 @@
+{% load gitpatrontags %}
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+});
+
+</script>
+<body>
+{#    {% load makenextags  %}#}
+    {% include 'topbar.html' %}
+    <div class="container gitpatron-top-container">
+        <div class="row">
+            <ul id="project_tabs" class="nav nav-pills" style="margin-top: 15px;">
+                <li class="active"><a href="#settings" data-toggle="tab">Settings</a></li>
+                <li><a href="#wallet" data-toggle="tab">Wallet</a></li>
+                <li><a href="#profile" data-toggle="tab">Profile</a></li>
+
+            </ul>
+        </div>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div class="tab-pane active" id="settings">
+                <div class="col-md-9" style="padding-left: 0px;">
+                    <h1>Settings</h1>
+                </div>
+                <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                    {% include 'sidebar.html' %}
+                </div><!--/span-->
+            </div>
+            <div class="tab-pane" id="wallet">
+                <div class="col-md-9" style="padding-left: 0px;">
+                    <h1>Wallet</h1>
+                    {% if  request.user and request.user|is_wallet_activated %}
+                        Wallet activated.
+                    {% endif %}
+                </div>
+                <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                    {% include 'sidebar.html' %}
+                </div><!--/span-->
+            </div>
+            <div class="tab-pane" id="profile">
+                <div class="col-md-9" style="padding-left: 0px;">
+                    <h1>Profile</h1>
+                </div>
+                <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                    {% include 'sidebar.html' %}
+                </div><!--/span-->
+            </div>
+        </div>
+
+
+
+    </div>
+
+    </div> <!-- /container -->
+    {% include "footer.html" %}
+</body>
+</html>

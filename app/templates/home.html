@@ -26,16 +26,6 @@ $(document).ready(function() {
 
     $('#chart').gpchart();
 
-{#    //make this jquery please#}
-{#    var chart = c3.generate({#}
-{#        bindto: '#chart',#}
-{#        data: {#}
-{#          columns: [#}
-{#            ['data1', 30, 200, 100, 400, 150, 250],#}
-{#            ['data2', 50, 20, 10, 40, 15, 25]#}
-{#          ]#}
-{#        }#}
-{#    });#}
 
 });
 
@@ -47,8 +37,6 @@ $(document).ready(function() {
         <div class="row">
             <ul id="project_tabs" class="nav nav-pills" style="margin-top: 15px;">
               <li class="active"><a href="#home" data-toggle="tab">Dashboard</a></li>
-{#              <li><a href="#updates" data-toggle="tab">Updates <span class="badge">0</span></a></li>#}
-{#              <li><a href="#patrons" data-toggle="tab">Supported Issues<span class="badge">0</span></a></li>#}
               <li><a href="#watched" data-toggle="tab">Watched <span class="badge">{{ watched|length }}</span></a></li>
               {% if repos %}
               <li><a href="#published_repos" data-toggle="tab">Published Repos <span class="badge">{{ repos|length }}</span></a></li>
@@ -66,11 +54,14 @@ $(document).ready(function() {
                 <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
               </p>
               <div class="jumbotron">
-{#                  https://avatars.githubusercontent.com/u/407854#}
                   <table>
                       <tr>
                           <td style="width: 128px; vertical-align: 0px;padding-right: 10px">
+                          {% if patron.github_avatar_url %}
                               <img src="{{  patron.github_avatar_url }}" class="gitpatron-avatar-128" alt="github avatar" >
+                          {% else %}
+                              <img src="{{ STATIC_URL }}img/generic_avatar.png" class="gitpatron-avatar-128" alt="github avatar" >
+                          {% endif %}
                           </td>
                           <td>
                              <h1>Hello, {{ patron.github_login }}!</h1>
@@ -82,28 +73,22 @@ $(document).ready(function() {
                       </tr>
                   </table>
             </div>
-            <div>
-                <h2>Your Payments</h2>
-                <div id="chart"></div>
-            </div>
+
 
             <div>
-                <h2>Your Feed</h2>
+                <h2>Donations to Your Repos</h2>
                 {% if orders %}
-                <table class="table table-striped">
-                    {% for order in orders %}
-                        <tr>
-                            <td class="col-md-1"><h4>Payment</h4></td>
-                            <td class="col-md-9"><strong>{{ order.button.issue.repository.name }}</strong> {{ order.button.issue.title }} {{ order.external_id }} {{ order.status }} </td>
-                            <td class="col-md-2 coin-order-cents">{{ order.total_coin_cents|btc_cents }} {{ order.total_coin_currency_iso }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
+                {% include 'order_table.html' %}
                 {% else %}
                 <strong>No Items in Your Feed Yet</strong>
                 {% endif %}
-
             </div>
+            {% if claimed_issues|length > 0 %}
+            <div>
+                <h2>Claimed Issues and Fixes for Your Repos</h2>
+                {% include 'claimed_issues_table.html' %}
+            </div>
+            {% endif %}
 
 
             </div><!--/span-->

@@ -4,6 +4,7 @@ from django.conf import settings
 import hashlib
 import hmac
 import time
+import urllib
 
 # GET /api/v1/account/balance HTTP/1.1
 # Accept: */*
@@ -30,16 +31,12 @@ class CoinbaseV1():
             'client_secret':app_client_secret
         }
 
-        print refresh_body
-
         refresh_response = opener.open(urllib2.Request(
             'https://coinbase.com/oauth/token',
             json.dumps(refresh_body),
             {'Content-Type': 'application/json'}))
 
         response_string = refresh_response.read()
-
-        print response_string
 
         return json.loads(response_string)
 
@@ -92,7 +89,6 @@ class CoinbaseV1():
             response = opener.open(urllib2.Request(url,body,{'Content-Type': 'application/json'}))
             return response
         except urllib2.HTTPError as e:
-            print e
             return e
 
     def get_json(self, url,
@@ -145,6 +141,7 @@ class CoinbaseV1():
 #     }
 #   }
 # }
+    #test
     def post_button_oauth(self,
             button_obj,
             access_token,
@@ -164,6 +161,9 @@ class CoinbaseV1():
 # Redirect the user to this page
 # https://coinbase.com/oauth/authorize?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_CALLBACK_URL
     def get_oauth_redirect(self):
+
+        print 'redirect_uri:{0}'.format(settings.COINBASE_OAUTH_CLIENT_CALLBACK)
+
         return 'https://coinbase.com/oauth/authorize?response_type=code&client_id={0}&redirect_uri={1}'.format(
             settings.COINBASE_OAUTH_CLIENT_ID,
             settings.COINBASE_OAUTH_CLIENT_CALLBACK)

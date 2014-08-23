@@ -1,16 +1,23 @@
+{% load gitpatrontags %}
 <div id="footer" class="panel-footer gitpatron-footer">
   <div class="container">
       <div class="col-md-5">
-          <p class="muted credit">&copy; gitpatron 2014</p>
+          <p class="muted credit">&copy; gitpatron 2014 version:{% settings_value "GITPATRON_VERSION" %} {% settings_value "GITPATRON_STATE" %}</p>
       </div>
-      <div class="col-md-5">
+
+
+
+      <div class="col-md-3">
           <a href="{% url 'attribution' %}" style="float: right; margin-right: 30px;">attribution</a>
+      </div>
+      <div class="col-md-2" style="margin-top: -5px;">
+          <a href='https://coinbase.com/?r=534c8de816403ea6c3000016&utm_campaign=user-referral&src=badge' alt='Create A Bitcoin Wallet On Coinbase'><img src='https://coinbase.com/assets/badges/badge3.png' width='120' height='40' /></a>
       </div>
       <div class="col-md-1">
           <a href="https://github.com/claytantor/gitpatron/fork"><img src="{{ STATIC_URL }}img/fork-button.png" style="height: 32px; float: right;"></a>
       </div>
       <div class="col-md-1">
-          <img src="{{ STATIC_URL }}img/by-nc-sa.png" style="height: 32px; float: right;">
+          <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="{{ STATIC_URL }}img/by-nc-sa.png" style="height: 32px; float: right;"></a>
       </div>
 
   </div>

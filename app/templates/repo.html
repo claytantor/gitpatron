@@ -1,4 +1,6 @@
 {% load gitpatrontags %}
+{% load markdown_deux_tags %}
+{% load humanize %}
 <!DOCTYPE html>
 <html>
 {% include 'head.html' %}
@@ -7,7 +9,7 @@
 $(document).ready(function() {
 
 
-    $('#publish_repo a').click(function (e) {
+    $('button.issues_sync').click(function (e) {
         $(this).find('span').show();
         $(this).find('span').toggleClass('glyphicon-refresh-animate');
         $.ajax({
@@ -36,7 +38,7 @@ $(document).ready(function() {
     $('button.claim_issue').click(function (e) {
         $(this).find('span').show();
         $(this).find('span').toggleClass('glyphicon-refresh-animate');
-        issue_id = $(this).data('issue')
+        issue_id = $(this).data('issue');
         $.ajax({
             url:"{{ settings.GITPATRON_APP_URL }}/claim_issue_ajax/"+issue_id+"/",
             success:function(result){
@@ -45,6 +47,46 @@ $(document).ready(function() {
         });
         return false;
 
+    });
+
+    $('button.associate_pull').click(function (e) {
+        $(this).find('span').show();
+        $(this).find('span').toggleClass('glyphicon-refresh-animate');
+        pull_request_id = $(this).data('pull-request-id');
+        issue_id = $("#select_pull_"+pull_request_id+" option:selected").data("issue-id");
+        $.ajax({
+            url:"{{ settings.GITPATRON_APP_URL }}/pull_mapping_ajax/{{ request.user }}/"+pull_request_id+"/"+issue_id+"/",
+            success:function(result){
+                $("#update_section_"+pull_request_id).html(result);
+                $("#pull_request_section_"+pull_request_id).html('<div class="col-md-6"><h3>Done!</h3></div>');
+            }
+        });
+        return false;
+    });
+
+    $('button.monetize_fix').click(function (e) {
+        $(this).find('span').show();
+        $(this).find('span').toggleClass('glyphicon-refresh-animate');
+        pull_request_id = $(this).data('pull-request-id');
+
+        $.ajax({
+            url:"{{ settings.GITPATRON_APP_URL }}/monetize_fix_ajax/{{ request.user }}/"+pull_request_id+"/",
+            success:function(result){
+                $("#update_section_"+pull_request_id).html(result);
+                $("#pull_request_section_"+pull_request_id).html('<div class="col-md-6"><h3>Done!</h3></div>');
+            }
+        });
+        return false;
+    });
+
+
+    $.ajax({ // ajax call starts
+        url: '{{ settings.GITPATRON_APP_URL }}/repo/{{ repo.owner.user.username }}/{{ repo.name }}/chart.json', // JQuery loads serverside.php
+        dataType: 'json', // Choosing a JSON datatype
+        success: function (chart_data) // Variable data contains the data we get from serverside
+        {
+            $('#chart').gpchart(chart_data);
+        }
     });
 
 
@@ -58,33 +100,46 @@ $(document).ready(function() {
             <div class="col-xs-12 col-sm-9">
                 {% if repo.owner.user.username == request.user.username %}
                 <div>
-                    <div class="nav navbar-right" id="publish_repo">
-                        <a class="btn btn-primary" href="#" role="button">Sync Issues &raquo;</a>
+                    <div class="nav navbar-right">
+                        <button class="btn btn-primary issues_sync" href="#" role="button">
+                            <span class="glyphicon glyphicon-refresh" style="display: none" id="issue_sync_icon"></span>
+                            &nbsp;Sync Issues &raquo;</button>
                     </div>
                 </div>
                 {% else%}
                     {% include 'watch_repo_ajax.html' %}
                 {% endif %}
                 <div>
-                    <h1>{{ repo.name }}</h1>
+                   <h1>{{ repo.name }}</h1>
                     <p>owned by <a href="{%  url 'patron' repo.owner.user.username %}">{{ repo.owner.user.username }}</a></p>
+                    <div>
+{% markdown  %}
+{{ repo.github_description }}
+{% endmarkdown %}
+                    </div>
+                </div>
+                {% if repo.owner.user.username == request.user.username and not request.user|is_wallet_activated %}
+                <p>
+                    <div class="form_errors bs-callout bs-callout-danger">
+                        <h4>Wallet Not Activated</h4>
+                        <p>You own this repo but have not activated your coinbase wallet
+                        so you are not able to monetize issues. Activate your wallet and
+                        you will be able to create donation buttons and pay committers.</p>
+                        <p><a class="btn btn-danger" href="{% url 'cb_auth_redirect' %}" role="button">Activate My Wallet Now &raquo;</a></p>
+                    </div>
+                </p>
+                {% endif %}
+
+                <div>
+                    <h2>Donations To This Repo</h2>
                     <h4>Patronage: {{ sum_patronage_cents|btc_cents }} BTC</h4>
                     <h4>Fix Payments: {{ sum_fix_cents|btc_cents }} BTC</h4>
-                    <p>{{ repo.github_description }}</p>
-                    {% if repo.owner.user.username == request.user.username and not request.user|is_wallet_activated %}
-                    <p>
-                        <div class="form_errors bs-callout bs-callout-danger">
-                            <h4>Wallet Not Activated</h4>
-                            <p>You own this repo but have not activated your coinbase wallet
-                            so you are not able to monetize issues. Activate your wallet and
-                            you will be able to create donation buttons and pay committers.</p>
-                            <p><a class="btn btn-danger" href="{% url 'cb_auth_redirect' %}" role="button">Activate My Wallet Now &raquo;</a></p>
-                        </div>
-                    </p>
-                    {% endif %}
-                    <div id="issues_area">
-                        {% include 'issues_ajax.html' %}
-                    </div>
+                    <div id="chart"></div>
+{#                    <div>{% include 'order_table.html' %}</div>#}
+                </div>
+
+                <div id="issues_area">
+                    {% include 'issues_ajax.html' %}
                 </div>
             </div>
             <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">

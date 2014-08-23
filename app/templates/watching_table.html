@@ -3,17 +3,11 @@
 {#        published by owner #}
         {% if watch.repository.owner.user.username and watch.repository.owner.user.username == request.user.username %}
         <tr>
-            <td class="col-md-10">
-                <div>{{ watch.repository.name }}</div>
+            <td class="col-md-12">
+                <div><a href="{% url 'repo' watch.repository.owner.user.username watch.repository.name %}"
+                   data-repoid="{{ watch.repository.id }}"
+                   data-fullname="{{ watch.repository.full_name }}">{{ watch.repository.name }}</a></div>
                 <div>{{ watch.repository.github_description }}</div>
-            </td>
-            <td class="col-md-1">
-
-            </td>
-            <td class="col-md-1">
-                <a href="{% url 'repo' watch.repository.owner.user.username watch.repository.name %}"
-                   class="btn btn-primary btn-publish" data-repoid="{{ watch.repository.id }}"
-                   data-fullname="{{ watch.repository.full_name }}">View Details</a>
             </td>
         </tr>
 
@@ -37,18 +31,12 @@
 {#        published by other #}
         {% elif watch.repository.owner.user.username and watch.repository.owner.user.username != request.user.username %}
         <tr>
-            <td class="col-md-10">
-                <div>{{ watch.repository.name }}</div>
+            <td class="col-md-12">
+                <div><a href="{% url 'repo' watch.repository.owner.user.username watch.repository.name %}"
+                   data-repoid="{{ watch.repository.id }}"
+                   data-fullname="{{ watch.repository.full_name }}">{{ watch.repository.name }}</a></div>
                 <div>{{ watch.repository.github_description }}</div>
             </td>
-            <td class="col-md-1">
-            </td>
-            <td class="col-md-1">
-                <a href="{% url 'repo' watch.repository.owner.user.username watch.repository.name %}"
-                   class="btn btn-primary btn-publish" data-repoid="{{ watch.repository.id }}"
-                   data-fullname="{{ watch.repository.full_name }}">View Details</a>
-            </td>
-        </tr>
 
         {% endif %}
 

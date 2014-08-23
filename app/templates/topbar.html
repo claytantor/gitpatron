@@ -25,13 +25,31 @@
                     <li><a style="padding: 5px 5px;" href="https://twitter.com/gitpatron" style="margin-left:10px;"><img src="{{ STATIC_URL }}img/twitter-logo.png" width="32" height="32"></a></li>
                     <li><a style="padding: 5px 5px;" href="https://github.com/claytantor/gitpatron" style="margin-left:10px;"><img src="{{ STATIC_URL }}img/github-logo.png" width="32" height="32"></a></li>
                 {% if request.user.is_authenticated %}
-                    <li><a href="{% url 'logout' %}">Logout {{ request.user.username }}</a></li>
+
+
+{#                    <li><a href="{% url 'logout' %}">Logout {{ request.user.username }}</a></li>#}
+                    <li>
+                    <div class="dropdown" style="margin-top: 5px;">
+                      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+                        {{ request.user.username }}
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'patron_settings' %}">Settings</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Sync With Github</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation"><a href="{% url 'logout' %}" role="menuitem" tabindex="-1" href="#">Sign Out</a></li>
+                      </ul>
+                    </div>
+                    </li>
+
+
+
                 {% else %}
-{#                    <li style="margin-right: 5px;"><button type="button btn-sm" class="btn btn-success">Join</button></li>#}
                     <li>
                         <button id="github_login" class="btn btn-default btn-small">
                         <img src="{{ STATIC_URL }}img/Logos-Github-icon.png"
-                             style="width: 16px; height: 16px; margin-bottom: 2px;"/>&nbsp;Login With Github</button>
+                             style="width: 16px; height: 16px; margin-bottom: 2px; margin-top: 5px;"/>&nbsp;Login With Github</button>
                     </li>
                 {% endif %}
               </ul>
