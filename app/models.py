@@ -199,7 +199,7 @@ class CoinOrder(models.Model):
     receive_address = models.CharField(max_length=36)
     refund_address = models.CharField(max_length=36)
     button = models.ForeignKey('CoinbaseButton',null=True,blank=True)
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(null=True,blank=True)
     def __unicode__(self):
         return '{0} order for button {1}'.format(self.id, self.button.code)
 
