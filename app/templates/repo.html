@@ -85,7 +85,7 @@ $(document).ready(function() {
         dataType: 'json', // Choosing a JSON datatype
         success: function (chart_data) // Variable data contains the data we get from serverside
         {
-            $('#chart').gpchart(chart_data);
+            $('#chart').gpchart_timeseries(chart_data);
         }
     });
 

@@ -30,8 +30,10 @@
     </span>
 {% elif pull_request.fix_issue != None  %}
     {% if  pull_request.issue_user.user == request.user %}
-        {% if pull_request.fix_issue|is_monetized_fixer:request.user %}
+        {% if pull_request.fix_issue|is_monetized_fixer:request.user and pull_request.fix_issue|is_paid == False %}
             You monetized this.
+        {% elif pull_request.fix_issue|is_paid %}
+            This fix has been paid.
         {% else %}
         <span  id="fixed_button_{{ claimed_issue.id }}">
             <button class="btn btn-primary has-spinner monetize_fix" id="button_pull_monitize_{{ pull_request.id }}"
@@ -43,18 +45,20 @@
         </span>
         {% endif %}
     {% else %}
-        {% if pull_request.fix_issue|is_monetized_owner:request.user %}
+        {% if pull_request.fix_issue|is_monetized_owner:request.user and pull_request.fix_issue|is_paid != True %} %}
             {% for button in pull_request.fix_issue.coinbasebutton_set.all %}
                 {% if button.type == 'fix' %}
-                    {{  button.code }} {{ button.type }}
+                    Payment Requested:
                     <a class="coinbase-button"
                        data-code="{{ button.code }}"
-                       data-button-style="donation_small"
+                       data-button-style="buy_now_small"
                        href="https://coinbase.com/checkouts/{{ button.code }}">
-                        Donate Bitcoins</a>
+                        Pay Bitcoins</a>
                     <script src="https://coinbase.com/assets/button.js" type="text/javascript"></script>
                 {% endif %}
             {% endfor %}&nbsp;
+        {% elif pull_request.fix_issue|is_paid %}
+            This fix has been paid.
         {% else %}
             Issue is associated
         {% endif %}

@@ -5,7 +5,7 @@
  */
 (function ( $ ) {
 
-    $.fn.gpchart = function(chart_data) {
+    $.fn.gpchart_basic = function(chart_data) {
 
         if(this.length>0){
             var chart_id = "#"+this[0].id;
@@ -16,10 +16,30 @@
             });
 
             return chart;
-
         }
+    };
 
 
+    $.fn.gpchart_timeseries = function(chart_data) {
+
+        if(this.length>0){
+            var chart_id = "#"+this[0].id;
+
+            var chart = c3.generate({
+                bindto: chart_id,
+                data: chart_data,
+                axis: {
+                    x: {
+                        type: 'timeseries',
+                        tick: {
+                            format: '%Y-%m-%d'
+                        }
+                    }
+                }
+            });
+
+            return chart;
+        }
     };
 
 }( jQuery ));

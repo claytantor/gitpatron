@@ -2,6 +2,8 @@ import urllib2
 import json
 from django.conf import settings
 from urllib2 import HTTPError
+import urllib
+import urlparse
 
 class GithubV3():
 
@@ -22,6 +24,27 @@ class GithubV3():
             val_response = f.read()
             f.close()
             response_obj = json.loads(val_response)
+            return response_obj
+        except HTTPError:
+            return json.loads('{}')
+
+    def post_json2(self, url, data_obj):
+        try:
+            data_json = json.dumps(data_obj)
+            req = urllib2.Request(url, data_json, {'Content-Type': 'application/json'})
+            f = urllib2.urlopen(req)
+            val_response = f.read()
+            f.close()
+            #result = urllib.unquote_plus('access_token=fe705f8830df00391e68ae6e31214a509a0cf8a5&scope=repo%2Cuser%3Aemail&token_type=bearer')
+            result = urllib.unquote_plus(val_response)
+            #{'access_token': ['fe705f8830df00391e68ae6e31214a509a0cf8a5'], 'scope': ['repo,user:email'], 'token_type': ['bearer']}
+            parsed = urlparse.parse_qs(result)
+
+            response_obj = {
+                'access_token':parsed['access_token'][0],
+                'scope':parsed['scope'][0],
+                'token_type':parsed['token_type'][0]
+            }
             return response_obj
         except HTTPError:
             return json.loads('{}')
@@ -77,7 +100,7 @@ class GithubV3():
             'code':oath_code
         }
 
-        response_obj = self.post_json(
+        response_obj = self.post_json2(
             'https://github.com/login/oauth/access_token',data)
 
         return response_obj

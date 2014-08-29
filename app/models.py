@@ -63,6 +63,8 @@ class Repository(models.Model):
     markdown = models.TextField( default="", verbose_name='Published Repo Info',null=True,blank=True)
     owner = models.ForeignKey('Patron',null=True,blank=True)
     private = models.NullBooleanField(default=False, null=True)
+    created_at = models.DateTimeField(null=True,blank=True)
+    updated_at = models.DateTimeField(null=True,blank=True)
 
     def __unicode__(self):
         return self.name
@@ -95,6 +97,10 @@ class Issue(models.Model):
     status = models.CharField(max_length=16, unique=False)
 
     issue_user = models.ForeignKey('Patron',null=True,blank=True)
+
+    created_at = models.DateTimeField(null=True,blank=True)
+
+    updated_at = models.DateTimeField(null=True,blank=True)
 
     def __unicode__(self):
         return '{0} {1}'.format(self.github_id,self.title)

@@ -3,6 +3,9 @@ import string
 import random
 import uuid
 import re
+import urllib
+from datetime import datetime
+from datetime import timedelta
 
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -168,12 +171,20 @@ def cbcallback(request,github_username):
 
 
 def login_user(request):
+    print settings.GIT_APP_REDIRECT
 
-	return redirect(
+    # rurl = 'https://github.com/login/oauth/authorize?client_id={0}&redirect_uri={1}&scope={2}'.format(
+		# settings.GIT_APP_CLIENT_ID,
+    #     urllib.quote_plus(settings.GIT_APP_REDIRECT),
+    #     settings.GIT_OAUTH_SCOPES)
+    #
+    # print rurl
+
+    return redirect(
 		'https://github.com/login/oauth/authorize?client_id={0}&redirect_uri={1}&scope={2}'.format(
 		settings.GIT_APP_CLIENT_ID,
-        	settings.GIT_APP_REDIRECT,
-        	settings.GIT_OAUTH_SCOPES), foo='bar')
+        urllib.quote_plus(settings.GIT_APP_REDIRECT),
+        settings.GIT_OAUTH_SCOPES), foo='bar')
 
 
 def oauth_redirect(request,
@@ -286,18 +297,45 @@ def repo_chart_json(request,git_username,repo_name):
     repo = Repository.objects.get(owner__user__username=git_username,name=repo_name)
     orders = CoinOrder.objects.filter(button__issue__repository=repo).order_by('created_at')
 
+
+    elapsedTime = datetime.now() - repo.created_at.replace(tzinfo=None)
+    days = elapsedTime.days
+
     data = {
-          'columns': [
+        'x': 'x',
+        'columns': [
+            ['x'],
             ['donations'],
-            ['amounts']
-          ]
+        ]
     }
 
     total_payments = 0
-    for order in orders:
-        total_payments += order.total_coin_cents
-        data['columns'][0].append(total_payments)
-        data['columns'][1].append(order.total_coin_cents)
+    for n in range(days):
+        date_donation = repo.created_at + timedelta(days=n)
+        donation_date_formatted = date_donation.strftime("%Y-%m-%d")
+        for order in orders:
+            order_date_formatted = order.created_at.strftime("%Y-%m-%d")
+
+            if donation_date_formatted == order_date_formatted:
+                total_payments += order.total_coin_cents
+
+
+        data['columns'][0].append(donation_date_formatted)
+        data['columns'][1].append("{0:g}".format(float(total_payments) / 100000000))
+
+
+    # data = {
+    #       'columns': [
+    #         ['donations'],
+    #         ['amounts']
+    #       ]
+    # }
+    #
+    # total_payments = 0
+    # for order in orders:
+    #     total_payments += order.total_coin_cents
+    #     data['columns'][0].append(total_payments)
+    #     data['columns'][1].append(order.total_coin_cents)
 
     return HttpResponse(json.dumps(data), mimetype='application/json')
 
@@ -431,9 +469,7 @@ def monetize_issue_ajax(request, issue_id,
     helper = GitpatronHelper()
     helper.refresh_user_token(patron.user.username)
 
-
     refresh_response = helper.refresh_user_token(patron.user.username)
-
 
     button_response = client_coinbase.post_button_oauth(
             button_request,
@@ -539,7 +575,7 @@ def monetize_fix_ajax(
     # how much I want to be paid. righT?
     # lets assume they are crazy, and that they arent
     # paid shit until we get a form model going
-    claim_issue_ajax = ClaimedIssue.objects.get(issue_id=pull_request.fix_issue.id)
+    claim_issue_ajax = ClaimedIssue.objects.get(issue=pull_request.fix_issue)
 
 
     #ok make a gd button!
@@ -559,7 +595,7 @@ def monetize_fix_ajax(
             'name':'Fix for {0} {1}'.format(claim_issue_ajax.issue.github_id, claim_issue_ajax.issue.title),
             'custom':button_guid,
             'description':'Fix for {0}'.format(claim_issue_ajax.issue.title),
-            'price_string':total_payments,
+            'price_string':0.005384,
             'price_currency_iso':'BTC',
             'button_type':'buy_now',
             'style':'buy_now_small',
@@ -823,7 +859,7 @@ def fix_form_ajax(request,
                     'name':'Fix for {0} {1}'.format(claim_issue_ajax.issue.github_id, claim_issue_ajax.issue.title),
                     'custom':button_guid,
                     'description':'Fix for {0}'.format(claim_issue_ajax.issue.title),
-                    'price_string':fixform.cleaned_data['min_amount'],
+                    'price_string':0.005384,
                     'price_currency_iso':'BTC',
                     'button_type':'buy_now',
                     'style':'buy_now_small',
@@ -897,18 +933,30 @@ def issue(request,
           template_name="issue.html"):
 
     issue = Issue.objects.get(repository__fullname='{0}/{1}'.format(owner,reponame),github_issue_no=issue_no)
-    orders = CoinOrder.objects.filter(button__issue=issue)
+    patronage_orders = CoinOrder.objects.filter(button__issue=issue,button__type='patronage')
+    fix_orders = CoinOrder.objects.filter(button__issue=issue,button__type='fix')
 
     #sum all orders value
     #total_payments = reduce(lambda x, y: x.total_coin_cents + y.total_coin_cents, orders)
-    total_payments = 0
-    for order in orders:
-        total_payments += order.total_coin_cents
+    total_patronage = 0
+    for order in patronage_orders:
+        total_patronage += order.total_coin_cents
+
+    total_fix = 0
+    for order in fix_orders:
+        total_fix += order.total_coin_cents
+
+
+
+    #pull requests paid related to this issue
+
 
     context = {
         'issue':issue,
-        'orders':orders,
-        'total_payments':total_payments
+        'patronage_orders':patronage_orders,
+        'fix_orders':fix_orders,
+        'total_patronage':total_patronage,
+        'total_fix':total_fix,
     }
 
     return render_to_response(template_name,
@@ -963,21 +1011,33 @@ def issue_chart_json(request,
           reponame,
           issue_no):
 
-    data = {
-          'columns': [
-            ['donations'],
-            ['amounts']
-          ]
-    }
 
     issue = Issue.objects.get(repository__fullname='{0}/{1}'.format(owner,reponame),github_issue_no=issue_no)
     orders = CoinOrder.objects.filter(button__issue=issue).order_by('created_at')
 
-    total_payments = 0;
-    for order in orders:
-        total_payments += order.total_coin_cents
-        data['columns'][0].append(total_payments)
-        data['columns'][1].append(order.total_coin_cents)
+    elapsedTime = datetime.now() - issue.created_at.replace(tzinfo=None)
+    days = elapsedTime.days
+
+    data = {
+        'x': 'x',
+        'columns': [
+            ['x'],
+            ['donations'],
+        ]
+    }
+
+    total_payments = 0
+    for n in range(days):
+        date_donation = issue.created_at + timedelta(days=n)
+        donation_date_formatted = date_donation.strftime("%Y-%m-%d")
+        for order in orders:
+            order_date_formatted = order.created_at.strftime("%Y-%m-%d")
+            if donation_date_formatted == order_date_formatted:
+                total_payments += order.total_coin_cents
+
+
+        data['columns'][0].append(donation_date_formatted)
+        data['columns'][1].append("{0:g}".format(float(total_payments) / 100000000))
 
 
     return HttpResponse(json.dumps(data), mimetype='application/json')
