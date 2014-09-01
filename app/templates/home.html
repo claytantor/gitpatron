@@ -33,7 +33,17 @@ $(document).ready(function() {
 <body>
 {#    {% load makenextags  %}#}
     {% include 'topbar.html' %}
+
+
     <div class="container gitpatron-top-container">
+        <p>
+            <div class="form_errors bs-callout bs-callout-danger">
+                <h4>Warning: Alpha Software</h4>
+                <p>We are still working on the website and its not quite ready for prime time. Right now it is intended for
+                testing purposes only. Please <a href="http://eepurl.com/YxMjH">sign up for the BETA program</a> if you are interested in
+                participating in advance availability for gitpatron.</p>
+            </div>
+        </p>
         <div class="row">
             <ul id="project_tabs" class="nav nav-pills" style="margin-top: 15px;">
               <li class="active"><a href="#home" data-toggle="tab">Dashboard</a></li>

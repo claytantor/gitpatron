@@ -226,7 +226,7 @@ def oauth_redirect(request,
                 # context['message']=request.POST['username']+' account has been suspended.'
                 return render_to_response('error.html',{'message':'auth user is not empty but us unactive'},context_instance=RequestContext(request))
         else:
-            return render_to_response('error.html',{'message':'auth user is empty'},context_instance=RequestContext(request))
+            return render_to_response('error.html',{'message':'auth user is empty or (most likely) the GITPATRON_PW_SECRET_KEY is incorrect '},context_instance=RequestContext(request))
 
 
     else:
@@ -541,6 +541,40 @@ def fix_issue_ajax(request, fix_issue_id,
     return render_to_response(template_name,
         { 'ajax_message':'Issue set to fixed and closed on github.' },
         context_instance=RequestContext(request))
+
+
+@require_http_methods(["GET"])
+@login_required(login_url='/login.html')
+def wallet_wf_ajax(request, wf_index):
+
+    data = {}
+
+    patron = Patron.objects.get(user__username=request.user.username)
+
+    if int(wf_index) == 1:
+        data['message'] = 'setting patron to has coinbase wallet'
+        data['next'] = True
+        data['this_state'] = 1
+        data['next_state'] = 2
+        patron.account_created = True
+        patron.save()
+
+    elif int(wf_index) == 2:
+        data['message'] = 'saving coinbase wallet address'
+        data['next'] = True
+        data['this_state'] = 2
+        data['next_state'] = 3
+        patron.wallet_address = request.GET['address']
+        patron.save()
+
+    elif int(wf_index) == 3:
+        data['message'] = 'activating wallet'
+    elif int(wf_index) == 4:
+        data['message'] = 'checking for donation'
+    else:
+        data['message'] = 'dont know what to do here'
+
+    return HttpResponse(json.dumps(data), mimetype='application/json')
 
 
 #'app.views.monetize_fix_ajax',name='monetize_fix_ajax'),

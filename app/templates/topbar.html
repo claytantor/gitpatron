@@ -1,3 +1,4 @@
+{% load gitpatrontags %}
 <div class="navbar navbar-inverse navbar-fixed-top" style="height: 80px;">
       <div class="navbar-header">
         <div class="container">
@@ -11,11 +12,13 @@
 
             </div>
             <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
-              <a href="{% url 'site_landing' %}" class="navbar-brand"><img src="{{ STATIC_URL }}img/gitpatron-logo-64.png" style="width: 64px; height: 64px;">&nbsp;gitpatron</a>
+              <a href="{% url 'site_landing' %}" class="navbar-brand"><img src="{{ STATIC_URL }}img/gitpatron-logo-big-new-64.png" style="width: 64px; height: 64px;">&nbsp;gitpatron</a>
               <ul class="nav navbar-nav navbar-left" style="margin-top: 20px; margin-left: 30px;">
-                <li>
-                  <a href="{% url 'patron_home' %}">Home</a>
-                </li>
+                  {% if request.user.is_authenticated %}
+                    <li>
+                      <a href="{% url 'patron_home' %}">Home</a>
+                    </li>
+                  {% endif %}
                 <li>
                   <a href="{% url 'about_gitpatron' %}">About</a>
                 </li>
@@ -25,9 +28,6 @@
                     <li><a style="padding: 5px 5px;" href="https://twitter.com/gitpatron" style="margin-left:10px;"><img src="{{ STATIC_URL }}img/twitter-logo.png" width="32" height="32"></a></li>
                     <li><a style="padding: 5px 5px;" href="https://github.com/claytantor/gitpatron" style="margin-left:10px;"><img src="{{ STATIC_URL }}img/github-logo.png" width="32" height="32"></a></li>
                 {% if request.user.is_authenticated %}
-
-
-{#                    <li><a href="{% url 'logout' %}">Logout {{ request.user.username }}</a></li>#}
                     <li>
                     <div class="dropdown" style="margin-top: 5px;">
                       <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
@@ -42,10 +42,7 @@
                       </ul>
                     </div>
                     </li>
-
-
-
-                {% else %}
+                {% elif "ENVIRONMENT"|settings_value_filter != "PROD" %}
                     <li>
                         <button id="github_login" class="btn btn-default btn-small">
                         <img src="{{ STATIC_URL }}img/Logos-Github-icon.png"
@@ -57,3 +54,4 @@
         </div>
       </div>
     </div>
+

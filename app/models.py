@@ -51,6 +51,15 @@ class Patron(models.Model):
 
     coinbase_callback_secret = models.CharField(max_length=128, unique=False, blank=True,  null=True)
 
+    #is_account_created
+    account_created = models.NullBooleanField(default=False, null=True)
+
+    #wallet_address
+    wallet_address = models.CharField(max_length=64, unique=False, blank=True,  null=True)
+
+    #has_donated
+    has_donated = models.NullBooleanField(default=False, null=True)
+
     def __unicode__(self):
         return self.github_login
 

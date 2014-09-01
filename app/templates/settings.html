@@ -6,6 +6,66 @@
 
 $(document).ready(function() {
 
+    {% if  request.user and request.user|is_wallet_activated %}
+        $('#project_tabs a[href="#settings"]').tab('show');
+    {% else %}
+        $('#project_tabs a[href="#wallet"]').tab('show');
+    {% endif %}
+
+    var wallet_wf_state = 2;
+
+    settings_workflow_state_init_ui(wallet_wf_state);
+
+
+    function settings_workflow_state_init_ui(this_state){
+
+        $("#wf_list_"+this_state).find("span").removeClass( "glyphicon-minus" );
+        $("#wf_list_"+this_state).find("span").addClass( "glyphicon-star" );
+        $("#wf_list_"+this_state ).removeClass( "disabled" );
+        $("#wallet_step_"+this_state).show();
+
+    }
+
+    function settings_workflow_state_change_ui(this_state, next_state){
+        $("#wallet_step_"+this_state).fadeOut( "slow", function() {
+            $("#wf_list_"+this_state).find("span").removeClass( "glyphicon-star" );
+            $("#wf_list_"+this_state).find("span").addClass( "glyphicon-minus" );
+
+            $("#wf_list_"+next_state).find("span").removeClass( "glyphicon-minus" );
+            $("#wf_list_"+next_state).find("span").addClass( "glyphicon-star" );
+
+            $("#wf_list_"+this_state ).toggleClass( "disabled" );
+            $("#wf_list_"+next_state ).toggleClass( "disabled" );
+            $("#wallet_step_"+this_state).hide();
+            $("#wallet_step_"+next_state).show();
+        });
+    }
+
+
+    $('button.wallet_wf_next').click(function (e) {
+
+        var wf_state = $(this).data("wf-state");
+
+        $.ajax({
+            url:"{{ settings.GITPATRON_APP_URL }}/wallet_wf_ajax/"+wf_state+"/",
+            success:function(data){
+                console.log(data.message);
+                if(data.next_state==2){
+                    var this_state = data.this_state;
+                    var next_state = data.next_state;
+                    settings_workflow_state_change_ui(this_state, next_state);
+
+
+                } else if (data.next_state==3){
+
+                }
+            }
+        });
+        return false;
+    });
+
+
+
 });
 
 </script>
@@ -15,7 +75,7 @@ $(document).ready(function() {
     <div class="container gitpatron-top-container">
         <div class="row">
             <ul id="project_tabs" class="nav nav-pills" style="margin-top: 15px;">
-                <li class="active"><a href="#settings" data-toggle="tab">Settings</a></li>
+                <li><a href="#settings" data-toggle="tab">Settings</a></li>
                 <li><a href="#wallet" data-toggle="tab">Wallet</a></li>
                 <li><a href="#profile" data-toggle="tab">Profile</a></li>
 
@@ -34,10 +94,72 @@ $(document).ready(function() {
             </div>
             <div class="tab-pane" id="wallet">
                 <div class="col-md-9" style="padding-left: 0px;">
-                    <h1>Wallet</h1>
-                    {% if  request.user and request.user|is_wallet_activated %}
-                        Wallet activated.
-                    {% endif %}
+                    <div class="row col-md-12">
+                       <h1>Wallet</h1>
+                       <p>
+                            <div class="form_errors bs-callout bs-callout-danger">
+                                <h4>Warning: Your Wallet Needs To Be Activated</h4>
+                                <p>While you don't need to activate a coinbase wallet to donate to an issue (any bitcoin wallet will work), you do need
+                                one to publish repos, or receive payment. That's because we directly integrate the coinbase API
+                                into the publisher and fixer workflow to automate the payment process. <strong>Its completely free
+                                and easy to create a coinbase wallet so please follow the directions below to
+                                activate your wallet now.</strong></p>
+                            </div>
+                        </p>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            {% if  request.user and request.user|is_wallet_activated %}
+                                Wallet activated.
+                            {% else %}
+                            <div id="wallet_step_1" style="display: none;">
+                                <h3>Let's Create Your Coinbase Wallet!</h3>
+                                <p>Its super easy to create a coinbase wallet, and you will need one if you plan on publishing your
+                                github repositories or if you want to collect bitcoin for fixing issues. You will need to come back
+                                    to this page for the next step once you have created your account.
+                                </p>
+                                <p><strong>Click on the "bitcoin accepted here" button below now
+                                to create your wallet on coinbase. </strong></p>
+                                <div style="margin-top: 10px;"><a href='https://coinbase.com/?r=534c8de816403ea6c3000016&utm_campaign=user-referral&src=badge'
+                                 alt='Create A Bitcoin Wallet On Coinbase'><img src='https://coinbase.com/assets/badges/badge3.png'
+                                 width='120' height='40' /></a>
+                                <button href="{% url 'wallet_wf_ajax' 1 %}" class="btn-primary btn wallet_wf_next" style="margin-left: 10px;" data-wf-state="1">I Have A Coinbase Wallet</button>
+                                </div>
+                            </div>
+                            <div id="wallet_step_2" style="display: none;">
+                                <h3>Enter Your Coinbase Wallet Address</h3>
+                                <p>
+                                    We need your wallet address to verify that you have a coinbase wallet. This is done by asking you
+                                    to make a small donation (less than one USD) to gitpatron which we will track to verify that you wallet has been successfully
+                                    created.
+                                </p>
+                                <p>
+                                    <form class="form-inline" role="form">
+                                      <div class="form-group">
+                                        <label class="sr-only" for="walletAddress">Coinbase wallet address</label>
+                                        <input type="email" class="form-control" id="walletAddress" placeholder="Enter wallet address">
+                                      </div>
+                                      <button type="submit" class="btn btn-primary">Save Address</button>
+                                    </form>
+                                </p>
+                            </div>
+
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Your to-do list.</h4>
+                            <div class="list-group">
+                                <a href="#" id="wf_list_1" class="list-group-item disabled"><span class="glyphicon glyphicon-minus"></span>&nbsp;Create Coinbase Wallet</a>
+                                <a href="#" id="wf_list_2" class="list-group-item disabled"><span class="glyphicon glyphicon-minus"></span>&nbsp;Enter Your Coinbase Address</a>
+                                <a href="#" id="wf_list_3" class="list-group-item disabled"><span class="glyphicon glyphicon-minus"></span>&nbsp;Activate Your Wallet</a>
+                                <a href="#" id="wf_list_4" class="list-group-item disabled"><span class="glyphicon glyphicon-minus"></span>&nbsp;Donate to <strong>gitpatron</strong></a>
+                              </div>
+
+                        </div>
+
+                    </div>
+
+
                 </div>
                 <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
                     {% include 'sidebar.html' %}

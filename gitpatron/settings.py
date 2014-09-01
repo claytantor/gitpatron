@@ -25,9 +25,11 @@ SECRET_KEY = config.get('secrets','DJANGO_SECRET_KEY')
 GITPATRON_PW_SECRET_KEY = config.get('secrets','GITPATRON_PW_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config.get('debug','DEBUG')
 
 TEMPLATE_DEBUG = config.get('debug','DEBUG')
+
+ENVIRONMENT = config.get('base','ENVIRONMENT')
 
 ALLOWED_HOSTS = []
 

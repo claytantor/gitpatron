@@ -126,7 +126,9 @@ def addcss(field, css):
 def settings_value(name):
     return getattr(settings, name, "")
 
-
+@register.filter(name='settings_value_filter')
+def settings_value_filter(name):
+   return getattr(settings, name, "")
 
 class SetVarNode(template.Node):
 

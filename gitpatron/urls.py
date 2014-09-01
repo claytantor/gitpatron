@@ -11,16 +11,19 @@ urlpatterns = patterns('',
     url(r'^index.html', 'app.views.index',name='site_landing'),
     url(r'^home.html', 'app.views.home', name='patron_home'),
     url(r'^logout.html', 'app.views.logout_user', name='logout'),
+
     url(r'^login.html', 'app.views.login_user', name='login'),
+
+
     url(r'^repos.html', 'app.views.repos', name='user_repos'),
     url(r'^claimed.html', 'app.views.claimed',name='user_claimed'),
     url(r'^about.html', 'app.views.about_gitpatron',name='about_gitpatron'),
     url(r'^attribution.html', 'app.views.attribution',name='attribution'),
 
+    url(r'^wallet_wf_ajax/([-\w]+)/$', 'app.views.wallet_wf_ajax', name='wallet_wf_ajax'),
 
 
     url(r'^repo/([-\w]+)/([-\w]+)/$', 'app.views.repo', name='repo'),
-
 
     #json
     url(r'^repo/([-\w]+)/([-\w]+)/chart.json$',
