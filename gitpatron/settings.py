@@ -27,7 +27,7 @@ GITPATRON_PW_SECRET_KEY = config.get('secrets','GITPATRON_PW_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config.get('debug','DEBUG')
 
-TEMPLATE_DEBUG = config.get('debug','DEBUG')
+TEMPLATE_DEBUG = config.get('debug','TEMPLATE_DEBUG')
 
 ENVIRONMENT = config.get('base','ENVIRONMENT')
 
