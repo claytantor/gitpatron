@@ -22,7 +22,15 @@ $(document).ready(function() {
                 </div>
                 <div class="col-md-9">
                 <h1>{{ patron.github_login }}</h1>
+
                 <table class="table">
+                    {% if github_user.html_url %}
+                    <tr>
+                        <td>on github</td><td><a href="{{ github_user.html_url }}">{{ github_user.html_url }}</a></td>
+                    </tr>
+                    {% endif %}
+
+
                     {% if github_user.blog %}
                     <tr>
                         <td>blog</td><td><a href="{{ github_user.blog }}">{{ github_user.blog }}</a></td>

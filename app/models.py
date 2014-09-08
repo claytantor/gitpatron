@@ -52,13 +52,15 @@ class Patron(models.Model):
     coinbase_callback_secret = models.CharField(max_length=128, unique=False, blank=True,  null=True)
 
     #is_account_created
-    account_created = models.NullBooleanField(default=False, null=True)
+    account_created = models.NullBooleanField(default=False,  blank=True,  null=True)
 
     #wallet_address
     wallet_address = models.CharField(max_length=64, unique=False, blank=True,  null=True)
 
     #has_donated
     has_donated = models.NullBooleanField(default=False, null=True)
+
+    gravatar_email = models.EmailField(max_length=128, unique=False, blank=True,  null=True)
 
     def __unicode__(self):
         return self.github_login
@@ -210,7 +212,7 @@ class CoinOrder(models.Model):
     button = models.ForeignKey('CoinbaseButton',null=True,blank=True)
     created_at = models.DateTimeField(null=True,blank=True)
     def __unicode__(self):
-        return '{0} order for button {1}'.format(self.id, self.button.code)
+        return 'order: {0} button type: {1} issue: {2}'.format(self.external_id, self.button.type, self.button.issue.title)
 
 
 
@@ -256,6 +258,7 @@ class CoinbaseButton(models.Model):
     callback_url = models.CharField(max_length=256,null=True,blank=True)
     total_coin_cents = models.BigIntegerField(default=0,null=True,blank=True)
     total_coin_currency_iso = models.CharField(max_length=3,null=True,blank=True)
+    enabled = models.NullBooleanField(default=False, null=True)
     def __unicode__(self):
         if self.issue:
             return '{0} for {1} {2}'.format(self.type,self.issue.github_id,self.issue.title)
@@ -283,6 +286,8 @@ class ClaimedIssue(models.Model):
     fixed = models.NullBooleanField(default=False, null=True)
     github_commit_id = models.CharField(max_length=255,null=True,blank=True)
     committer_type = models.CharField(max_length=16,null=True,blank=True)
+    created_at = models.DateTimeField(null=True,blank=True)
+    updated_at = models.DateTimeField(null=True,blank=True)
 
     def __unicode__(self):
         return '{0} has claimed {1}'.format(self.committer.user.username,self.issue.title)
@@ -323,6 +328,9 @@ class PullRequest(models.Model):
     issue_user = models.ForeignKey('Patron',null=True,blank=True)
 
     fix_issue = models.ForeignKey('Issue',null=True,blank=True)
+
+    created_at = models.DateTimeField(null=True,blank=True)
+    updated_at = models.DateTimeField(null=True,blank=True)
 
     def __unicode__(self):
         return '{0} {1}'.format(self.github_id,self.title)

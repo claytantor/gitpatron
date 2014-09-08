@@ -1,0 +1,18 @@
+{% load gitpatrontags %}
+{% if issue|payment_status_filter == "none" %}
+<span class="label label-default gitpatron-label text-center" >none <span class="glyphicon glyphicon-minus-sign"></span></span>
+{% elif issue|payment_status_filter == "monetized"  %}
+    {% if request.user and  issue|is_repo_owner:request.user %}
+        <span class="label label-info gitpatron-label text-center" >monetized <span class="glyphicon glyphicon-plus-sign"></span></span>
+    {% else %}
+        <span id="claim_section_{{ issue.id }}" style="display: block;">
+         <button class="btn btn-default btn-xs claim_issue" data-issue="{{ issue.id }}">
+            <span class="glyphicon glyphicon-refresh" style="display: none" id="issue_sync_icon"></span>
+            &nbsp;Claim Issue</button>
+        </span>
+    {% endif %}
+{% elif issue|payment_status_filter == "claimed"  %}
+<span class="label label-warning gitpatron-label text-center" >claimed <span class="glyphicon glyphicon-warning-sign"></span></span>
+{% elif issue|payment_status_filter == "fixed"  %}
+<span class="label label-danger gitpatron-label text-center" >fixed <span class="glyphicon glyphicon-check"></span></span>
+{% endif %}

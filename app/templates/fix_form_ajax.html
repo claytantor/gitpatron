@@ -22,17 +22,3 @@
     </ul>
 </div>
 {% endif %}
-
-<form action="{% url 'fix_form_ajax' issue.repository.owner.user.username issue.repository.name issue.github_issue_no  %}" method="post" id="fix_form">{% csrf_token %}
-    {# Include the hidden fields #}
-    {% for hidden in form.hidden_fields %}
-    {{ hidden }}
-    {% endfor %}
-    {# Include the visible fields #}
-    {% for field in form.visible_fields %}
-        <div class="fieldWrapper">
-            {{ field.label_tag }} {{field|addcss:"form-control"}}
-        </div>
-    {% endfor %}
-{#    <p><input type="submit" value="Send message" class="btn btn-primary"/></p>#}
-</form>

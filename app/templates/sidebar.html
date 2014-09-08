@@ -13,40 +13,36 @@
   </div>
   </hr>
 
-  <span class="sidebar-title">Patrons</span>
-  <div class="list-group">
+{#  <span class="sidebar-title">Patrons</span>#}
+{#  <div class="list-group">#}
 {#    <a href="{% url 'browse_published_repos' %}" class="list-group-item">Find A Published Repo</a>#}
-    <a href="{% url 'public_repos' %}" class="list-group-item">All Published Repos</a>
-    <a href="{% url 'user_repos' %}" class="list-group-item">Support An Issue</a>
-  </div>
-  </hr>
+{#    <a href="{% url 'public_repos' %}" class="list-group-item">All Published Repos</a>#}
+{#    <a href="{% url 'user_repos' %}" class="list-group-item">Support An Issue</a>#}
+{#  </div>#}
+{#  </hr>#}
 
   <span class="sidebar-title">Repo Owners</span>
   <div class="list-group">
-    {% if  request.user and request.user|is_wallet_activated %}
-    <a href="#" class="list-group-item disabled">Activate My Wallet - DONE</a>
+    {% if  request.user|wallet_state_filter >= 5 %}
+        <a href="#" class="list-group-item disabled">Authorize My Wallet - DONE</a>
+        <a href="{% url 'user_repos' %}" class="list-group-item">Publish A Repo</a>
     {% else %}
-    <a href="{% url 'cb_auth_redirect' %}" class="list-group-item">Activate My Wallet</a>
+        <a href="{% url 'patron_settings' %}" class="list-group-item">Authorize My Wallet</a>
     {% endif %}
-
-    <a href="{% url 'user_repos' %}" class="list-group-item">Publish A Repo</a>
-    <a href="{% url 'user_repos' %}" class="list-group-item">Pay A Committer</a>
-    <a href="{% url 'patronage' %}" class="list-group-item">Patronage</a>
   </div>
   </hr>
 
   <span class="sidebar-title">Committers</span>
   <div class="list-group">
-    {% if  request.user and request.user|is_wallet_activated %}
-    <a href="#" class="list-group-item disabled">Activate My Wallet - DONE</a>
+    {% if  request.user|wallet_state_filter >= 5 %}
+        <a href="#" class="list-group-item disabled">Activate My Wallet - DONE</a>
+        <a href="{% url 'user_claimed' %}" class="list-group-item">Claimed Issues</a>
+        <a href="{% url 'payments' %}" class="list-group-item">Payments</a>
     {% else %}
-    <a href="{% url 'cb_auth_redirect' %}" class="list-group-item">Activate My Wallet</a>
+        <a href="{% url 'patron_settings' %}" class="list-group-item">Authorize My Wallet</a>
     {% endif %}
-    <a href="{% url 'user_claimed' %}" class="list-group-item">Claimed Issues</a>
-    <a href="{% url 'payments' %}" class="list-group-item">Payments</a>
   </div>
 {% else %}
-
     <span class="sidebar-title">Non Member Menu</span>
     <div class="list-group">
         <a href="#" class="list-group-item">Join <stron>gitpatron</stron></a>

@@ -18,16 +18,14 @@ $(document).ready(function() {
 });
 
 </script>
-{% if request.user.is_authenticated and repo|is_watched:request.user %}
-<div id="watching_section">
-    <div class="nav navbar-right">
-        <button class="btn btn-primary watching_repo" role="button" data-repoid="{{ repo.id }}">Stop Watching</button>
-    </div>
-</div>
-{% elif request.user.is_authenticated  %}
-<div id="watching_section">
-    <div class="nav navbar-right">
-        <button class="btn btn-primary watching_repo" role="button"  data-repoid="{{ repo.id }}">Watch This</button>
-    </div>
-</div>
-{% endif %}
+    {% if request.user.is_authenticated and repo|is_watched:request.user %}
+    <span id="watching_section">
+            <button class="btn btn-default btn-sm watching_repo gitpatron-hbar-button" role="button" data-repoid="{{ repo.id }}">
+                <span class="glyphicon glyphicon-eye-close"></span> Stop Watching</button>
+    </span>
+    {% elif request.user.is_authenticated  %}
+    <span id="watching_section">
+            <button class="btn btn-default btn-sm watching_repo gitpatron-hbar-button" role="button"  data-repoid="{{ repo.id }}">
+                <span class="glyphicon glyphicon-eye-open"></span> Watch This</button>
+    </span>
+    {% endif %}

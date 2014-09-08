@@ -13,3 +13,4 @@ drop table if exists app_repository cascade;
 drop table if exists app_reward cascade;
 drop table if exists app_update cascade;
 drop table if exists app_watchedrepository cascade;
+drop table if exists app_pullrequest cascade;

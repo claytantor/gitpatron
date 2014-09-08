@@ -22,6 +22,13 @@
 
     $.fn.gpchart_timeseries = function(chart_data) {
 
+        if(chart_data.is_paid){
+            $(this).addClass('gitpatron-chart-paid');
+        } else {
+            $(this).addClass('gitpatron-chart-open');
+        }
+
+
         if(this.length>0){
             var chart_id = "#"+this[0].id;
 

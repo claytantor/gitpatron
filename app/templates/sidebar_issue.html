@@ -1,11 +1,42 @@
 {% load gitpatrontags %}
 <div  class="issue-sidebar">
-    <div style="margin-left: 10px; margin-top: 10px;">
-        <div style="font-size: x-large; font-weight: 900; line-height: 1.0;">{{ patronage_orders|length }}</div>
-        <div style="font-size: xx-small; margin-bottom: 10px;">Patronage Payments</div>
-        <div style="font-size: x-large; font-weight: 900; line-height: 1.0;">{{ total_patronage|btc_cents }} BTC</div>
-        <div style="font-size: xx-small; margin-bottom: 10px;">Total Patronage Payments Value</div>
-        <div style="font-size: x-large; font-weight: 900; line-height: 1.0;">{{ total_fix|btc_cents }} BTC</div>
-        <div style="font-size: xx-small; margin-bottom: 10px;">Total Fix Payments Value</div>
+    <div style="margin-left: 10px; margin-top: 5px;">
+        <div style="margin-bottom: 10px;"><h4>#{{ issue.github_issue_no }} {{ issue.title }}</h4></div>
+        <div>
+            {% if issue.status == 'closed' %}
+                <span class="label label-danger gitpatron-label text-center" >{{ issue.status }} <span class="glyphicon glyphicon-remove-sign"></span></span>
+            {% else %}
+                <span class="label label-success gitpatron-label text-center">{{ issue.status }} <span class="glyphicon glyphicon-ok-circle"></span></span>
+            {% endif %}
+        </div>
+        <div class="gitpatron-sidebar-title">Issue Status</div>
+        <div>
+            {% include 'payment_status.html' %}
+        </div>
+        <div class="gitpatron-sidebar-title">Payment Status</div>
+
+        <div class="gitpatron-sidebar-value">{{ patronage_orders|length }}</div>
+        <div class="gitpatron-sidebar-title">Patronage Payments</div>
+        <div class="gitpatron-sidebar-value">{{ total_patronage|btc_cents }} BTC</div>
+        <div class="gitpatron-sidebar-title">Total Patronage Payments Value</div>
+        {% if issue|is_fixed %}
+        <div class="gitpatron-sidebar-value">{{ total_fix|btc_cents }} BTC</div>
+        <div class="gitpatron-sidebar-title">Total Fix Payments Value</div>
+        {% endif %}
+        <div>
+            {% include 'repo_button_ajax.html' %}
+        </div>
+
+        <div style="margin-top: 30px;">
+            <button type="button" class="btn btn-default btn-xs issue-sidebar-share"><span class="glyphicon glyphicon-share"></span> Share</button>
+            <span>
+                <a href="https://twitter.com/share"
+                   class="twitter-share-button"
+                   data-via="gitpatron"
+                   data-text="Donate to {{ issue.title }} from the {{ issue.repository.name }} project. Your #bitcoin patronage helps."
+                   data-lang="en">Tweet</a>
+                <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+            </span>
+        </div>
     </div>
 </div>

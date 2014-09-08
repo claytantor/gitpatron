@@ -1,7 +1,5 @@
 <table class="table table-striped">
     {% for repo in repos %}
-{#        published by owner #}
-        {% if repo.owner.user.username and repo.owner.user.username == request.user.username %}
         <tr>
             <td>
                 <div><a href="{% url 'repo' repo.owner.user.username repo.name %}"
@@ -9,50 +7,6 @@
                    data-fullname="{{ repo.full_name }}">{{ repo.name }}</a></div>
                 <div>{{ repo.github_description }}</div>
             </td>
-{#            <td class="col-md-1">#}
-{##}
-{#            </td>#}
-{#            <td class="col-md-1">#}
-{#                <a href="{% url 'repo' repo.owner.user.username repo.name %}"#}
-{#                   class="btn btn-primary" data-repoid="{{ repo.id }}"#}
-{#                   data-fullname="{{ repo.full_name }}">View Details</a>#}
-{#            </td>#}
         </tr>
-
-{#        unpublished by owner #}
-        {% elif repo.owner.login and repo.owner.login == request.user.username and not repo.private %}
-        <tr>
-            <td class="col-md-10">
-                <div>{{ repo.name }}</div>
-                <div>{{ repo.description }}</div>
-            </td>
-            <td class="col-md-1">
-                <div id="publish_area_{{ repo.id }}" class="publish_area">
-                    <button type="button" class="btn btn-primary btn-publish" data-repoid="{{ repo.id }}" data-fullname="{{ repo.full_name }}">Publish</button>
-                </div>
-            </td>
-            <td class="col-md-1">
-                <a href="http://github.com/{{ repo.full_name }}" class="btn btn-primary btn-publish">View on Github</a>
-            </td>
-        </tr>
-
-{#        published by other #}
-        {% elif repo.owner.user.username and repo.owner.user.username != request.user.username %}
-        <tr>
-            <td class="col-md-10">
-                <div>{{ repo.name }}</div>
-                <div>{{ repo.github_description }}</div>
-            </td>
-            <td class="col-md-1">
-            </td>
-            <td class="col-md-1">
-                <a href="{% url 'repo' repo.owner.user.username repo.name %}"
-                   class="btn btn-primary btn-publish" data-repoid="{{ repo.id }}"
-                   data-fullname="{{ repo.full_name }}">View Details</a>
-            </td>
-        </tr>
-
-        {% endif %}
-
     {% endfor %}
 </table>

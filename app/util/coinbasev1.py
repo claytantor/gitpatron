@@ -4,7 +4,7 @@ from django.conf import settings
 import hashlib
 import hmac
 import time
-import urllib
+import uuid
 
 # GET /api/v1/account/balance HTTP/1.1
 # Accept: */*
@@ -18,7 +18,6 @@ class CoinbaseV1():
 
     def refresh_token(
             self,
-            access_token,
             refresh_token,
             app_client_id,
             app_client_secret):
@@ -195,5 +194,56 @@ class CoinbaseV1():
 
         return json.loads(response.read())
 
+
+
+    def make_button(self,
+                    amount,
+                    name,
+                    description,
+                    refresh_token,
+                    callback_url,
+                    custom):
+
+        #make a button id that will persist for callback
+        # button_guid = str(uuid.uuid1())
+        # callback_url = '{0}/{1}/?secret={2}'.format(
+        #     settings.COINBASE_ORDER_CALLBACK,
+        #     patron_username,
+        #     coinbase_callback_secret)
+
+        button_request = {
+            'button':{
+                'name':name,
+                'custom':custom,
+                'description':description,
+                'price_string':'{0}'.format(amount),
+                'price_currency_iso':'USD',
+                'button_type':'donation',
+                'style':'donation_small',
+                'choose_price':True,
+                'price1':5.00,
+                'price2':10.00,
+                'price3':25.00,
+                'price4':100.00,
+                'callback_url':callback_url
+            }
+        }
+
+        refresh_response = self.refresh_token(
+            refresh_token,
+            settings.COINBASE_OAUTH_CLIENT_ID,
+            settings.COINBASE_OAUTH_CLIENT_SECRET)
+
+        button_response = self.post_button_oauth(
+                button_request,
+                refresh_response['access_token'],
+                refresh_response['refresh_token'],
+                settings.COINBASE_OAUTH_CLIENT_ID,
+                settings.COINBASE_OAUTH_CLIENT_SECRET)
+
+        return {
+            'refresh_response':refresh_response,
+            'button_response':button_response
+        }
 
 

@@ -36,15 +36,27 @@ $(document).ready(function() {
 
 
     <div class="container gitpatron-top-container">
-        <p>
-            <div class="form_errors bs-callout bs-callout-danger">
-                <h4>Warning: Alpha Software</h4>
-                <p>We are still working on the website and its not quite ready for prime time. Right now it is intended for
-                testing purposes only. Please <a href="http://eepurl.com/YxMjH">sign up for the BETA program</a> if you are interested in
-                participating in advance availability for gitpatron.</p>
-            </div>
-        </p>
+
+
         <div class="row">
+
+
+
+            {% if  request.user|wallet_state_filter < 5 %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <strong>Attention!</strong> Your coinbase wallet is nor authorized. This is required to publish or monetize repositories,
+                as well as for monetizing fixes. Goto <a href="{% url 'patron_settings' %}">settings</a> to authorize your wallet now!
+            </div>
+            {% endif %}
+
+            <div class="alert alert-warning alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <strong>Warning!</strong> We are still working on the website and its not quite ready for prime time.
+                Please <a href="http://eepurl.com/YxMjH">sign up for the BETA program</a> to
+                participate in advance availability for gitpatron.
+            </div>
+
             <ul id="project_tabs" class="nav nav-pills" style="margin-top: 15px;">
               <li class="active"><a href="#home" data-toggle="tab">Dashboard</a></li>
               <li><a href="#watched" data-toggle="tab">Watched <span class="badge">{{ watched|length }}</span></a></li>
@@ -84,21 +96,34 @@ $(document).ready(function() {
                   </table>
             </div>
 
-
+            {% if patron_donation_orders|length > 0 %}
             <div>
-                <h2>Donations to Your Repos</h2>
-                {% if orders %}
-                {% include 'order_table.html' %}
-                {% else %}
-                <strong>No Items in Your Feed Yet</strong>
-                {% endif %}
-            </div>
-            {% if claimed_issues|length > 0 %}
-            <div>
-                <h2>Claimed Issues and Fixes for Your Repos</h2>
-                {% include 'claimed_issues_table.html' %}
+                <h4>Donations To Repos You Published</h4>
+                <h5>Total Patronage: {{ sum_patronage_cents|btc_cents }} BTC</h5>
+                {% with orders=patron_donation_orders type="donation" %}
+                <div>{% include 'order_table.html' %}</div>
+                {% endwith %}
             </div>
             {% endif %}
+
+            {% if fix_orders|length > 0 %}
+            <div>
+                <h4>Payments Made on Repos You Published</h4>
+                <h5>Total Fix Payments: {{ sum_fix_cents|btc_cents }} BTC</h5>
+                {% with orders=fix_orders type="fix" %}
+                <div>{% include 'order_table.html' %}</div>
+                {% endwith %}
+            </div>
+            {% endif %}
+
+
+{#            {% if claimed_issues|length > 0 %}#}
+{#            <div>#}
+{#                <h2>Claimed Issues and Fixes for Your Repos</h2>#}
+{#                <h4>Donations To Repos You Published</h4>#}
+{#                {% include 'claimed_issues_table.html' %}#}
+{#            </div>#}
+{#            {% endif %}#}
 
 
             </div><!--/span-->

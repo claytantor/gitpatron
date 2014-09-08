@@ -22,6 +22,8 @@ urlpatterns = patterns('',
 
     url(r'^wallet_wf_ajax/([-\w]+)/$', 'app.views.wallet_wf_ajax', name='wallet_wf_ajax'),
 
+    url(r'^revoke_wallet/$', 'app.views.revoke_wallet', name='revoke_wallet'),
+
 
     url(r'^repo/([-\w]+)/([-\w]+)/$', 'app.views.repo', name='repo'),
 
@@ -43,6 +45,11 @@ urlpatterns = patterns('',
     #monetize_issue_ajax
     url(r'^monetize_issue_ajax/([\w]+)/$',
         'app.views.monetize_issue_ajax',name='monetize_issue_ajax'),
+
+    #monetize_issue_ajax
+    url(r'^monetize_repo_ajax/([\w]+)/$',
+        'app.views.monetize_repo_ajax',name='monetize_repo_ajax'),
+
 
     #claim issue
     url(r'^claim_issue_ajax/([\w]+)/$',
@@ -76,9 +83,9 @@ urlpatterns = patterns('',
     url(r'^patron/([-\w]+)/$',
         'app.views.patron',name='patron'),
 
-    #fix form
-    url(r'^fix_form_ajax/([-\w]+)/([-\w]+)/([-\w]+)/$',
-        'app.views.fix_form_ajax',name='fix_form_ajax'),
+    # #fix form
+    # url(r'^fix_form_ajax/([-\w]+)/([-\w]+)/([-\w]+)/$',
+    #     'app.views.fix_form_ajax',name='fix_form_ajax'),
 
 
     #repo owner view patronage
@@ -100,6 +107,9 @@ urlpatterns = patterns('',
     
     #coin calls this is when an user pays coin
     url(r'^cbcallback/([\w]+)/$', 'app.views.cbcallback',name='cbcallback'),
+
+    #the activation callback
+    url(r'^activate_callback/$', 'app.views.activate_callback',name='activate_callback'),
 
     #coin result pages
     url(r'^coin_success.html', 'app.views.coin_success',name='coin_success'),

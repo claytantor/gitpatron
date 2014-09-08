@@ -10,6 +10,7 @@ $(document).ready(function() {
 
 
     $('button.issues_sync').click(function (e) {
+        _this = this;
         $(this).find('span').show();
         $(this).find('span').toggleClass('glyphicon-refresh-animate');
         $.ajax({
@@ -22,18 +23,7 @@ $(document).ready(function() {
         return false;
     });
 
-    $('button.monetize_issue').click(function (e) {
-        $(this).find('span').show();
-        $(this).find('span').toggleClass('glyphicon-refresh-animate');
-        issue_id = $(this).data('issue')
-        $.ajax({
-            url:"{{ settings.GITPATRON_APP_URL }}/monetize_issue_ajax/"+issue_id+"/",
-            success:function(result){
-                $("#issue_monetize_"+issue_id).html(result);
-            }
-        });
-        return false;
-    });
+
 
     $('button.claim_issue').click(function (e) {
         $(this).find('span').show();
@@ -42,7 +32,9 @@ $(document).ready(function() {
         $.ajax({
             url:"{{ settings.GITPATRON_APP_URL }}/claim_issue_ajax/"+issue_id+"/",
             success:function(result){
-                $("#claim_section_"+issue_id).html(result);
+                $("#claim_section_"+issue_id).html('<span class="label label-warning gitpatron-label text-center" >claimed <span class="glyphicon glyphicon-warning-sign"></span></span>');
+                $("#patronage_button_area_"+issue_id).html('IS CLAIMER');
+
             }
         });
         return false;
@@ -64,6 +56,35 @@ $(document).ready(function() {
         return false;
     });
 
+
+    $('button.monetize_repo').click(function (e) {
+        $(this).find('span').show();
+        $(this).find('span').toggleClass('glyphicon-refresh-animate');
+        repo_id = $(this).data('repo-id');
+
+{#        $.ajax({#}
+{#            url:"{{ settings.GITPATRON_APP_URL }}/monetize_fix_ajax/{{ request.user }}/"+pull_request_id+"/",#}
+{#            success:function(result){#}
+{#                $("#update_section_"+pull_request_id).html(result);#}
+{#                $("#pull_request_section_"+pull_request_id).html('<div class="col-md-6"><h3>Done!</h3></div>');#}
+{#            }#}
+{#        });#}
+        return false;
+    });
+
+
+    $.ajax({ // ajax call starts
+        url: '{{ settings.GITPATRON_APP_URL }}/repo/{{ repo.owner.user.username }}/{{ repo.name }}/chart.json', // JQuery loads serverside.php
+        dataType: 'json', // Choosing a JSON datatype
+        success: function (chart_data) // Variable data contains the data we get from serverside
+        {
+            $('#chart').gpchart_timeseries(chart_data);
+        }
+    });
+
+
+
+
     $('button.monetize_fix').click(function (e) {
         $(this).find('span').show();
         $(this).find('span').toggleClass('glyphicon-refresh-animate');
@@ -80,72 +101,170 @@ $(document).ready(function() {
     });
 
 
-    $.ajax({ // ajax call starts
-        url: '{{ settings.GITPATRON_APP_URL }}/repo/{{ repo.owner.user.username }}/{{ repo.name }}/chart.json', // JQuery loads serverside.php
-        dataType: 'json', // Choosing a JSON datatype
-        success: function (chart_data) // Variable data contains the data we get from serverside
-        {
-            $('#chart').gpchart_timeseries(chart_data);
-        }
+    //event deligation for ajax content
+    $('#issues_area').on('click','button.monetize_issue', function () {
+        $('button.monetize_issue').click(function (e) {
+            $(this).find('span').show();
+            $(this).find('span').toggleClass('glyphicon-refresh-animate');
+            issue_id = $(this).data('issue')
+            $.ajax({
+                url:"{{ settings.GITPATRON_APP_URL }}/monetize_issue_ajax/"+issue_id+"/",
+                success:function(result){
+                    $("#issue_monetize_"+issue_id).html(result);
+                    $("#payment_status_"+issue_id).html('<span class="label label-info gitpatron-label text-center" >monetized <span class="glyphicon glyphicon-plus-sign"></span></span>');
+                }
+            });
+            return false;
+        });
+        return false;
+
     });
 
 
 });
 
+
+
 </script>
 <body>
     {% include 'topbar.html' %}
-    <div class="container gitpatron-top-container" style="margin-top: 60px;" id="repo_container">
-        <div class="row" style="margin-top: 30px;">
-            <div class="col-xs-12 col-sm-9">
+    <div class="container gitpatron-top-container" id="repo_container">
+
+       <div class="col-md-9">
+            <div class="panel panel-default gitpatron-hbar">
+              <div class="panel-body text-right gitpatron-hbar">
+
                 {% if repo.owner.user.username == request.user.username %}
-                <div>
-                    <div class="nav navbar-right">
-                        <button class="btn btn-primary issues_sync" href="#" role="button">
-                            <span class="glyphicon glyphicon-refresh" style="display: none" id="issue_sync_icon"></span>
-                            &nbsp;Sync Issues &raquo;</button>
-                    </div>
-                </div>
+                    <span id="issue_monetize_{{ issue.id }}">
+                        <button class="btn btn-default btn-sm has-spinner monetize_repo" role="button" style="margin-top: -5px;"  data-repo-id="{{ repo.id }}">
+                        <span class="glyphicon glyphicon-refresh"
+                              style="display: none"
+                              id="monetize_ajax_icon"></span>&nbsp;Monetize Repo</button>
+                    </span>
+                    <button class="btn btn-default btn-sm issues_sync" href="#" role="button" style="margin-top: -5px;">
+                        <span class="glyphicon glyphicon-refresh" style="display: none" id="issue_sync_icon"></span>
+                        &nbsp;Sync With Github</button>
                 {% else%}
                     {% include 'watch_repo_ajax.html' %}
                 {% endif %}
-                <div>
-                   <h1>{{ repo.name }}</h1>
-                    <p>owned by <a href="{%  url 'patron' repo.owner.user.username %}">{{ repo.owner.user.username }}</a></p>
-                    <div>
+                <span id="twitter_button" style="margin-left: 10px;">
+                        <a href="https://twitter.com/share"
+                           class="twitter-share-button"
+                           data-via="gitpatron"
+                           data-text="Donate to the github repo {{ repo.name }}. Your #bitcoin patronage helps open source thrive."
+                           data-lang="en">Tweet</a>
+                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                </span>
+
+
+              </div>
+            </div>
+            <ol class="breadcrumb">
+                <li><a href="{%  url 'patron' repo.owner.user.username %}">{{ repo.owner.user.username }}</a></li>
+                <li><strong>{{ repo.name }}</strong></li>
+
+            </ol>
+            {% if request.user.is_authenticated and issue|is_repo_owner:request.user and request.user|wallet_state_filter < 5 %}
+                <div class="form_errors bs-callout bs-callout-danger">
+                    <h4>Warning: Your Wallet Needs To Be Activated</h4>
+                    <p>While you don't need to activate a coinbase wallet to donate to an issue (any bitcoin wallet will work), you do need
+                    one to publish repos, or receive payment. That's because we directly integrate the coinbase API
+                    into the publisher and fixer workflow to automate the payment process. <strong>Its completely free
+                    and easy to create a coinbase wallet so please follow the directions below to
+                    activate your wallet now.</strong></p>
+                </div>
+            {% endif %}
+            <div class="panel panel-default">
+                  <div class="panel-heading">
+                      <div style="width: 50%; display: inline-block;"><h3 class="panel-title">{{ repo.name }}</h3></div>
+                      <div style="width: 45%; display: inline-block;" class="text-right">
+                          <a target="_blank" class="btn btn-default btn-xs" href="https://github.com/{{ repo.owner.user.username }}/{{ repo.name }}">View on github</a>
+                          <button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-eye-open"></span> Show Markdown</button>
+                      </div>
+                  </div>
+                  <div class="panel-body" style="display: none">
 {% markdown  %}
-{{ repo.github_description }}
+{{ repo.description }}
 {% endmarkdown %}
-                    </div>
-                </div>
-                {% if repo.owner.user.username == request.user.username and not request.user|is_wallet_activated %}
-                <p>
-                    <div class="form_errors bs-callout bs-callout-danger">
-                        <h4>Wallet Not Activated</h4>
-                        <p>You own this repo but have not activated your coinbase wallet
-                        so you are not able to monetize issues. Activate your wallet and
-                        you will be able to create donation buttons and pay committers.</p>
-                        <p><a class="btn btn-danger" href="{% url 'cb_auth_redirect' %}" role="button">Activate My Wallet Now &raquo;</a></p>
-                    </div>
-                </p>
+                  </div>
+            </div>
+            <div>
+                {% if repo_patronage_orders|length > 0  or repo_fix_orders|length > 0 %}
+                <h2>Donations and Payments</h2>
+                <div id="chart"></div>
                 {% endif %}
-
+                {% if repo_patronage_orders|length > 0 %}
                 <div>
-                    <h2>Donations To This Repo</h2>
-                    <h4>Patronage: {{ sum_patronage_cents|btc_cents }} BTC</h4>
-                    <h4>Fix Payments: {{ sum_fix_cents|btc_cents }} BTC</h4>
-                    <div id="chart"></div>
-{#                    <div>{% include 'order_table.html' %}</div>#}
+                    <h4>Donations To This Repo</h4>
+                    <h5>Patronage: {{ sum_patronage_cents|btc_cents }} BTC</h5>
+                    {% with orders=repo_patronage_orders type="donation" %}
+                    <div>{% include 'order_table.html' %}</div>
+                    {% endwith %}
                 </div>
+                {% endif %}
+                {% if repo_fix_orders|length > 0 %}
+                <div>
+                    <h4>Payments to Comitters</h4>
+                    <h5>Fix Payments: {{ sum_fix_cents|btc_cents }} BTC</h5>
+                    {% with orders=repo_fix_orders type="fix" %}
+                    <div>{% include 'order_table.html' %}</div>
+                    {% endwith %}
+                </div>
+                {% endif %}
+            </div>
 
+            <div id="sync_refresh_area">
+                {% if issues|length > 0 %}
+                <h3>Issues</h3>
                 <div id="issues_area">
                     {% include 'issues_ajax.html' %}
                 </div>
+                {% endif %}
+
+                {% if pull_requests|length > 0 %}
+                <h3>Pull Requests</h3>
+                <div id="pulls_area">
+                    {% include 'pulls_ajax.html' %}
+                </div>
+                {% endif %}
             </div>
-            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
-                {% include 'sidebar.html' %}
-            </div><!--/span-->
-        </div>
+       </div>
+       <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+            {% include 'sidebar_repo.html' %}
+       </div><!--/span-->
+
+{##}
+{#        <div>#}
+{#            <div class="col-xs-12 col-sm-9">#}
+{##}
+{##}
+{##}
+{#                <div id="sync_refresh_area">#}
+{#                    {% if issues|length > 0 %}#}
+{#                    <h3>Issues</h3>#}
+{#                    <div id="issues_area">#}
+{#                        {% include 'issues_ajax.html' %}#}
+{#                    </div>#}
+{#                    {% endif %}#}
+{##}
+{#                    {% if pull_requests|length > 0 %}#}
+{#                    <h3>Pull Requests</h3>#}
+{#                    <div id="pulls_area">#}
+{#                        {% include 'pulls_ajax.html' %}#}
+{#                    </div>#}
+{#                    {% endif %}#}
+{#                </div>#}
+{##}
+{##}
+{##}
+{#            </div>#}
+{#            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">#}
+{#                {% include 'sidebar.html' %}#}
+{#            </div><!--/span-->#}
+{#        </div>#}
+
+
+
     </div> <!-- /container -->
     {% include "footer.html" %}
 </body>

@@ -1,10 +1,14 @@
 __author__ = 'claygraham'
+
 import json
+import uuid
+
 from django import template
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 from app.models import Issue,Patron,CoinbaseButton,ClaimedIssue,Repository,WatchedRepository,CoinOrder
-
+from app.util.gitpatronhelper import GitpatronHelper
 
 register = template.Library()
 
@@ -38,9 +42,8 @@ def is_fix_owner(fix_issue,fix_user):
 
 @register.filter
 def is_fixed(fix_issue):
-
-    fix_for_issue = ClaimedIssue.objects.filter(issue=fix_issue,fixed=True)
-    return len(fix_for_issue) > 0
+    payments_for_issue = CoinOrder.objects.filter(button__issue=fix_issue,button__type='fix')
+    return len(payments_for_issue) > 0
 
 @register.filter
 def is_paid(fix_issue):
@@ -68,6 +71,12 @@ def is_claimer(claim_issue,claim_user):
     #has the user proof? see if there is a fix button for this issue committer
     patron=Patron.objects.get(user=claim_user)
     claimed = ClaimedIssue.objects.filter(issue=claim_issue,committer=patron)
+    return len(claimed) > 0
+
+@register.filter
+def is_claimed(claim_issue):
+    #has the user proof? see if there is a fix button for this issue committer
+    claimed = ClaimedIssue.objects.filter(issue=claim_issue)
     return len(claimed) > 0
 
 @register.filter
@@ -102,7 +111,7 @@ def is_monetized_fix(monetized_issue):
 
 @register.filter
 def is_monetized(issue):
-    return len(CoinbaseButton.objects.filter(issue=issue,type='patronage'))>0
+    return len(CoinbaseButton.objects.filter(issue=issue,type='patronage')) > 0
 
 @register.filter
 def is_issue_owner(issue,user):
@@ -110,21 +119,51 @@ def is_issue_owner(issue,user):
 
 @register.filter
 def is_order_owner(order,user):
-    return len(CoinOrder.objects.filter(id=order.id, button__owner__user=user,button__type='fix'))>0
+    return len(CoinOrder.objects.filter(id=order.id, button__owner__user=user,button__type='fix')) > 0
 
 @register.filter
 def is_watched(repository,repo_user):
     watching_for_user = WatchedRepository.objects.filter(watcher__user=repo_user, repository=repository)
     return len(watching_for_user) > 0
 
+@register.filter
+def wallet_activation_complete(repo_user):
+    return False
 
 @register.filter(name='addcss')
 def addcss(field, css):
    return field.as_widget(attrs={"class":css})
 
-@register.simple_tag
-def settings_value(name):
-    return getattr(settings, name, "")
+@register.filter(name='payment_status_filter')
+def payment_status_filter(issue):
+
+    count = 0
+    buttons = CoinbaseButton.objects.filter(issue=issue,type='patronage')
+    index = len(buttons)
+
+    if index == 1:
+        count += 1
+        if is_claimed(issue):
+            count += 1
+            if is_fixed(issue):
+                count += 1
+    elif index > 1:
+        count = 3;
+
+    if count == 0:
+        return "none"
+    elif count == 1:
+        return "monetized"
+    elif count == 2:
+        return "claimed"
+    else:
+        return "fixed"
+
+@register.filter
+def is_funded(issue):
+    patronage_for_issue = CoinOrder.objects.get(button__issue=issue,button__type='patronage')
+    return len(patronage_for_issue) > 0
+
 
 @register.filter(name='settings_value_filter')
 def settings_value_filter(name):
@@ -143,6 +182,106 @@ class SetVarNode(template.Node):
             value = ""
         context[self.var_name] = value
         return u""
+
+@register.filter
+def wallet_state_filter(wallet_user):
+    patron=Patron.objects.get(user=wallet_user)
+    index_stage = 1;
+    if patron.account_created:
+        index_stage += 1
+
+    if patron.wallet_address:
+        index_stage += 1
+
+    if (patron.coinbase_access_token is not None and patron.coinbase_access_token != ''):
+        index_stage += 1
+
+    if patron.has_donated:
+        index_stage += 1
+
+    return index_stage
+
+
+#--- TAGS  ---------
+
+@register.simple_tag
+def settings_value(name):
+    return getattr(settings, name, "")
+
+
+
+@register.simple_tag
+def wallet_state(wallet_user):
+    patron=Patron.objects.get(user=wallet_user)
+    index_stage = 1;
+    if patron.account_created:
+        index_stage += 1
+
+    if patron.wallet_address:
+        index_stage += 1
+
+    if (patron.coinbase_access_token is not None and patron.coinbase_access_token != ''):
+
+        #check if there is an activation button already
+        try:
+            button = CoinbaseButton.objects.get(external_id=patron.wallet_address,type="activation")
+            index_stage += 1
+
+        except ObjectDoesNotExist:
+
+            helper = GitpatronHelper()
+            make_resonse = helper.make_button(
+                'claytantor',
+                0.99,
+                "Activation Verification Donation",
+                "Make a small donation to verify that your wallet is properly integrated with gitpatron.",
+                "activate_callback/?secret=fe5b2912221",
+                patron.wallet_address)
+
+            refresh_response = make_resonse['refresh_response']
+            button_response = make_resonse['button_response']
+
+            #always update tokens on every oauth call
+            patron.coinbase_access_token = button_response['access_token']
+            patron.coinbase_refresh_token = button_response['refresh_token']
+            patron.save()
+
+            if(button_response['error_code'] == None):
+
+                button_guid = str(uuid.uuid1())
+
+                callback_url = '{0}/{1}'.format(
+                    settings.GITPATRON_APP_URL,
+                    "activate_callback/?secret=fe5b2912221")
+
+                #create the button
+                button_created = CoinbaseButton.objects.create(
+                    code=button_response['button']['code'],
+                    external_id=patron.wallet_address,
+                    button_response=json.dumps(button_response),
+                    button_guid=button_guid,
+                    callback_url=callback_url,
+                    issue=None,
+                    type="activation",
+                    owner=patron)
+
+                index_stage += 1
+
+    if patron.has_donated:
+        index_stage += 1
+
+    return index_stage
+
+@register.simple_tag
+def wallet_activation_button_code(wallet_user):
+    patron=Patron.objects.get(user=wallet_user)
+    try:
+        button = CoinbaseButton.objects.get(external_id=patron.wallet_address,type="activation")
+        return button.code
+    except ObjectDoesNotExist:
+        return ''
+
+
 
 def set_var(parser, token):
     """

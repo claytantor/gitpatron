@@ -1,12 +1,13 @@
 {% load gitpatrontags %}
 
 
-{% if request.user and pull_request.issue_user.user == request.user and pull_request.fix_issue == None  %}
+{% if request.user and pull_request.status == 'open' and pull_request.issue_user.user == request.user and pull_request.fix_issue == None  %}
     <span id="pull_request_section_{{ pull_request.id }}">
         <div class="col-md-6">
-           <select class="form-control" id="select_pull_{{ pull_request.id }}">
+           {% if issues|length > 0 %}
+           <select class="form-control associate-issue-field" id="select_pull_{{ pull_request.id }}">
                {% for issue_fix in issues %}
-                   {% if issue_fix|is_claimer:request.user and issue_fix|is_monetized_fixer:request.user == False%}
+                   {% if issue_fix|is_claimer:request.user and issue_fix|is_monetized_fixer:request.user == False %}
                     <option data-issue-owner="{{ issue_fix.repository.owner.user.username }}"
                             data-issue-id="{{ issue_fix.id }}"
                             data-repo-name="{{ issue_fix.repository.name }}"
@@ -16,9 +17,10 @@
                    {% endif %}
                {% endfor %}
             </select>
+            {% endif %}
         </div>
         <div class="col-md-6">
-         <button class="btn btn-primary associate_pull" id="button_pull_{{ pull_request.id }}"
+         <button class="btn btn-default btn-xs associate_pull" id="button_pull_{{ pull_request.id }}"
                  data-pull-request-id ="{{ pull_request.id  }}"
                  data-issue-owner="{{ pull_request.repository.owner.user.username }}"
                  data-repo-name="{{ pull_request.repository.name }}"
@@ -26,17 +28,16 @@
             <span class="glyphicon glyphicon-refresh" style="display: none" id="issue_sync_icon"></span>
             &nbsp;Associate</button>
         </div>
-
     </span>
 {% elif pull_request.fix_issue != None  %}
     {% if  pull_request.issue_user.user == request.user %}
-        {% if pull_request.fix_issue|is_monetized_fixer:request.user and pull_request.fix_issue|is_paid == False %}
-            You monetized this.
-        {% elif pull_request.fix_issue|is_paid %}
-            This fix has been paid.
-        {% else %}
-        <span  id="fixed_button_{{ claimed_issue.id }}">
-            <button class="btn btn-primary has-spinner monetize_fix" id="button_pull_monitize_{{ pull_request.id }}"
+        {% if issue|payment_status_filter == "monetized" %}
+            MONETIZED
+        {% elif issue|payment_status_filter == "fixed" %}
+            FIXED
+        {% elif issue|payment_status_filter == "claimed" and pull_request.fix_issue|is_funded %}
+        <span id="fixed_button_{{ pull_request.fix_issue.id }}">
+            <button class="btn btn-default btn-xs has-spinner monetize_fix" id="button_pull_monitize_{{ pull_request.id }}"
                  data-pull-request-id ="{{ pull_request.id  }}"
                  data-issue-owner="{{ pull_request.repository.owner.user.username }}"
                  data-repo-name="{{ pull_request.repository.name }}"
@@ -45,10 +46,9 @@
         </span>
         {% endif %}
     {% else %}
-        {% if pull_request.fix_issue|is_monetized_owner:request.user and pull_request.fix_issue|is_paid != True %} %}
+        {% if pull_request.fix_issue|is_monetized_owner:request.user and pull_request.fix_issue|is_paid != True %}
             {% for button in pull_request.fix_issue.coinbasebutton_set.all %}
-                {% if button.type == 'fix' %}
-                    Payment Requested:
+                {% if button.type == 'fix' and button.enabled %}
                     <a class="coinbase-button"
                        data-code="{{ button.code }}"
                        data-button-style="buy_now_small"
@@ -58,9 +58,9 @@
                 {% endif %}
             {% endfor %}&nbsp;
         {% elif pull_request.fix_issue|is_paid %}
-            This fix has been paid.
+            PAID
         {% else %}
-            Issue is associated
+            LINKED
         {% endif %}
     {% endif %}
 {% endif %}

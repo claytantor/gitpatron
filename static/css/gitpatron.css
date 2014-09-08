@@ -38,9 +38,61 @@ body {
 margin: 30px 10px 0px 0px
 }
 
+.gitpatron-label-block {
+    display:block;
+    width: 60px;
+    height: 20px;
+}
+
+.gitpatron-label {
+}
+
+.gitpatron-sidebar-title {
+    font-size: xx-small;
+    margin-bottom: 10px;
+}
+
+.gitpatron-sidebar-value {
+    font-size: x-large;
+    font-weight: 900;
+    line-height: 1.0;
+}
 
 
+.gitpatron-blue {
+    color: blue;
+}
 
+.gitpatron-green {
+    color: #07870e;
+}
+
+.gitpatron-chart-paid{
+    border-right-color: #ad1115;
+    border-right-width: 4px;
+    border-right-style: solid;
+}
+
+.gitpatron-chart-open{
+    border-right-color: #00ad00;
+    border-right-width: 4px;
+    border-right-style: solid;
+}
+
+.gitpatron-hbar {
+    padding: 1px;
+    border: 0px solid transparent;
+}
+
+.gitpatron-hbar-button {
+    margin-top: -10px;
+}
+
+.associate-issue-field{
+    font-size: x-small;
+    height: 25px;
+
+}
 /* CUSTOMIZE THE NAVBAR
 -------------------------------------------------- */
 
@@ -332,11 +384,21 @@ a.list-group-item.disabled:focus {
 background-color: #fdd8da;
 border-color: #d9534f;
     color: #672428;
+    border-left: 3px solid #e11;
 }
+
+.bs-callout-success {
+background-color: #d1fdd6;
+border-color: #52d90d;
+    color: #204f17;
+    border-left: 3px solid #07870e;
+}
+
+
 .bs-callout {
 margin: 20px 0;
 padding: 20px;
-border-left: 3px solid #e11;
+
     /*display: none;*/
 }
 
@@ -344,14 +406,31 @@ border-left: 3px solid #e11;
 .issue-sidebar{
     margin-bottom: 10px;
     padding: 5px;
-    width:100%;
-    height:300px;
-    -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-    border-radius: 20px;
+    width:200px;
+    height:350px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
     border:0px solid #777;
     background-color: #eee;
-    -webkit-box-shadow: #8C8C8C 9px 9px 9px;
-    -moz-box-shadow: #8C8C8C 9px 9px 9px;
-    box-shadow: #8C8C8C 9px 9px 9px;
 }
+
+.issue-sidebar-share{
+    display: inline-block;
+    position: relative;
+    top: -6px;
+}
+
+/*-- repo   ----*/
+.repo-sidebar{
+    margin-bottom: 10px;
+    padding: 5px;
+    width:200px;
+    height:350px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    border:0px solid #777;
+    background-color: #eee;
+}
+

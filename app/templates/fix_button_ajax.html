@@ -1,41 +1,30 @@
-{% load gitpatrontags %}
-{% if not issue|is_fixed %}
-    {% if request.user and not issue|is_repo_owner:request.user %}
-            {% if request.user and issue|is_claimer:request.user  %}
-
-                {% if issue|is_monetized_fixer:request.user %}
-                    <span class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
-                        Waiting for payment.
-                    </span>
-                    <span>&nbsp;</span>
-                {% elif request.user|is_wallet_activated and issue.pullrequest_set.all|length == 0%}
-                    <span class="col-md-2" >
-                        Associate to monetize.
-                    </span>
-                    <span>&nbsp;</span>
-                {% elif request.user|is_wallet_activated == False %}
-                    <span class="col-md-2" id="fixed_button_{{ claimed_issue.id }}">
-                        Wallet not activated!
-                    </span>
-                    <span>&nbsp;</span>
-                {% endif %}
-
-
-            {% else %}
-                {% if not issue|is_monetized %}
-                    Not Montetized
-                {% else %}
-                    <span id="claim_section_{{ issue.id }}">
-                     <button class="btn btn-primary claim_issue" data-issue="{{ issue.id }}">
-                        <span class="glyphicon glyphicon-refresh" style="display: none" id="issue_sync_icon"></span>
-                        &nbsp;Claim Issue</button>
-                    </span>
-
-                {% endif %}
-
-            {% endif %}&nbsp;
-
-    {% endif %}
-{% else %}
-    &nbsp;
-{% endif %}
+{#OBSOLETE#}
+{#{% load gitpatrontags %}#}
+{#{% if not issue|is_fixed %}#}
+{#    {% if request.user and not issue|is_repo_owner:request.user %}#}
+{#            {% if request.user and issue|is_claimer:request.user  %}#}
+{#                {% if issue|is_monetized_fixer:request.user %}#}
+{#                    <span>#}
+{#                        WAITING#}
+{#                    </span>#}
+{#                {% elif request.user|is_wallet_activated == False %}#}
+{#                    <span>#}
+{#                        AUTHORIZE WALLET#}
+{#                    </span>#}
+{#                {% endif %}#}
+{#            {% else %}#}
+{#                {% if  issue|is_monetized == False  %}#}
+{#                    &nbsp;#}
+{#                {% elif issue|is_fixed == False %}#}
+{#                    <span id="claim_section_{{ issue.id }}" style="display: block;">#}
+{#                     <button class="btn btn-default btn-xs claim_issue" data-issue="{{ issue.id }}">#}
+{#                        <span class="glyphicon glyphicon-refresh" style="display: none" id="issue_sync_icon"></span>#}
+{#                        &nbsp;Claim Issue</button>#}
+{#                    </span>#}
+{#                {% endif %}#}
+{#            {% endif %}&nbsp;#}
+{##}
+{#    {% endif %}#}
+{#{% else %}#}
+{#    &nbsp;#}
+{#{% endif %}#}

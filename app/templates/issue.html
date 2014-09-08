@@ -24,14 +24,13 @@ $(document).ready(function() {
         $.ajax({
             url:"{{ settings.GITPATRON_APP_URL }}/claim_issue_ajax/"+issue_id+"/",
             success:function(result){
-                $("#claim_section_"+issue_id).html(result);
+                $("#claim_section_"+issue_id).html('<span class="label label-warning gitpatron-label text-center" >claimed <span class="glyphicon glyphicon-warning-sign"></span></span>');
             },
             error:function( jqXHR,  textStatus,  errorThrown){
                 console.log(errorThrown);
             }
         });
         return false;
-
     });
 
     $('button.monetize_issue').click(function (e) {
@@ -47,35 +46,29 @@ $(document).ready(function() {
         return false;
     });
 
-     $('button.fix_submit').click(function (e) {
-        $(this).find('span').show();
-        $(this).find('span').toggleClass('glyphicon-refresh-animate');
-        $.ajax({
-            type: "POST",
-            data: $("#fix_form").serialize(),
-            url:"{% url 'fix_form_ajax' issue.repository.owner.user.username issue.repository.name issue.github_issue_no  %}",
-            success:function(result){
-                $("#fix_form_ajax").html(result);
-            }
-        });
-
-    });
-
-    $('button.fixed_claimed_issue').click(function (e) {
-{#        params = { fixed_issue_id:$(this).data('fixed') } ;#}
-        $.ajax({
-            url:"{% url 'fix_form_ajax' issue.repository.owner.user.username issue.repository.name issue.github_issue_no  %}",
-            success:function(result){
-                $("#fix_form_ajax").html(result);
-                $('#fix_modal').modal({});
-            }
-        });
-    });
-
 
     $('button.associate_pull').click(function (e) {
         $(this).find('span').show();
         $(this).find('span').toggleClass('glyphicon-refresh-animate');
+
+    });
+
+    $('button.show_markdown').click(function (e) {
+        if($('#issue_markdown:visible').length){
+            $(this).find('span.show_icon').removeClass('glyphicon-eye-close');
+            $(this).find('span.show_icon').addClass('glyphicon-eye-open');
+            $(this).find('span.show_text').html('Show Markup');
+            $("#issue_markdown").toggle();
+        }
+        else {
+            $(this).find('span.show_icon').removeClass('glyphicon-eye-open');
+            $(this).find('span.show_icon').addClass('glyphicon-eye-close');
+
+            $(this).find('span.show_text').html('Hide Markup');
+            $("#issue_markdown").toggle();
+        }
+
+
 
     });
 
@@ -86,58 +79,53 @@ $(document).ready(function() {
     {% include 'topbar.html' %}
     <div class="container gitpatron-top-container" id="issue_container">
         <div class="col-md-9">
-
-            <div class="nav navbar-right">
-                <table class="table" style="margin-bottom: -30px;">
-                     <tr>
-                        <td style="border-top: 0px solid #ddd;">{% include 'repo_button_ajax.html' %}</td>
-                        <td style="border-top: 0px solid #ddd;">{% include 'fix_button_ajax.html' %}</td>
-                        <td style="border-top: 0px solid #ddd;">
-                            <a href="https://twitter.com/share"
-                               class="twitter-share-button"
-                               data-via="gitpatron"
-                               data-text="Donate to {{ issue.title }} from the {{ issue.repository.name }} project. Your #bitcoin patronage helps."
-                               data-lang="en">Tweet</a>
-                            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                        </td>
-
-                        {% if request.user and issue|is_issue_owner:request.user %}
-                        <td style="border-top: 0px solid #ddd;"><button class="btn btn-primary sync-issue" role="button">Sync With Github</button></td>
-                        {% endif %}
-                     </tr>
-                </table>
+            <div class="panel panel-default gitpatron-hbar" >
+              <div class="panel-body text-right gitpatron-hbar">
+{#                {% include 'repo_button_ajax.html' %}#}
+                {% if request.user and issue|is_issue_owner:request.user %}
+                <button class="btn btn-default btn-sm sync-issue" role="button">Sync With Github</button>
+                {% endif %}
+              </div>
             </div>
-
-            <hr class="topline-divider">
-            <div><a href="{% url 'patron' issue.repository.owner.user.username %}">{{ issue.repository.owner.user.username }}</a>/<a href="{% url 'repo' issue.repository.owner.user.username issue.repository.name %}">{{ issue.repository.name }}</a></div>
-{#            issue details#}
-            <div>
-                <h1>#{{ issue.github_issue_no }} {{ issue.title }}</h1>
-                <div>
+            <ol class="breadcrumb">
+              <li><a href="{% url 'patron' issue.repository.owner.user.username %}">{{ issue.repository.owner.user.username }}</a></li>
+              <li><a href="{% url 'repo' issue.repository.owner.user.username issue.repository.name %}">{{ issue.repository.name }}</a></li>
+              <li class="active"><strong>#{{ issue.github_issue_no }} {{ issue.title }}</strong></li>
+            </ol>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                  <div style="width: 50%; display: inline-block;"><h3 class="panel-title">#{{ issue.github_issue_no }} {{ issue.title }}</h3></div>
+                  <div style="width: 45%; display: inline-block;" class="text-right">
+                    <a target="_blank" class="btn btn-default btn-xs" href="{{ issue.github_html_url }}">View on github</a>
+                    <button type="button" class="btn btn-default btn-xs show_markdown"><span class="show_icon glyphicon glyphicon-eye-open"></span> <span class="show_text">Show Markdown</span></button>
+                  </div>
+              </div>
+              <div class="panel-body" style="display: none" id="issue_markdown">
 {% markdown  %}
 {{ issue.description }}
 {% endmarkdown %}
-                </div>
-
-
+              </div>
             </div>
 
+            <div id="chart"></div>
+            {% if patronage_orders|length > 0 %}
+                <div>
+                    <h2>Donations To This Issue</h2>
+                    <h4>Patronage: {{ total_patronage|btc_cents }} BTC</h4>
+                    {% with orders=patronage_orders type='donation' %}
+                    <div>{% include 'order_table.html' %}</div>
+                    {% endwith %}
+                </div>
+            {% else %}
+                <h3>No Donations Have Been Made</h3>
+                {% if issue|payment_status_filter == "claimed"  %}
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  <strong>Warning!</strong> No payments for fixes can be made until donations have been made for this issue.
+                </div>
+                {% endif %}
 
-        <hr class="topline-divider">
-        <div id="chart"></div>
-{% if patronage_orders|length > 0 %}
-        <div>
-            <h2>Donations To This Issue</h2>
-            <h4>Patronage: {{ total_patronage|btc_cents }} BTC</h4>
-            {% with patronage_orders as orders %}
-            <div>{% include 'order_table.html' %}</div>
-            {% endwith %}
-        </div>
-{% else %}
-    <h3>No Donations Have Been Made</h3>
-{% endif %}
-
-
+            {% endif %}
             {% if issue.claimedissue_set.all|length > 0%}
             <div>
                 <h2>Claims For Fix</h2>
@@ -155,24 +143,5 @@ $(document).ready(function() {
 
     </div> <!-- /container -->
     {% include "footer.html" %}
-<!-- Modal -->
-    <div class="modal fade" id="fix_modal" tabindex="-1" role="dialog" aria-labelledby="fix_modal_label" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title" id="fix_modal_label">Monetize fix</h4>
-              <p>You are proving you have fixed the issue by submitting your commit id and setting the
-                  donation you would like to accept for the fix.</p>
-          </div>
-          <div class="modal-body" id="fix_form_ajax">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary fix_submit">Save changes</button>
-          </div>
-        </div>
-      </div>
-    </div>
 </body>
 </html>

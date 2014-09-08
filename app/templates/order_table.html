@@ -1,6 +1,7 @@
 {% load gitpatrontags %}
 <table class="table table-striped">
     {% for order in orders %}
+        {% if type == "donation" %}
         <tr>
             <td class="col-md-2">{{ order.created_at|date:"P D M d, Y" }}</td>
             <td class="col-md-1">{{ order.external_id }}</td>
@@ -8,7 +9,16 @@
             <td class="col-md-4"><a href="{% url 'issue' order.button.issue.repository.owner.user.username order.button.issue.repository.name order.button.issue.github_issue_no %}">#{{ order.button.issue.github_issue_no }} {{ order.button.issue.title }}</a></td>
             <td class="col-md-1">{{ order.status }}</td>
             <td class="col-md-3 coin-order-cents coin-order-positive">+ {{ order.total_coin_cents|btc_cents }} {{ order.total_coin_currency_iso }}</td>
-
         </tr>
+        {% else %}
+        <tr>
+            <td class="col-md-2">{{ order.created_at|date:"P D M d, Y" }}</td>
+            <td class="col-md-1">{{ order.external_id }}</td>
+            <td class="col-md-1"><a href="{% url 'repo' order.button.issue.repository.owner.user.username order.button.issue.repository.name %}">{{ order.button.issue.repository.name }}</a>  </td>
+            <td class="col-md-4"><a href="{% url 'issue' order.button.issue.repository.owner.user.username order.button.issue.repository.name order.button.issue.github_issue_no %}">#{{ order.button.issue.github_issue_no }} {{ order.button.issue.title }}</a></td>
+            <td class="col-md-1">{{ order.status }}</td>
+            <td class="col-md-3 coin-order-cents coin-order-negative">- {{ order.total_coin_cents|btc_cents }} {{ order.total_coin_currency_iso }}</td>
+        </tr>
+        {% endif %}
     {% endfor %}
 </table>

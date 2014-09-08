@@ -1,18 +1,11 @@
 from django import forms
 
+class SettingsProfileForm(forms.Form):
+    gravatar_email = forms.EmailField(
+       label='Gravatar Email Address',
+       max_length=64,
+       required=False)
 
-class FixForm(forms.Form):
-    git_commit_id = forms.URLField(label='Pull Request URL In GitHub', max_length=128, required=True, error_messages={'required': 'A commit URL from github is required.'})
-    message = forms.CharField( widget=forms.Textarea(attrs={'rows': 4 }),
-                               label='Describe Your Fix',
-                               max_length=500,
-                               required=True,
-                               error_messages={'required': 'Please provide an brief overview of the fix.'} )
-    min_amount = forms.FloatField(label='Fix Payment Request in BTC',
-                                  required=True,
-                                  error_messages={'required': 'Please enter an amount in BTC you would like to receive.'})
-    issue_id = forms.IntegerField(widget=forms.HiddenInput(), required=True)
-    type = forms.ChoiceField(widget = forms.Select(),
-                     choices = ([('pull_request','Pull Request') ]),
-                     initial='committer', required = True, label='Commit Type')
+    auto_merge = forms.BooleanField(label='Auto Merge on Fix Payment')
 
+    auto_close = forms.BooleanField(label='Auto Close on Fix Payment')

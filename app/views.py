@@ -13,19 +13,15 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
-
 from django.shortcuts import redirect
-
-
-#from django.conf import settings
 from django.conf import settings
-
-
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+
+from app.util.gravatarv1 import GravatarV1
 from app.util.githubv3 import GithubV3
 from app.util.coinbasev1 import CoinbaseV1
 from app.util.gitpatronhelper import GitpatronHelper
@@ -34,7 +30,7 @@ from app.models import Patron, CallbackMessage, CoinbaseButton, \
     Issue, Repository, ClaimedIssue, CoinOrder, WatchedRepository, \
     PullRequest
 
-from app.forms import FixForm
+from app.forms import SettingsProfileForm
 
 # Create your views here.
 
@@ -57,22 +53,45 @@ def home(request,
     github_repos = client.get_oauth_user_repos(patron.github_access_token)
     watched = WatchedRepository.objects.filter(watcher=patron)
 
-    #find all clained issues for this repo and order by day
-    claimed_issues = ClaimedIssue.objects.filter(issue__repository__owner__user=request.user)
+    # #find all clained issues for this repo and order by day
+    # claimed_issues = ClaimedIssue.objects.filter(issue__repository__owner__user=request.user)
 
 
-    orders = CoinOrder.objects.filter(
+    patron_donation_orders = CoinOrder.objects.filter(
         button__owner=patron
     )
 
+    sum_patronage_cents = 0;
+    for order in patron_donation_orders:
+        sum_patronage_cents += order.total_coin_cents
+
+    fix_orders = CoinOrder.objects.filter(
+        button__issue__repository__owner=patron
+    )
+
+    sum_fix_cents = 0;
+    for order in fix_orders:
+        sum_fix_cents += order.total_coin_cents
+
+
     return render_to_response(template_name,
         {
-            'orders':orders,
+            # 'orders':orders,
             'watched':watched,
             'patron':patron,
+
+            #this is patronage into repos the patron owns
+            'patron_donation_orders':patron_donation_orders,
+            'sum_patronage_cents':sum_patronage_cents,
+
+            'fix_orders':fix_orders,
+            'sum_fix_cents':sum_fix_cents,
+
+            #this is where payments have been made
+            # 'claimed_issues':claimed_issues,
             'repos':published_repos,
             'github_repos':github_repos,
-            'claimed_issues':claimed_issues
+            # 'claimed_issues':claimed_issues
         },
         context_instance=RequestContext(request))
 
@@ -120,55 +139,68 @@ def browse_published_repos(request,
 #http://gitpatron.com/cbcallback.html?secret=a8b693bf-668c-461d-9a91-78f4b083e288
 @require_http_methods(["POST"])
 @csrf_exempt
-def cbcallback(request,github_username):
+def cbcallback(request, github_username):
 
-	patron = Patron.objects.get(user__username=github_username)
-		
+    print request.body
 
-	if request.GET['secret'] and request.GET['secret']==patron.coinbase_callback_secret:
+    patron = Patron.objects.get(user__username=github_username)
 
-		callback_message = json.loads(request.body)
+    print 'request secret: {0} patron callaback secret: {1}'.format(request.GET['secret'],patron.coinbase_callback_secret)
 
-		order_message = callback_message['order']
+    if request.GET['secret'] and request.GET['secret'] == patron.coinbase_callback_secret:
 
-            	#find the button related to this order
-            	order_button = CoinbaseButton.objects.get(code=order_message['button']['id'])
+        print 'secret was found'
 
-                #dont let the order be created if it already exists
-                orders_exist = CoinOrder.objects.filter(external_id= order_message['id'])
-                if len(orders_exist) == 0:
-                    order = CoinOrder.objects.create(
-                        # external_id = models.CharField(max_length=12)
-                        external_id = order_message['id'],
-                        # status = models.CharField(max_length=12)
-                        status = order_message['status'],
-                        # total_coin_cents = models.DecimalField(max_digits=8, decimal_places=8, default="", verbose_name="Order BTC Amount")
-                        total_coin_cents = order_message['total_btc']['cents'],
-                        # total_coin_currency_iso = models.CharField(max_length=3)
-                        total_coin_currency_iso = order_message['total_btc']['currency_iso'],
-                        # receive_address = models.CharField(max_length=36)
-                        receive_address = order_message['receive_address'],
-                        # refund_address = models.CharField(max_length=36)
-                        refund_address = order_message['refund_address'],
-                        button = order_button
-                    )
+        callback_message = json.loads(request.body)
 
-		CallbackMessage.objects.create(
-			is_processed = True,
-                        owner=patron,
-			processed_at = timezone.now(),
-                        message=request.body)
+        order_message = callback_message['order']
+
+        #find the button related to this order
+        order_button = CoinbaseButton.objects.get(code=order_message['button']['id'])
+
+        #dont let the order be created if it already exists
+        orders_exist = CoinOrder.objects.filter(external_id=order_message['id'])
+
+        print 'orders found: {0} for order with id: {1}'.format(len(orders_exist), order_message['id'])
+
+        if len(orders_exist) == 0:
+            print 'making order'
 
 
+            try:
 
-        	response = {'message':'SUCCEED'}
-        	return HttpResponse(json.dumps(response), mimetype='application/json')
-	else:
-        	return render_to_response("error.html",
-        		{'message':'could not find secret in response callback.'},
-        		context_instance=RequestContext(request))
+                order = CoinOrder.objects.create(
+                    # external_id = models.CharField(max_length=12)
+                    external_id = order_message['id'],
+                    # status = models.CharField(max_length=12)
+                    status = order_message['status'],
+                    # total_coin_cents = models.DecimalField(max_digits=8, decimal_places=8, default="", verbose_name="Order BTC Amount")
+                    total_coin_cents = order_message['total_btc']['cents'],
+                    # total_coin_currency_iso = models.CharField(max_length=3)
+                    total_coin_currency_iso = order_message['total_btc']['currency_iso'],
+                    # receive_address = models.CharField(max_length=36)
+                    receive_address = order_message['receive_address'],
+                    # refund_address = models.CharField(max_length=36)
+                    refund_address = order_message['refund_address'],
+                    button = order_button,
+                    created_at=datetime.utcnow()
+                )
 
+                print 'made order: {0}'.format(order.external_id)
 
+            except Exception as e:
+                print '%s (%s)' % (e.message, type(e))
+
+        else:
+            print 'did not make order'
+
+        CallbackMessage.objects.create(is_processed=True, owner=patron, processed_at = timezone.now(), message=request.body)
+        response = {'message':'SUCCEED'}
+        return HttpResponse(json.dumps(response), mimetype='application/json')
+    else:
+        return render_to_response("error.html",
+            {'message':'could not find secret in response callback.'},
+            context_instance=RequestContext(request))
 
 def login_user(request):
     print settings.GIT_APP_REDIRECT
@@ -249,7 +281,7 @@ def repo(request,git_username,repo_name,
         is_published = True
         issues = Issue.objects.filter(repository=repo).exclude(json_body__iregex=r'pull_request').order_by('github_issue_no')
         #pull_requests = Issue.objects.filter(repository=repo, json_body__iregex=r'pull_request').exclude(status='closed').order_by('github_issue_no')
-        pull_requests = PullRequest.objects.filter(repository=repo).exclude(status='closed').order_by('github_issue_no')
+        pull_requests = PullRequest.objects.filter(repository=repo).order_by('github_issue_no')
 
         #calculate all patronage
         #get all orders for the specifc repo
@@ -271,8 +303,7 @@ def repo(request,git_username,repo_name,
         total_payments = 0
         for order in repo_fix_orders:
             total_payments += order.total_coin_cents
-            # data['columns'][0].append(total_payments)
-            # data['columns'][1].append(order.total_coin_cents)
+
 
 
     except ObjectDoesNotExist:
@@ -283,6 +314,8 @@ def repo(request,git_username,repo_name,
         {
             'repo':repo,
             'issues':issues,
+            'repo_patronage_orders':repo_patronage_orders,
+            'repo_fix_orders':repo_fix_orders,
             'pull_requests':pull_requests,
             'is_published':is_published,
             'settings':settings,
@@ -297,9 +330,15 @@ def repo_chart_json(request,git_username,repo_name):
     repo = Repository.objects.get(owner__user__username=git_username,name=repo_name)
     orders = CoinOrder.objects.filter(button__issue__repository=repo).order_by('created_at')
 
+    last_order = orders.reverse()[0]
 
-    elapsedTime = datetime.now() - repo.created_at.replace(tzinfo=None)
-    days = elapsedTime.days
+    elapsedTime = last_order.created_at.replace(tzinfo=None) - repo.created_at.replace(tzinfo=None)
+    days = elapsedTime.days+2
+
+    # print 'last_order_date:{0} repo_created:{1} elapsed:{2}'.format(
+    #     last_order.created_at.replace(tzinfo=None),
+    #     repo.created_at.replace(tzinfo=None),
+    #     elapsedTime.days)
 
     data = {
         'x': 'x',
@@ -315,6 +354,12 @@ def repo_chart_json(request,git_username,repo_name):
         donation_date_formatted = date_donation.strftime("%Y-%m-%d")
         for order in orders:
             order_date_formatted = order.created_at.strftime("%Y-%m-%d")
+            eq = donation_date_formatted == order_date_formatted
+            # print '{0}={1} {2} {3}'.format(
+            #     order_date_formatted,
+            #     donation_date_formatted,
+            #     eq,
+            #     order.total_coin_cents)
 
             if donation_date_formatted == order_date_formatted:
                 total_payments += order.total_coin_cents
@@ -356,7 +401,9 @@ def publish_repo_ajax(request, git_username,repo_name,
             fullname = repo_response['full_name'],
             github_description=repo_response['description'],
             private= repo_response['private'] in ['true', 'True'],
-            owner = patron
+            owner = patron,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
         )
 
         #get the issues and add those
@@ -395,6 +442,8 @@ def sync_issues_ajax(request, git_username,repo_name,
             if is_pull_request(issue_response):
                 try:
                     pull_request = PullRequest.objects.get(github_id=issue_response['id'])
+                    pull_request.status = issue_response['state']
+                    pull_request.save()
                     pull_requests.append(pull_request)
                 except ObjectDoesNotExist:
                     pull_request = create_pull_request(issue_response,repo_saved)
@@ -405,13 +454,13 @@ def sync_issues_ajax(request, git_username,repo_name,
                     issue = Issue.objects.get(github_id=issue_response['id'])
                     issue.status = issue_response['state']
 
-                    #if closed then remove monetization
+                    # #if closed then remove monetization WHY?, just disable them!!! this is confusing
                     if issue.status == 'closed':
-                        owner = Patron.objects.get(user__username=git_username)
-                        monetization_buttons = CoinbaseButton.objects.filter(issue=issue,owner=owner,type="patronage")
+                        monetization_buttons = CoinbaseButton.objects.filter(issue=issue)
                         if len(monetization_buttons)>0:
                             for button in monetization_buttons:
-                                button.delete()
+                                button.enabled = False
+                                button.save()
 
                     issue.save()
                     issues.append(issue)
@@ -432,79 +481,103 @@ def sync_issues_ajax(request, git_username,repo_name,
 
 @login_required(login_url='/login.html')
 def monetize_issue_ajax(request, issue_id,
-          template_name="repo_button_ajax.html"):
+          template_name="ajax_result.html"):
 
     patron = Patron.objects.get(user__username=request.user.username)
+
+
 
     client_coinbase = CoinbaseV1()
 
     issue  = get_object_or_404(Issue, pk=issue_id)
-    
-    #make a button id that will persist for callback
-    button_guid = str(uuid.uuid1())
-    callback_url = '{0}/{1}/?secret={2}'.format(
-    	settings.COINBASE_ORDER_CALLBACK,
-    	patron.user.username,
-    	patron.coinbase_callback_secret)
-    	
-    button_request = {
-        'button':{
-            'name':'{0} {1}'.format(issue.github_id, issue.title),
-            'custom':button_guid,
-            'description':issue.title,
-            'price_string':10.00,
-            'price_currency_iso':'USD',
-            'button_type':'donation',
-            'style':'donation_small',
-            'choose_price':True,
-            'price1':5.00,
-            'price2':10.00,
-            'price3':25.00,
-            'price4':100.00,
-            'callback_url':callback_url
+
+    #see if a patronage button for this issue exists
+    patronage_button_issue = CoinbaseButton.objects.filter(issue=issue, type='patronage')
+
+    if len(patronage_button_issue) == 0:
+
+        #make a button id that will persist for callback
+        button_guid = str(uuid.uuid1())
+        callback_url = '{0}/{1}/?secret={2}'.format(
+            settings.COINBASE_ORDER_CALLBACK,
+            patron.user.username,
+            patron.coinbase_callback_secret)
+
+        button_request = {
+            'button':{
+                'name':'{0} {1}'.format(issue.github_id, issue.title),
+                'custom':button_guid,
+                'description':issue.title,
+                'price_string':10.00,
+                'price_currency_iso':'USD',
+                'button_type':'donation',
+                'style':'donation_small',
+                'choose_price':True,
+                'price1':5.00,
+                'price2':10.00,
+                'price3':25.00,
+                'price4':100.00,
+                'callback_url':callback_url
+            }
         }
-    }
 
-    #refresh the user token before any coinbase call
-    helper = GitpatronHelper()
-    helper.refresh_user_token(patron.user.username)
+        #refresh the user token before any coinbase call
+        helper = GitpatronHelper()
+        helper.refresh_user_token(patron.user.username)
 
-    refresh_response = helper.refresh_user_token(patron.user.username)
+        refresh_response = helper.refresh_user_token(patron.user.username)
 
-    button_response = client_coinbase.post_button_oauth(
-            button_request,
-            refresh_response['access_token'],
-            refresh_response['refresh_token'],
-            settings.COINBASE_OAUTH_CLIENT_ID,
-            settings.COINBASE_OAUTH_CLIENT_SECRET)
+        button_response = client_coinbase.post_button_oauth(
+                button_request,
+                refresh_response['access_token'],
+                refresh_response['refresh_token'],
+                settings.COINBASE_OAUTH_CLIENT_ID,
+                settings.COINBASE_OAUTH_CLIENT_SECRET)
 
 
-    if(button_response['error_code'] != None):
+        if(button_response['error_code'] != None):
+            return render_to_response('error_ajax.html',
+                {'message':'problem making button'},
+                context_instance=RequestContext(request))
+
+        else:
+            #always update tokens on every oauth call
+            patron.coinbase_access_token = button_response['access_token']
+            patron.coinbase_refresh_token = button_response['refresh_token']
+            # patron.coinbase_callback_secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+            patron.save()
+
+            #create the button (if a patronage button doesnt already exist)
+
+            button_created = CoinbaseButton.objects.create(
+                code=button_response['button']['code'],
+                external_id=issue.github_api_url,
+                button_response=json.dumps(button_response),
+                button_guid=button_guid,
+                callback_url=callback_url,
+                issue=issue,
+                type="patronage",
+                owner=patron,
+                enabled=True)
+
+            return render_to_response(template_name,
+                { 'issue':issue,
+                  'ajax_message':"Done!"},
+                context_instance=RequestContext(request))
+    else:
         return render_to_response('error_ajax.html',
-            button_response,
+            {'message':'patronage button already exists for this issue'},
             context_instance=RequestContext(request))
 
-    else:
-        #always update tokens on every oauth call
-        patron.coinbase_access_token = button_response['access_token']
-        patron.coinbase_refresh_token = button_response['refresh_token']
-        # patron.coinbase_callback_secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        patron.save()
+def monetize_repo_ajax(request, repo_id,
+          template_name="ajax_response.html"):
 
-        #create the button
-        button_created = CoinbaseButton.objects.create(
-            code=button_response['button']['code'],
-            external_id=issue.github_api_url,
-            button_response=json.dumps(button_response),
-            button_guid=button_guid,
-            callback_url=callback_url,
-            issue=issue,
-            type="patronage",
-            owner=patron)
+        repo  = get_object_or_404(Repository, pk=repo_id)
 
         return render_to_response(template_name,
-            { 'issue':issue },
+            { 'repo':repo },
             context_instance=RequestContext(request))
+
 
 @login_required(login_url='/login.html')
 def claim_issue_ajax(request, issue_id,
@@ -512,7 +585,10 @@ def claim_issue_ajax(request, issue_id,
 
     committer = Patron.objects.get(user__username=request.user.username)
     issue  = get_object_or_404(Issue, pk=issue_id)
-    claim_issue_ajax = ClaimedIssue.objects.create(committer=committer, issue=issue)
+    claim_issue_ajax = ClaimedIssue.objects.create(
+        committer=committer, issue=issue,
+        created_at=datetime.now(),
+        updated_at=datetime.now())
 
     return render_to_response(template_name,
         { 'issue':issue },
@@ -576,6 +652,55 @@ def wallet_wf_ajax(request, wf_index):
 
     return HttpResponse(json.dumps(data), mimetype='application/json')
 
+@require_http_methods(["GET"])
+@login_required(login_url='/login.html')
+def revoke_wallet(request):
+
+    patron = Patron.objects.get(user__username=request.user.username)
+    patron.coinbase_access_token = None
+    patron.coinbase_refresh_token = None
+    patron.coinbase_callback_secret = None
+
+    #is_account_created
+    patron.account_created = False
+
+    #wallet_address
+    patron.wallet_address = None
+
+    #has_donated
+    patron.has_donated = False
+    patron.save()
+
+
+    return HttpResponseRedirect('{0}/settings.html'.format(settings.GITPATRON_APP_URL))
+
+@require_http_methods(["POST"])
+@csrf_exempt
+def activate_callback(request):
+
+    print 'got actvate callback secret:{0}={1}'.format(request.GET['secret'],settings.GITPATRON_CALLBACK_SECRET)
+    print request.body
+
+    #the system will own these
+    if request.GET['secret'] and request.GET['secret']==settings.GITPATRON_CALLBACK_SECRET:
+        patron = Patron.objects.get(coinbase_callback_secret=request.GET['secret'])
+
+        callback_message = json.loads(request.body)
+        order_message = callback_message['order']
+
+        print json.dumps(order_message)
+
+        activate_patron  = get_object_or_404(Patron, wallet_address=order_message['custom'])
+        print 'activating patron:{0}'.format(activate_callback)
+
+        activate_patron.has_donated = True
+        activate_patron.save()
+
+        CallbackMessage.objects.create(
+			is_processed = True,
+            owner=patron,
+			processed_at = datetime.utcnow(),
+            message=request.body)
 
 #'app.views.monetize_fix_ajax',name='monetize_fix_ajax'),
 @login_required(login_url='/login.html')
@@ -676,7 +801,8 @@ def monetize_fix_ajax(
             type="fix",
             owner=patron,
             total_coin_cents=coin_cents,
-            total_coin_currency_iso="BTC")
+            total_coin_currency_iso="BTC",
+            enabled=True)
 
         # claim_issue_ajax.fixed = True
         claim_issue_ajax.button = button_created
@@ -719,26 +845,12 @@ def coinbase_callback(request,template_name="coinbase_auth.html"):
         #use the code to POST and get an access_token
         coinbase_client = CoinbaseV1()
 
-        #refresh the user token before any coinbase call
-        helper = GitpatronHelper()
-
-        # refresh_response = helper.refresh_user_token(patron.user.username)
-
         response_obj = coinbase_client.get_oauth_response(request.GET['code'])
-        # {
-        #     u'access_token': u'76af04cab8413dc39e7affe408673fbb75d4a02143a6cc21732af6d470bbab8b',
-        #     u'token_type': u'bearer',
-        #     u'expires_in': 7200,
-        #     u'refresh_token': u'4deb04b689ae38165af92edb1077e07ef0eba692107cb97796260b9f56be0899',
-        #     u'scope': u'all'
-        # }
 
         #update the Patron object
         if patron:
             context = {}
             context['access_token']=response_obj['access_token']
-            #http://gitpatron.com/cbcallback/claytantor/?secret=a8b693bf-668c-461d-9a91-78f4b083e288
-
             patron.coinbase_access_token=response_obj['access_token']
             patron.coinbase_refresh_token=response_obj['refresh_token']
             patron.coinbase_callback_secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
@@ -748,8 +860,6 @@ def coinbase_callback(request,template_name="coinbase_auth.html"):
         else:
             context['message'] = 'error finding patron account.'
             template_name="error.html"
-
-
 
 
     return render_to_response(template_name,
@@ -800,7 +910,8 @@ def payments(request,
 
     committer = Patron.objects.get(user__username=request.user.username)
     orders = CoinOrder.objects.filter(
-        button__owner=committer
+        button__owner=committer,
+        button__type='fix'
     )
 
     return render_to_response(template_name,
@@ -845,120 +956,120 @@ def watch_repo_ajax(request,repoid,
         { 'repo':repository },
         context_instance=RequestContext(request))
 
-@login_required(login_url='/login.html')
-def fix_form_ajax(request,
-          owner,
-          reponame,
-          issue_no,
-          template_name="fix_form_ajax.html"):
-
-
-
-    issue = Issue.objects.get(repository__fullname='{0}/{1}'.format(owner,reponame),github_issue_no=issue_no)
-    context = {
-        'issue':issue
-    }
-
-    if request.method == 'POST':
-        fixform = FixForm(request.POST)
-        if fixform.is_valid():
-            template_name='ajax_result.html'
-            context['ajax_message'] = 'Fix Saved'
-
-            patron = Patron.objects.get(user__username=request.user.username)
-
-
-            # look we need to make a button and it should
-            # be interactive like it asks me
-            # how much I want to be paid. righT?
-            # lets assume they are crazy, and that they arent
-            # paid shit until we get a form model going
-            claim_issue_ajax = ClaimedIssue.objects.get(issue_id=fixform.cleaned_data['issue_id'])
-
-
-            #ok make a gd button!
-            client_coinbase = CoinbaseV1()
-
-            #make a button id that will persist for callback
-            button_guid = str(uuid.uuid1())
-
-            callback_url = '{0}/{1}/?secret={2}'.format(
-                settings.COINBASE_ORDER_CALLBACK,
-                patron.user.username,
-                patron.coinbase_callback_secret)
-
-            # issue  = get_object_or_404(Issue, pk=issue_id)
-            button_request = {
-                'button':{
-                    'name':'Fix for {0} {1}'.format(claim_issue_ajax.issue.github_id, claim_issue_ajax.issue.title),
-                    'custom':button_guid,
-                    'description':'Fix for {0}'.format(claim_issue_ajax.issue.title),
-                    'price_string':0.005384,
-                    'price_currency_iso':'BTC',
-                    'button_type':'buy_now',
-                    'style':'buy_now_small',
-                    'choose_price':False,
-                    'callback_url':callback_url
-                }
-            }
-
-            #refresh the user token before any coinbase call
-            helper = GitpatronHelper()
-            refresh_response = helper.refresh_user_token(patron.user.username)
-
-            button_response = client_coinbase.post_button_oauth(
-                    button_request,
-                    refresh_response['access_token'],
-                    refresh_response['refresh_token'],
-                    settings.COINBASE_OAUTH_CLIENT_ID,
-                    settings.COINBASE_OAUTH_CLIENT_SECRET)
-
-
-            if(button_response['error_code'] != None):
-                return render_to_response('error_ajax.html',
-                    button_response,
-                    context_instance=RequestContext(request))
-
-            else:
-                #always update tokens on every oauth call
-                patron.coinbase_access_token = button_response['access_token']
-                patron.coinbase_refresh_token = button_response['refresh_token']
-                patron.save()
-
-                #make coin cents a bigint
-                coin_val = fixform.cleaned_data['min_amount'] * 100000000
-                coin_cents = "%.0f" % coin_val
-
-                #create the button
-                button_created = CoinbaseButton.objects.create(
-                    code=button_response['button']['code'],
-                    external_id=claim_issue_ajax.issue.github_api_url,
-                    button_guid=button_guid,
-                    callback_url=callback_url,
-                    button_response=json.dumps(button_response),
-                    issue=claim_issue_ajax.issue,
-                    type="fix",
-                    owner=patron,
-                    total_coin_cents=coin_cents,
-                    total_coin_currency_iso="BTC")
-
-                # claim_issue_ajax.fixed = True
-                claim_issue_ajax.button = button_created
-                claim_issue_ajax.github_commit_id = fixform.cleaned_data['git_commit_id']
-                claim_issue_ajax.committer_type = fixform.cleaned_data['type']
-                claim_issue_ajax.save()
-
-        context['form'] = fixform
-
-
-    else:
-        form = FixForm(initial={'issue_id': issue.id})
-        context['form'] = form
-
-
-    return render_to_response(template_name,
-    context,
-    context_instance=RequestContext(request))
+# @login_required(login_url='/login.html')
+# def fix_form_ajax(request,
+#           owner,
+#           reponame,
+#           issue_no,
+#           template_name="fix_form_ajax.html"):
+#
+#
+#
+#     issue = Issue.objects.get(repository__fullname='{0}/{1}'.format(owner,reponame),github_issue_no=issue_no)
+#     context = {
+#         'issue':issue
+#     }
+#
+#     if request.method == 'POST':
+#         fixform = FixForm(request.POST)
+#         if fixform.is_valid():
+#             template_name='ajax_result.html'
+#             context['ajax_message'] = 'Fix Saved'
+#
+#             patron = Patron.objects.get(user__username=request.user.username)
+#
+#
+#             # look we need to make a button and it should
+#             # be interactive like it asks me
+#             # how much I want to be paid. righT?
+#             # lets assume they are crazy, and that they arent
+#             # paid shit until we get a form model going
+#             claim_issue_ajax = ClaimedIssue.objects.get(issue_id=fixform.cleaned_data['issue_id'])
+#
+#
+#             #ok make a gd button!
+#             client_coinbase = CoinbaseV1()
+#
+#             #make a button id that will persist for callback
+#             button_guid = str(uuid.uuid1())
+#
+#             callback_url = '{0}/{1}/?secret={2}'.format(
+#                 settings.COINBASE_ORDER_CALLBACK,
+#                 patron.user.username,
+#                 patron.coinbase_callback_secret)
+#
+#             # issue  = get_object_or_404(Issue, pk=issue_id)
+#             button_request = {
+#                 'button':{
+#                     'name':'Fix for {0} {1}'.format(claim_issue_ajax.issue.github_id, claim_issue_ajax.issue.title),
+#                     'custom':button_guid,
+#                     'description':'Fix for {0}'.format(claim_issue_ajax.issue.title),
+#                     'price_string':0.005384,
+#                     'price_currency_iso':'BTC',
+#                     'button_type':'buy_now',
+#                     'style':'buy_now_small',
+#                     'choose_price':False,
+#                     'callback_url':callback_url
+#                 }
+#             }
+#
+#             #refresh the user token before any coinbase call
+#             helper = GitpatronHelper()
+#             refresh_response = helper.refresh_user_token(patron.user.username)
+#
+#             button_response = client_coinbase.post_button_oauth(
+#                     button_request,
+#                     refresh_response['access_token'],
+#                     refresh_response['refresh_token'],
+#                     settings.COINBASE_OAUTH_CLIENT_ID,
+#                     settings.COINBASE_OAUTH_CLIENT_SECRET)
+#
+#
+#             if(button_response['error_code'] != None):
+#                 return render_to_response('error_ajax.html',
+#                     button_response,
+#                     context_instance=RequestContext(request))
+#
+#             else:
+#                 #always update tokens on every oauth call
+#                 patron.coinbase_access_token = button_response['access_token']
+#                 patron.coinbase_refresh_token = button_response['refresh_token']
+#                 patron.save()
+#
+#                 #make coin cents a bigint
+#                 coin_val = fixform.cleaned_data['min_amount'] * 100000000
+#                 coin_cents = "%.0f" % coin_val
+#
+#                 #create the button
+#                 button_created = CoinbaseButton.objects.create(
+#                     code=button_response['button']['code'],
+#                     external_id=claim_issue_ajax.issue.github_api_url,
+#                     button_guid=button_guid,
+#                     callback_url=callback_url,
+#                     button_response=json.dumps(button_response),
+#                     issue=claim_issue_ajax.issue,
+#                     type="fix",
+#                     owner=patron,
+#                     total_coin_cents=coin_cents,
+#                     total_coin_currency_iso="BTC")
+#
+#                 # claim_issue_ajax.fixed = True
+#                 claim_issue_ajax.button = button_created
+#                 claim_issue_ajax.github_commit_id = fixform.cleaned_data['git_commit_id']
+#                 claim_issue_ajax.committer_type = fixform.cleaned_data['type']
+#                 claim_issue_ajax.save()
+#
+#         context['form'] = fixform
+#
+#
+#     else:
+#         form = FixForm(initial={'issue_id': issue.id})
+#         context['form'] = form
+#
+#
+#     return render_to_response(template_name,
+#     context,
+#     context_instance=RequestContext(request))
 
 def issue(request,
           owner,
@@ -1045,14 +1156,27 @@ def issue_chart_json(request,
           reponame,
           issue_no):
 
-
     issue = Issue.objects.get(repository__fullname='{0}/{1}'.format(owner,reponame),github_issue_no=issue_no)
     orders = CoinOrder.objects.filter(button__issue=issue).order_by('created_at')
 
-    elapsedTime = datetime.now() - issue.created_at.replace(tzinfo=None)
-    days = elapsedTime.days
+    #get the last donation order
+    last_order = orders.reverse()[0]
+
+    elapsedTime = last_order.created_at.replace(tzinfo=None) - issue.created_at.replace(tzinfo=None)
+    days = elapsedTime.days+2
+
+    # print 'last_order_date:{0} repo_created:{1} elapsed:{2} type:{3}'.format(
+    #     last_order.created_at.replace(tzinfo=None),
+    #     issue.created_at.replace(tzinfo=None),
+    #     elapsedTime.days,
+    #     last_order.button.type)
+
+    is_paid = False;
+    if(last_order.button.type=='fix'):
+        is_paid = True
 
     data = {
+        'is_paid':is_paid,
         'x': 'x',
         'columns': [
             ['x'],
@@ -1076,11 +1200,32 @@ def issue_chart_json(request,
 
     return HttpResponse(json.dumps(data), mimetype='application/json')
 
-
+@login_required(login_url='/login.html')
 def patron_settings(request,
           template_name="settings.html"):
 
-    context = { }
+    patron = Patron.objects.get(user=request.user)
+    context = {
+    }
+
+    if request.method == 'GET':
+        context ['settings_profile_form'] = \
+            SettingsProfileForm(initial={'gravatar_email': patron.gravatar_email})
+        context ['patron'] = patron
+
+    elif request.method == 'POST':
+        settings_profile_form = SettingsProfileForm(request.POST)
+        if settings_profile_form.is_valid():
+            gravatar_util = GravatarV1()
+            email = settings_profile_form.cleaned_data['gravatar_email']
+            gravatar_url = gravatar_util.make_url(
+                email_addr=email,
+                default_url="{0}/static/img/generic_avatar.png".format(settings.GITPATRON_APP_URL))
+            patron.github_avatar_url = gravatar_url
+            patron.gravatar_email = email
+            patron.save()
+            context ['settings_profile_form'] = settings_profile_form
+            context ['patron'] = patron
 
     return render_to_response(template_name,
     context,
@@ -1112,7 +1257,9 @@ def create_issue(issue_response, repo_created):
                 description=issue_response['body'],
                 repository=repo_created,
                 status=issue_response['state'],
-                issue_user=issue_user
+                issue_user=issue_user,
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
             )
         return issue
     else:
@@ -1144,7 +1291,9 @@ def create_pull_request(issue_response, repo_created):
                 description=issue_response['body'],
                 repository=repo_created,
                 status=issue_response['state'],
-                issue_user=issue_user
+                issue_user=issue_user,
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
         )
         return pull_request
     else:
