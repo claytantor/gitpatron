@@ -62,13 +62,6 @@ $(document).ready(function() {
         $(this).find('span').toggleClass('glyphicon-refresh-animate');
         repo_id = $(this).data('repo-id');
 
-{#        $.ajax({#}
-{#            url:"{{ settings.GITPATRON_APP_URL }}/monetize_fix_ajax/{{ request.user }}/"+pull_request_id+"/",#}
-{#            success:function(result){#}
-{#                $("#update_section_"+pull_request_id).html(result);#}
-{#                $("#pull_request_section_"+pull_request_id).html('<div class="col-md-6"><h3>Done!</h3></div>');#}
-{#            }#}
-{#        });#}
         return false;
     });
 
@@ -79,10 +72,11 @@ $(document).ready(function() {
         success: function (chart_data) // Variable data contains the data we get from serverside
         {
             $('#chart').gpchart_timeseries(chart_data);
+        },
+        error: function (  jqXHR,  textStatus,  errorThrown ){
+            console.log("error:"+errorThrown);
         }
     });
-
-
 
 
     $('button.monetize_fix').click(function (e) {
@@ -93,8 +87,12 @@ $(document).ready(function() {
         $.ajax({
             url:"{{ settings.GITPATRON_APP_URL }}/monetize_fix_ajax/{{ request.user }}/"+pull_request_id+"/",
             success:function(result){
+                console.log("success monetize_fix");
                 $("#update_section_"+pull_request_id).html(result);
-                $("#pull_request_section_"+pull_request_id).html('<div class="col-md-6"><h3>Done!</h3></div>');
+                $("#fixed_button_"+pull_request_id).html('<div class="col-md-6"><h3>Done!</h3></div>');
+            },
+            error: function (  jqXHR,  textStatus,  errorThrown ){
+                console.log("error:"+errorThrown);
             }
         });
         return false;
@@ -135,27 +133,13 @@ $(document).ready(function() {
               <div class="panel-body text-right gitpatron-hbar">
 
                 {% if repo.owner.user.username == request.user.username %}
-                    <span id="issue_monetize_{{ issue.id }}">
-                        <button class="btn btn-default btn-sm has-spinner monetize_repo" role="button" style="margin-top: -5px;"  data-repo-id="{{ repo.id }}">
-                        <span class="glyphicon glyphicon-refresh"
-                              style="display: none"
-                              id="monetize_ajax_icon"></span>&nbsp;Monetize Repo</button>
-                    </span>
+
                     <button class="btn btn-default btn-sm issues_sync" href="#" role="button" style="margin-top: -5px;">
                         <span class="glyphicon glyphicon-refresh" style="display: none" id="issue_sync_icon"></span>
                         &nbsp;Sync With Github</button>
                 {% else%}
                     {% include 'watch_repo_ajax.html' %}
                 {% endif %}
-                <span id="twitter_button" style="margin-left: 10px;">
-                        <a href="https://twitter.com/share"
-                           class="twitter-share-button"
-                           data-via="gitpatron"
-                           data-text="Donate to the github repo {{ repo.name }}. Your #bitcoin patronage helps open source thrive."
-                           data-lang="en">Tweet</a>
-                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                </span>
-
 
               </div>
             </div>
@@ -178,7 +162,7 @@ $(document).ready(function() {
                   <div class="panel-heading">
                       <div style="width: 50%; display: inline-block;"><h3 class="panel-title">{{ repo.name }}</h3></div>
                       <div style="width: 45%; display: inline-block;" class="text-right">
-                          <a target="_blank" class="btn btn-default btn-xs" href="https://github.com/{{ repo.owner.user.username }}/{{ repo.name }}">View on github</a>
+                          <a target="_blank" class="btn btn-default btn-xs" href="https://github.com/{{ repo.owner.user.username }}/{{ repo.name }}"><img src="{{ STATIC_URL }}img/github-icon-64.png" class="github-icon"/>&nbsp; View on github</a>
                           <button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-eye-open"></span> Show Markdown</button>
                       </div>
                   </div>
@@ -204,7 +188,7 @@ $(document).ready(function() {
                 {% endif %}
                 {% if repo_fix_orders|length > 0 %}
                 <div>
-                    <h4>Payments to Comitters</h4>
+                    <h4>Payments to Commits</h4>
                     <h5>Fix Payments: {{ sum_fix_cents|btc_cents }} BTC</h5>
                     {% with orders=repo_fix_orders type="fix" %}
                     <div>{% include 'order_table.html' %}</div>
@@ -232,37 +216,6 @@ $(document).ready(function() {
        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
             {% include 'sidebar_repo.html' %}
        </div><!--/span-->
-
-{##}
-{#        <div>#}
-{#            <div class="col-xs-12 col-sm-9">#}
-{##}
-{##}
-{##}
-{#                <div id="sync_refresh_area">#}
-{#                    {% if issues|length > 0 %}#}
-{#                    <h3>Issues</h3>#}
-{#                    <div id="issues_area">#}
-{#                        {% include 'issues_ajax.html' %}#}
-{#                    </div>#}
-{#                    {% endif %}#}
-{##}
-{#                    {% if pull_requests|length > 0 %}#}
-{#                    <h3>Pull Requests</h3>#}
-{#                    <div id="pulls_area">#}
-{#                        {% include 'pulls_ajax.html' %}#}
-{#                    </div>#}
-{#                    {% endif %}#}
-{#                </div>#}
-{##}
-{##}
-{##}
-{#            </div>#}
-{#            <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">#}
-{#                {% include 'sidebar.html' %}#}
-{#            </div><!--/span-->#}
-{#        </div>#}
-
 
 
     </div> <!-- /container -->

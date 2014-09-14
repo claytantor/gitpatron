@@ -1,6 +1,4 @@
 {% load gitpatrontags %}
-
-
 {% if request.user and pull_request.status == 'open' and pull_request.issue_user.user == request.user and pull_request.fix_issue == None  %}
     <span id="pull_request_section_{{ pull_request.id }}">
         <div class="col-md-6">
@@ -31,19 +29,25 @@
     </span>
 {% elif pull_request.fix_issue != None  %}
     {% if  pull_request.issue_user.user == request.user %}
-        {% if issue|payment_status_filter == "monetized" %}
+        {% if pull_request.fix_issue|payment_status_filter == "monetized" %}
             MONETIZED
-        {% elif issue|payment_status_filter == "fixed" %}
+        {% elif pull_request.fix_issue|payment_status_filter == "fixed" %}
             FIXED
-        {% elif issue|payment_status_filter == "claimed" and pull_request.fix_issue|is_funded %}
-        <span id="fixed_button_{{ pull_request.fix_issue.id }}">
-            <button class="btn btn-default btn-xs has-spinner monetize_fix" id="button_pull_monitize_{{ pull_request.id }}"
-                 data-pull-request-id ="{{ pull_request.id  }}"
-                 data-issue-owner="{{ pull_request.repository.owner.user.username }}"
-                 data-repo-name="{{ pull_request.repository.name }}"
-                 data-github-issue="{{ pull_request.github_issue_no }}">
-            <span class="glyphicon glyphicon-refresh" data-toggle="modal" data-target="#fix_modal"  style="display: none"></span>&nbsp;Monetize Fix</button>
-        </span>
+        {% elif pull_request.fix_issue|payment_status_filter == "claimed" and pull_request.fix_issue|is_funded %}
+            {% if pull_request.fix_issue|is_funded and not pull_request.fix_issue|is_monetized_fix%}
+                <span id="fixed_button_{{ pull_request.fix_issue.id }}">
+                    <button class="btn btn-default btn-xs has-spinner monetize_fix" id="button_pull_monitize_{{ pull_request.id }}"
+                         data-pull-request-id ="{{ pull_request.id  }}"
+                         data-issue-owner="{{ pull_request.repository.owner.user.username }}"
+                         data-repo-name="{{ pull_request.repository.name }}"
+                         data-github-issue="{{ pull_request.github_issue_no }}">
+                    <span class="glyphicon glyphicon-refresh" data-toggle="modal" data-target="#fix_modal"  style="display: none"></span>&nbsp;Monetize Fix</button>
+                </span>
+             {% elif pull_request.fix_issue|is_funded  %}
+                MONETIZED FIX
+            {% else %}
+                NOT FUNDED
+            {% endif %}
         {% endif %}
     {% else %}
         {% if pull_request.fix_issue|is_monetized_owner:request.user and pull_request.fix_issue|is_paid != True %}
@@ -64,3 +68,5 @@
         {% endif %}
     {% endif %}
 {% endif %}
+{{ button.code }}
+

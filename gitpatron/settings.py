@@ -5,6 +5,7 @@ from ConfigParser import RawConfigParser
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PROJECT_DIR = os.path.dirname(__file__)
 CONF_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+STATIC_MAIN_DIR = os.path.join(PROJECT_DIR, '..', 'static/')
 
 
 here = lambda x: os.path.join(os.path.abspath(os.path.dirname(__file__)), x)
@@ -156,6 +157,11 @@ COINBASE_OAUTH_CLIENT_SECRET=config.get('coinbase','COINBASE_OAUTH_CLIENT_SECRET
 COINBASE_OAUTH_CLIENT_CALLBACK=config.get('coinbase','COINBASE_OAUTH_CLIENT_CALLBACK')
 COINBASE_ORDER_CALLBACK=config.get('coinbase','COINBASE_ORDER_CALLBACK')
 GITPATRON_ACTIVATE_DONATION_BUTTON_CODE=config.get('coinbase','GITPATRON_ACTIVATE_DONATION_BUTTON_CODE')
+
+#mailchimp
+MAILCHIMP_APIKEY=config.get('mailchimp','MAILCHIMP_APIKEY')
+MAILCHIMP_LIST_ID=config.get('mailchimp','MAILCHIMP_LIST_ID')
+
 
 #gitpatron
 #http://local.gitpatron.com:8000

@@ -53,9 +53,9 @@ $(document).ready(function() {
             <div class="alert alert-warning alert-dismissible" role="alert">
               <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
               <strong>Warning!</strong> We are still working on the website and its not quite ready for prime time.
-                Please <a href="http://eepurl.com/YxMjH">sign up for the BETA program</a> to
-                participate in advance availability for gitpatron.
+                Please help make gitpatron better by participating in the community and <a href="{% url 'moderator' %}">asking questions</a>.
             </div>
+
 
             <ul id="project_tabs" class="nav nav-pills" style="margin-top: 15px;">
               <li class="active"><a href="#home" data-toggle="tab">Dashboard</a></li>
@@ -109,21 +109,24 @@ $(document).ready(function() {
             {% if fix_orders|length > 0 %}
             <div>
                 <h4>Payments Made on Repos You Published</h4>
-                <h5>Total Fix Payments: {{ sum_fix_cents|btc_cents }} BTC</h5>
+                <h5>Total Fix Payments Out: {{ sum_fix_cents|btc_cents }} BTC</h5>
                 {% with orders=fix_orders type="fix" %}
                 <div>{% include 'order_table.html' %}</div>
                 {% endwith %}
             </div>
             {% endif %}
 
+            {% if fix_payments|length > 0 %}
+            <div>
+                <h4>Payments Made To You For Fixes</h4>
+                <h5>Total Fix Payments In: {{ sum_fix_cents_paid|btc_cents }} BTC</h5>
+                {% with orders=fix_payments type="donation" %}
+                <div>{% include 'order_table.html' %}</div>
+                {% endwith %}
+            </div>
+            {% endif %}
 
-{#            {% if claimed_issues|length > 0 %}#}
-{#            <div>#}
-{#                <h2>Claimed Issues and Fixes for Your Repos</h2>#}
-{#                <h4>Donations To Repos You Published</h4>#}
-{#                {% include 'claimed_issues_table.html' %}#}
-{#            </div>#}
-{#            {% endif %}#}
+
 
 
             </div><!--/span-->

@@ -92,6 +92,15 @@ $(document).ready(function() {
 {#    {% load makenextags  %}#}
     {% include 'topbar.html' %}
     <div class="container gitpatron-top-container">
+
+        {% if  request.user|wallet_state_filter >= 5 %}
+        <div class="row">
+            <div class="alert alert-success alert-dismissible" role="alert" style="margin-top: 10px;">
+              <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <span class="glyphicon glyphicon-ok gitpatron-green"></span>&nbsp; <strong>Hooray!</strong> Your coinbase wallet has been successfuly integrated with <strong>gitpatron</strong>.
+            </div>
+        </div>
+        {% endif %}
         <div class="row">
             <ul id="project_tabs" class="nav nav-pills" style="margin-top: 15px;">
                 <li><a href="#settings" data-toggle="tab">Settings</a></li>
@@ -102,14 +111,14 @@ $(document).ready(function() {
         <!-- Tab panes -->
         <div class="tab-content">
             <div class="tab-pane" id="settings">
-                {% if  request.user|wallet_state_filter >= 5 %}
-                <div class="row">
-                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-top: 10px;">
-                      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                      <span class="glyphicon glyphicon-ok gitpatron-green"></span>&nbsp; <strong>Hooray!</strong> Your coinbase wallet has been successfuly integrated with <strong>gitpatron</strong>.
-                    </div>
-                </div>
-                {% endif %}
+{#                {% if  request.user|wallet_state_filter >= 5 %}#}
+{#                <div class="row">#}
+{#                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-top: 10px;">#}
+{#                      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>#}
+{#                      <span class="glyphicon glyphicon-ok gitpatron-green"></span>&nbsp; <strong>Hooray!</strong> Your coinbase wallet has been successfuly integrated with <strong>gitpatron</strong>.#}
+{#                    </div>#}
+{#                </div>#}
+{#                {% endif %}#}
                 <div class="row">
                     <div class="col-md-9" style="padding-left: 0px;">
                         <h1>Settings</h1>
@@ -137,14 +146,14 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="tab-pane" id="wallet">
-                {% if  request.user|wallet_state_filter >= 5 %}
-                <div class="row">
-                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-top: 10px;">
-                      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                      <span class="glyphicon glyphicon-ok gitpatron-green"></span>&nbsp; <strong>Hooray!</strong> Your coinbase wallet has been successfuly integrated with <strong>gitpatron</strong>.
-                    </div>
-                </div>
-                {% endif %}
+{#                {% if  request.user|wallet_state_filter >= 5 %}#}
+{#                <div class="row">#}
+{#                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-top: 10px;">#}
+{#                      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>#}
+{#                      <span class="glyphicon glyphicon-ok gitpatron-green"></span>&nbsp; <strong>Hooray!</strong> Your coinbase wallet has been successfuly integrated with <strong>gitpatron</strong>.#}
+{#                    </div>#}
+{#                </div>#}
+{#                {% endif %}#}
                 <div class="row">
                      <div class="col-md-9" style="padding-left: 0px;">
 

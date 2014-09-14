@@ -290,7 +290,7 @@ class ClaimedIssue(models.Model):
     updated_at = models.DateTimeField(null=True,blank=True)
 
     def __unicode__(self):
-        return '{0} has claimed {1}'.format(self.committer.user.username,self.issue.title)
+        return '{0} has claimed #{1} {2}'.format(self.committer.user.username,self.issue.github_issue_no, self.issue.title)
 
 class WatchedRepository(models.Model):
     repository = models.ForeignKey('Repository',null=True,blank=True)

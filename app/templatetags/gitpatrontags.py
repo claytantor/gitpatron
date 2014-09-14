@@ -80,6 +80,12 @@ def is_claimed(claim_issue):
     return len(claimed) > 0
 
 @register.filter
+def is_claim_closed(claim_issue):
+    #has the user proof? see if there is a fix button for this issue committer
+    claimed = ClaimedIssue.objects.filter(issue=claim_issue,fixed=True)
+    return len(claimed) > 0
+
+@register.filter
 def is_repo_owner(issue,repo_user):
     owned_repo = Repository.objects.filter(id=issue.repository.id,owner__user=repo_user)
     return len(owned_repo) > 0
@@ -147,6 +153,8 @@ def payment_status_filter(issue):
             count += 1
             if is_fixed(issue):
                 count += 1
+            elif is_claim_closed(issue):
+                return "none"
     elif index > 1:
         count = 3;
 
@@ -161,7 +169,7 @@ def payment_status_filter(issue):
 
 @register.filter
 def is_funded(issue):
-    patronage_for_issue = CoinOrder.objects.get(button__issue=issue,button__type='patronage')
+    patronage_for_issue = CoinOrder.objects.filter(button__issue=issue,button__type='patronage')
     return len(patronage_for_issue) > 0
 
 

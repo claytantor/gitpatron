@@ -8,7 +8,7 @@
             </a>
         </td>
         <td class="col-md-1">
-            <a class="btn btn-default btn-xs" target="_blank" href="{{ issue.github_html_url }}">view on github</a>
+            <a class="btn btn-default btn-xs" target="_blank" href="{{ issue.github_html_url }}"><img src="{{ STATIC_URL }}img/github-icon-64.png" class="github-icon"/>&nbsp; View on github</a>
         </td>
         <td class="col-md-2 text-right" id="patronage_button_area_{{ issue.id }}">
             {% include 'repo_button_ajax.html' %}

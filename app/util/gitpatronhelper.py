@@ -1,6 +1,10 @@
+import json
+
 from django.conf import settings
+
 from app.models import Patron
 from app.util.coinbasev1 import CoinbaseV1
+from app.util.mailchimpv1 import MailchimpV1
 
 
 class GitpatronHelper():
@@ -63,3 +67,13 @@ class GitpatronHelper():
 
         return make_resonse
 
+    def is_beta_user(self, username):
+
+        client = MailchimpV1()
+        members = client.get_list(settings.MAILCHIMP_APIKEY,settings.MAILCHIMP_LIST_ID)
+        usernames = []
+        for member in members:
+            usernames.append(member['Github Username'])
+
+        #is the user in the list?
+        return username in usernames

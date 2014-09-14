@@ -18,15 +18,51 @@ body {
     color: #5a5a5a;
 }
 
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+body > .container {
+  padding: 60px 15px 0;
+}
+.container .text-muted {
+  margin: 20px 0;
+}
+
+.footer > .container {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
 
 /*footer*/
 .gitpatron-footer{
-    margin-top: 100px;
+    /*margin-top: 100px;*/
 }
 
 .gitpatron-top-container{
-    margin-top: 100px;
-    min-height: 800px;
+    margin-top: 65px;
+    /*min-height: 800px;*/
 }
 
 .gitpatron-avatar-128 {
@@ -93,27 +129,27 @@ margin: 30px 10px 0px 0px
     height: 25px;
 
 }
-/* CUSTOMIZE THE NAVBAR
--------------------------------------------------- */
+/* CUSTOMIZE THE NAVBAR*/
+/*-------------------------------------------------- */
 
 /* Special class on .container surrounding .navbar, used for positioning it into place. */
-.navbar-wrapper {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 20;
-}
+/*.navbar-wrapper {*/
+  /*position: absolute;*/
+  /*top: 0;*/
+  /*right: 0;*/
+  /*left: 0;*/
+  /*z-index: 20;*/
+/*}*/
 
 /* Flip around the padding for proper display in narrow viewports */
-.navbar-wrapper .container {
-  padding-right: 0;
-  padding-left: 0;
-}
-.navbar-wrapper .navbar {
-  padding-right: 15px;
-  padding-left: 15px;
-}
+/*.navbar-wrapper .container {*/
+  /*padding-right: 0;*/
+  /*padding-left: 0;*/
+/*}*/
+/*.navbar-wrapper .navbar {*/
+  /*padding-right: 15px;*/
+  /*padding-left: 15px;*/
+/*}*/
 
 .navbar-brand{
     padding: 0px 0px;
@@ -400,6 +436,11 @@ margin: 20px 0;
 padding: 20px;
 
     /*display: none;*/
+}
+
+.github-icon {
+    width: 16px;
+    height: 16px;
 }
 
 /*-- issue   ----*/

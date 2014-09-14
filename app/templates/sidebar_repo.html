@@ -1,14 +1,42 @@
 {% load gitpatrontags %}
 <div  class="issue-sidebar">
     <div style="margin-left: 10px; margin-top: 5px;">
-        <div style="margin-bottom: 10px;"><h4>{{ repo.name }}</h4></div>
-{#        <div>#}
-{#            {% if issue.status == 'closed' %}#}
-{#                <span class="label label-danger gitpatron-label text-center" >{{ issue.status }} <span class="glyphicon glyphicon-remove-sign"></span></span>#}
-{#            {% else %}#}
-{#                <span class="label label-success gitpatron-label text-center">{{ issue.status }} <span class="glyphicon glyphicon-ok-circle"></span></span>#}
-{#            {% endif %}#}
-{#        </div>#}
+        <div style="margin-bottom: 10px;"><h4><a href="{% url 'repo' repo.owner.user.username repo.name %}"
+                   data-repoid="{{ repo.id }}"
+                   data-fullname="{{ repo.full_name }}">{{ repo.name }}</a></h4></div>
+
+        <div class="gitpatron-sidebar-value">{{ issues|length }}</div>
+        <div class="gitpatron-sidebar-title">Issues</div>
+        <div class="gitpatron-sidebar-value">{{ repo_patronage_orders|length }}</div>
+        <div class="gitpatron-sidebar-title">Patronage Payments</div>
+        <div class="gitpatron-sidebar-value">{{ sum_patronage_cents|btc_cents }} BTC</div>
+        <div class="gitpatron-sidebar-title">Total Patronage Payments Value</div>
+        <div class="gitpatron-sidebar-value">{{ sum_fix_cents|btc_cents }} BTC</div>
+        <div class="gitpatron-sidebar-title">Payments to Commits</div>
+
+        <div style="margin-top: 30px;">
+{#            <span>#}
+{#                <a href="#"#}
+{#                   type="button"#}
+{#                   class="btn btn-default btn-xs issue-sidebar-share">#}
+{#                   Share</a>#}
+{#                <div id="issue_share"></div>#}
+{#                <script src="{{ STATIC_URL }}js/gitpatron-share-issue.js?issue_id={{ issue.id }}" type="text/javascript"></script>#}
+{#            </span>#}
+
+
+
+
+            <span>
+                <a href="https://twitter.com/share"
+                   class="twitter-share-button"
+                   data-via="gitpatron"
+                   data-text="Donate to the github repo {{ repo.name }}. Your #bitcoin patronage helps open source thrive."
+                   data-lang="en">Tweet</a>
+                <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+            </span>
+        </div>
+
 {#        <div class="gitpatron-sidebar-title">Issue Status</div>#}
 {#        <div>#}
 {#            {% include 'payment_status.html' %}#}

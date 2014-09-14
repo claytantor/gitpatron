@@ -68,8 +68,13 @@ $(document).ready(function() {
             $("#issue_markdown").toggle();
         }
 
+    });
 
-
+    $('button.show_embed_code').click(function (e) {
+        newwindow=window.open("{% url 'issue_popup' issue.id %}",'name','height=300,width=450');
+        newwindow.moveTo(screen.width/2-300,screen.height/2-250);
+        if (window.focus) {newwindow.focus()}
+        return false;
     });
 
 });
@@ -96,7 +101,7 @@ $(document).ready(function() {
               <div class="panel-heading">
                   <div style="width: 50%; display: inline-block;"><h3 class="panel-title">#{{ issue.github_issue_no }} {{ issue.title }}</h3></div>
                   <div style="width: 45%; display: inline-block;" class="text-right">
-                    <a target="_blank" class="btn btn-default btn-xs" href="{{ issue.github_html_url }}">View on github</a>
+                    <a target="_blank" class="btn btn-default btn-xs" href="{{ issue.github_html_url }}"><img src="{{ STATIC_URL }}img/github-icon-64.png" class="github-icon"/>&nbsp; View on github</a>
                     <button type="button" class="btn btn-default btn-xs show_markdown"><span class="show_icon glyphicon glyphicon-eye-open"></span> <span class="show_text">Show Markdown</span></button>
                   </div>
               </div>

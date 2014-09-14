@@ -1,11 +1,12 @@
 {% load gitpatrontags %}
-<div id="footer" class="panel-footer gitpatron-footer">
-  <div class="container">
+<div class="footer">
+      <div class="container">
+
       <div class="col-md-5">
           <p class="muted credit"><span class="glyphicon glyphicon-copyright-mark"></span>&nbsp; gitpatron 2014 version:{% settings_value "GITPATRON_VERSION" %} {% settings_value "GITPATRON_STATE" %} {% settings_value "ENVIRONMENT" %}</p>
       </div>
 
-      <div class="col-md-7" style="margin-top: -5px; float: right; ">
+      <div class="col-md-7" style="margin-top: 5px; float: right; ">
           <a href="{% url 'attribution' %}" style="margin-right: 30px;">attribution</a>&nbsp;
           <a href="http://www.apache.org/licenses/LICENSE-2.0" style="margin-right: 30px;">Apache License, Version 2.0</a>&nbsp;
           <a href='https://coinbase.com/?r=534c8de816403ea6c3000016&utm_campaign=user-referral&src=badge'
@@ -17,7 +18,8 @@
               <img src="{{ STATIC_URL }}img/by-nc-sa.png" style="height: 32px; float: right;"></a>
       </div>
 
-  </div>
+
+      </div>
 </div>
 
 <script>

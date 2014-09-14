@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     url(r'^claimed.html', 'app.views.claimed',name='user_claimed'),
     url(r'^about.html', 'app.views.about_gitpatron',name='about_gitpatron'),
     url(r'^attribution.html', 'app.views.attribution',name='attribution'),
+    url(r'^moderator.html', 'app.views.moderator', name='moderator'),
 
     url(r'^wallet_wf_ajax/([-\w]+)/$', 'app.views.wallet_wf_ajax', name='wallet_wf_ajax'),
 
@@ -118,6 +119,13 @@ urlpatterns = patterns('',
 
     url(r'^settings.html', 'app.views.patron_settings',name='patron_settings'),
 
+    #sharable widgets
+    #issue iframe javascript
+    url(r'^widget/issue.js$', 'app.views.issue_widget_js', name='issue_widget_js'),
+    #issue iframe contents
+    url(r'^widget/issue/([\w]+)/$', 'app.views.issue_widget', name='issue_widget'),
+    #popup contents
+    url(r'^popup/issue/([\w]+)/$', 'app.views.issue_popup', name='issue_popup'),
 
 
 

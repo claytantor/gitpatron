@@ -26,14 +26,14 @@ $(document).ready(function() {
                 <table class="table">
                     {% if github_user.html_url %}
                     <tr>
-                        <td>on github</td><td><a href="{{ github_user.html_url }}">{{ github_user.html_url }}</a></td>
+                        <td>on github</td><td><a href="{{ github_user.html_url }}" target="_blank">{{ github_user.html_url }}</a></td>
                     </tr>
                     {% endif %}
 
 
                     {% if github_user.blog %}
                     <tr>
-                        <td>blog</td><td><a href="{{ github_user.blog }}">{{ github_user.blog }}</a></td>
+                        <td>blog</td><td><a href="{{ github_user.blog }}" target="_blank">{{ github_user.blog }}</a></td>
                     </tr>
                     {% endif %}
                     {% if github_user.email %}

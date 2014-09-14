@@ -6,6 +6,6 @@ class SettingsProfileForm(forms.Form):
        max_length=64,
        required=False)
 
-    auto_merge = forms.BooleanField(label='Auto Merge on Fix Payment')
-
-    auto_close = forms.BooleanField(label='Auto Close on Fix Payment')
+    # auto_merge = forms.BooleanField(label='Auto Merge on Fix Payment')
+    #
+    # auto_close = forms.BooleanField(label='Auto Close on Fix Payment')

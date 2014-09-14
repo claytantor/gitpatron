@@ -1,0 +1,33 @@
+{% load gitpatrontags %}
+{% load markdown_deux_tags %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+
+
+});
+
+</script>
+<body>
+    {% include 'topbar.html' %}
+    <div class="container gitpatron-top-container">
+        <h1>Not In Beta Program</h1>
+        <h2>{{ message }}</h2>
+        <div class="alert alert-danger" role="alert">
+          <strong>You are not in our BETA Program!</strong> We are still working on the website and its not quite ready for prime time. We are
+            only working with key users who can help us improve our site until we are ready. We would love your help though so if you
+            are interested in joining a select community who will have a very special relationship with the site then
+            please <a href="http://eepurl.com/YxMjH">sign up for the BETA program</a> to
+            participate in advance availability for gitpatron.
+        </div>
+
+    </div> <!-- /container -->
+    {% include "footer.html" %}
+</body>
+</html>
+
