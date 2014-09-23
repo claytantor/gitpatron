@@ -118,6 +118,23 @@ $(document).ready(function() {
 
     });
 
+     $('button.show_markdown').click(function (e) {
+        if($('#repo_markdown:visible').length){
+            $(this).find('span.show_icon').removeClass('glyphicon-eye-close');
+            $(this).find('span.show_icon').addClass('glyphicon-eye-open');
+            $(this).find('span.show_text').html('Show Markup');
+            $("#repo_markdown").toggle();
+        }
+        else {
+            $(this).find('span.show_icon').removeClass('glyphicon-eye-open');
+            $(this).find('span.show_icon').addClass('glyphicon-eye-close');
+
+            $(this).find('span.show_text').html('Hide Markup');
+            $("#repo_markdown").toggle();
+        }
+
+    });
+
 
 });
 
@@ -163,12 +180,12 @@ $(document).ready(function() {
                       <div style="width: 50%; display: inline-block;"><h3 class="panel-title">{{ repo.name }}</h3></div>
                       <div style="width: 45%; display: inline-block;" class="text-right">
                           <a target="_blank" class="btn btn-default btn-xs" href="https://github.com/{{ repo.owner.user.username }}/{{ repo.name }}"><img src="{{ STATIC_URL }}img/github-icon-64.png" class="github-icon"/>&nbsp; View on github</a>
-                          <button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-eye-open"></span> Show Markdown</button>
+                          <button type="button" class="btn btn-default btn-xs show_markdown"><span class="glyphicon glyphicon-eye-open show_icon"></span> <span class="show_text">Show Markdown</span></button>
                       </div>
                   </div>
-                  <div class="panel-body" style="display: none">
+                  <div class="panel-body" style="display: none" id="repo_markdown">
 {% markdown  %}
-{{ repo.description }}
+{{ repo.github_description }}
 {% endmarkdown %}
                   </div>
             </div>

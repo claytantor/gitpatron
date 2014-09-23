@@ -3,29 +3,21 @@
   <span class="sidebar-title">Gitpatron</span>
   <div class="list-group">
     <a href="{% url 'patron_settings' %}" class="list-group-item">Settings</a>
+    <a href="{% url 'public_repos' %}" class="list-group-item">Browse Published</a>
   </div>
   </hr>
   <span class="sidebar-title">Github</span>
   <div class="list-group">
     <a href=#" class="list-group-item">Sync with Github</a>
-    <a href="{% url 'user_repos' %}" class="list-group-item">Browse My Github Repos</a>
-    <a href="#" class="list-group-item">Invite a Repo</a>
   </div>
   </hr>
 
-{#  <span class="sidebar-title">Patrons</span>#}
-{#  <div class="list-group">#}
-{#    <a href="{% url 'browse_published_repos' %}" class="list-group-item">Find A Published Repo</a>#}
-{#    <a href="{% url 'public_repos' %}" class="list-group-item">All Published Repos</a>#}
-{#    <a href="{% url 'user_repos' %}" class="list-group-item">Support An Issue</a>#}
-{#  </div>#}
-{#  </hr>#}
 
   <span class="sidebar-title">Repo Owners</span>
   <div class="list-group">
     {% if  request.user|wallet_state_filter >= 5 %}
         <a href="#" class="list-group-item disabled">Authorize My Wallet - DONE</a>
-        <a href="{% url 'user_repos' %}" class="list-group-item">Publish A Repo</a>
+        <a href="{% url 'github_repos' %}" class="list-group-item">Publish A Repo</a>
     {% else %}
         <a href="{% url 'patron_settings' %}" class="list-group-item">Authorize My Wallet</a>
     {% endif %}

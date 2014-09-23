@@ -114,17 +114,27 @@ def home(request,
         context_instance=RequestContext(request))
 
 @login_required(login_url='/login.html')
-def repos(request,
-          template_name="repos.html"):
+def github_repos(request,
+          template_name="ghrepos.html"):
 
     # patron = Patron.objects.get(github_login=request.user.username)
     patron = Patron.objects.get(github_login=request.user.username)
 
     client = GithubV3()
-    repos = client.get_oauth_user_repos(patron.github_access_token)
+    github_repos = client.get_oauth_user_repos(patron.github_access_token)
+
+    #now get the user repos and set which ones are published
+    repos = Repository.objects.filter(owner=patron)
+
+    #set published repos
+    for repo in repos:
+        for ghrepo in github_repos:
+            if ghrepo['full_name'] == repo.fullname:
+                ghrepo['published'] = True
+
 
     return render_to_response(template_name,
-        {'repos':repos},
+        {'repos':github_repos},
         context_instance=RequestContext(request))
 
 @login_required(login_url='/login.html')
@@ -434,7 +444,7 @@ def repo_chart_json(request,git_username,repo_name):
 
 @login_required(login_url='/login.html')
 def publish_repo_ajax(request, git_username,repo_name,
-          template_name="publish_ajax.html"):
+          template_name="ajax_result.html"):
 
     #make sure the user is the owner
     is_published = False
@@ -444,15 +454,19 @@ def publish_repo_ajax(request, git_username,repo_name,
 
         patron = Patron.objects.get(user__username=request.user.username)
 
-        repo_created = Repository.objects.create(
-            name=repo_response['name'],
-            fullname = repo_response['full_name'],
-            github_description=repo_response['description'],
-            private= repo_response['private'] in ['true', 'True'],
-            owner = patron,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow()
-        )
+        #try to get the repo
+        try:
+            repo_exists = Repository.objects.get(fullname=repo_response['full_name'])
+        except ObjectDoesNotExist:
+            repo_created = Repository.objects.create(
+                name=repo_response['name'],
+                fullname = repo_response['full_name'],
+                github_description=repo_response['description'],
+                private= repo_response['private'] in ['true', 'True'],
+                owner = patron,
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
+            )
 
         #get the issues and add those
         issues_response = github_client.get_repo_issues(git_username,repo_name)
@@ -467,7 +481,7 @@ def publish_repo_ajax(request, git_username,repo_name,
         template_name="error_ajax.html"
 
     return render_to_response(template_name,
-            {'repo':repo_created, 'issues':repo_created.issue_set.all(),'is_published':is_published  },
+            {'repo':repo_created, 'issues':repo_created.issue_set.all(),'is_published':is_published, 'ajax_message':'PUBLISHED'  },
             context_instance=RequestContext(request))
 
 @login_required(login_url='/login.html')

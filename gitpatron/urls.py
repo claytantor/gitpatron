@@ -14,8 +14,12 @@ urlpatterns = patterns('',
 
     url(r'^login.html', 'app.views.login_user', name='login'),
 
+    #github repos for the user
+    url(r'^ghrepos.html', 'app.views.github_repos', name='github_repos'),
 
-    url(r'^repos.html', 'app.views.repos', name='user_repos'),
+    #these are the published repos
+    url(r'^public/repos.html', 'app.views.public_repos',name='public_repos'),
+
     url(r'^claimed.html', 'app.views.claimed',name='user_claimed'),
     url(r'^about.html', 'app.views.about_gitpatron',name='about_gitpatron'),
     url(r'^attribution.html', 'app.views.attribution',name='attribution'),
@@ -32,7 +36,7 @@ urlpatterns = patterns('',
     url(r'^repo/([-\w]+)/([-\w]+)/chart.json$',
         'app.views.repo_chart_json', name='repo_chart_json'),
 
-    url(r'^public/repos.html', 'app.views.public_repos',name='public_repos'),
+
 
 
     #publish_repo_ajax

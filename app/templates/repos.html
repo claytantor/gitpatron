@@ -4,36 +4,21 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-    $('button.btn-publish').click(function (e) {
-
-        $(this).find('span').show();
-        $(this).find('span').toggleClass('glyphicon-refresh-animate');
-        var repo_id = $(this).data('repoid');
-        $.ajax({
-            url:"/publish_repo_ajax/"+$(this).data('fullname')+"/",
-
-            success:function(result){
-                $("#publish_area_"+repo_id).html(result);
-            }
-        });
-        return false;
-    });
 
 });
 
 </script>
 <body>
-{#    {% load makenextags  %}#}
     {% include 'topbar.html' %}
-    <div class="container" style="margin-top: 60px;">
-
-        <div class="row">
+    <div class="container gitpatron-top-container">
+        <div class="col-md-12">
             <h1>Repos</h1>
-            <div class="col-md-12">
-                {% include 'repos_table.html' %}
-            </div>
+            {% if repos|length > 0 %}
+            {% include 'repos_table.html' %}
+            {% else %}
+                <h2>No repos have been published yet.</h2>
+            {% endif %}
         </div>
-
     </div> <!-- /container -->
     {% include "footer.html" %}
 </body>

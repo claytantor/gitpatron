@@ -1,0 +1,68 @@
+{% load gitpatrontags %}
+<html>
+{% include 'head.html' %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('button.btn-publish').click(function (e) {
+
+        $(this).find('span').show();
+        $(this).find('span').toggleClass('glyphicon-refresh-animate');
+        var repo_id = $(this).data('repoid');
+        $.ajax({
+            url:"/publish_repo_ajax/"+$(this).data('fullname')+"/",
+            success:function(result){
+                $("#publish_area_"+repo_id).html(result);
+            }
+        });
+        return false;
+    });
+});
+</script>
+<body>
+    {% include 'topbar.html' %}
+    <div class="container gitpatron-top-container">
+        <div class="col-md-12">
+            <h1>Github Repos</h1>
+            {% if repos|length > 0 %}
+                   <table class="table table-striped">
+                    {% for repo in repos %}
+                        {% if not repo.private  %}
+                        <tr>
+                            <td>
+                                <div>{{ repo.name }}&nbsp;</div>
+                                <div>{{ repo.description }}</div>
+                            </td>
+                            <td><a target="_blank" class="btn btn-default btn-xs" href="https://github.com/{{ repo.owner.login }}/{{ repo.name }}"><img src="{{ STATIC_URL }}img/github-icon-64.png" class="github-icon"/>&nbsp; View on github</a></td>
+
+{#                            dont let them publish unless they have activated the wallet#}
+                            {% if  request.user|wallet_state_filter < 5 %}
+                                <td><span class="label label-danger">Activate Wallet To Publish</span></td>
+                            {% else %}
+                                {% if repo.published %}
+                                    <td>PUBLISHED</td>
+                                {% else %}
+                                <td id="publish_area_{{ repo.id }}"><button class="btn btn-default btn-xs btn-publish" href="#" data-repoid="{{ repo.id }}" data-fullname="{{ repo.full_name }}">
+                                    <span class="glyphicon glyphicon-refresh"
+                                      style="display: none"
+                                      id="issue_sync_icon"></span>&nbsp;Publish Repo</button></td>
+                                {% endif %}
+                            {% endif %}
+                        </tr>
+                        {% else %}
+                            <tr>
+                            <td colspan="4">
+                                <div><span class="label label-warning">PRIVATE</span> {{ repo.name }}&nbsp;</div>
+                                <div>{{ repo.description }}</div>
+                            </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </table>
+            {% else %}
+                <h2>No repos have been published yet.</h2>
+            {% endif %}
+        </div>
+    </div> <!-- /container -->
+    {% include "footer.html" %}
+</body>
+</html>
