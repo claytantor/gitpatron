@@ -254,7 +254,7 @@ def wallet_state(wallet_user):
             patron.coinbase_refresh_token = button_response['refresh_token']
             patron.save()
 
-            if(button_response['error_code'] == None):
+            if(button_response['error_code'] == None and patron.wallet_address):
 
                 button_guid = str(uuid.uuid1())
 
